@@ -186,6 +186,12 @@ extern struct node_widget moshiLayer_2;
 extern struct node_widget moshiLayer_3;
 extern struct node_widget moshiLayer_4;
 
+//出水模式
+extern struct node_widget chushui_0;
+extern struct node_widget chushui_1;
+extern struct node_widget chushui_2;
+
+
 //樱雪基础数据
 struct yingxue_base_tag{
 	struct node_widget *yure_time_widget; //预热时间

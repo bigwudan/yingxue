@@ -131,6 +131,19 @@ static void node_widget_up_down(struct node_widget *widget, unsigned char state)
 			sprintf(t_buf, "%d", t_num);
 			ituTextSetString(t_widget, t_buf);
 		}
+		else if (strcmp(widget->name, "chushui_Background13") == 0){
+			t_widget = ituSceneFindWidget(&theScene, "Text38");
+			t_num = atoi(ituTextGetString((ITUText*)t_widget));
+			if (state == 0){
+				t_num = t_num + 1;
+			}
+			else{
+				t_num = t_num - 1;
+			}
+			sprintf(t_buf, "%d", t_num);
+			ituTextSetString(t_widget, t_buf);
+		
+		}
 
 
 		
@@ -158,7 +171,9 @@ static void node_widget_up_down(struct node_widget *widget, unsigned char state)
 				(strcmp(curr_node_widget->name, "moshi_BackgroundButton10") == 0) ||
 				(strcmp(curr_node_widget->name, "moshi_BackgroundButton11") == 0) ||
 				(strcmp(curr_node_widget->name, "moshi_BackgroundButton12") == 0) ||
-				(strcmp(curr_node_widget->name, "moshi_BackgroundButton13") == 0) 
+				(strcmp(curr_node_widget->name, "moshi_BackgroundButton13") == 0) ||
+				(strcmp(curr_node_widget->name, "chushui_BackgroundButton73") == 0)
+				
 				){
 				t_widget = ituSceneFindWidget(&theScene, curr_node_widget->focus_back_name);
 				ituWidgetSetVisible(t_widget, false);
@@ -173,8 +188,10 @@ static void node_widget_up_down(struct node_widget *widget, unsigned char state)
 				(strcmp(t_node_widget->name, "moshi_BackgroundButton10") == 0) ||
 				(strcmp(t_node_widget->name, "moshi_BackgroundButton11") == 0) ||
 				(strcmp(t_node_widget->name, "moshi_BackgroundButton12") == 0) ||
-				(strcmp(t_node_widget->name, "moshi_BackgroundButton13") == 0)
+				(strcmp(t_node_widget->name, "moshi_BackgroundButton13") == 0) || 
+				(strcmp(t_node_widget->name, "chushui_BackgroundButton73") == 0) 
 				){
+
 
 				t_widget = ituSceneFindWidget(&theScene, t_node_widget->focus_back_name);
 				ituWidgetSetVisible(t_widget, true);
@@ -320,6 +337,12 @@ struct node_widget moshiLayer_1;
 struct node_widget moshiLayer_2;
 struct node_widget moshiLayer_3;
 struct node_widget moshiLayer_4;
+
+//出水模式
+struct node_widget chushui_0;
+struct node_widget chushui_1;
+struct node_widget chushui_2;
+
 
 //预热时间
 static void yure_init()
@@ -672,6 +695,23 @@ node_widget_init(void)
 	moshiLayer_4.name = "moshi_BackgroundButton13";
 	moshiLayer_4.confirm_cb = node_widget_confirm_cb;
 	moshiLayer_4.updown_cb = node_widget_up_down;
+
+	//出水
+	chushui_0.up = NULL;
+	chushui_0.down = &chushui_1;
+	chushui_0.focus_back_name = "chushui_BackgroundButton7";
+	chushui_0.name = "chushui_BackgroundButton73";
+	chushui_0.confirm_cb = node_widget_confirm_cb;
+	chushui_0.updown_cb = node_widget_up_down;
+
+	chushui_1.up = &chushui_0;
+	chushui_1.down = NULL;
+	chushui_1.focus_back_name = "chushui_Background37";
+	chushui_1.checked_back_name = "chushui_Background45";
+	chushui_1.name = "chushui_Background13";
+	chushui_1.confirm_cb = node_widget_confirm_cb;
+	chushui_1.updown_cb = node_widget_up_down;
+	chushui_1.type = 1;
 
 	//预热时间
 	yure_init();

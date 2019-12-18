@@ -519,7 +519,7 @@ bool YX_MenuOnEnter(ITUWidget* widget, char* param)
 	//MainLayer 首页
 	if (strcmp(widget->name, "MainLayer") == 0){
 		//test
-		ituLayerGoto(ituSceneFindWidget(&theScene, "moshiLayer"));
+		ituLayerGoto(ituSceneFindWidget(&theScene, "chushui"));
 		return true;
 		//全部隐藏
 		t_widget = ituSceneFindWidget(&theScene, "Background100");
@@ -629,6 +629,33 @@ bool YX_MenuOnEnter(ITUWidget* widget, char* param)
 		//4
 		t_widget = ituSceneFindWidget(&theScene, "moshi_BackgroundButton82");
 		ituWidgetSetVisible(t_widget, false);
+	}
+	//出水设置
+	else if ( strcmp(widget->name, "chushui") == 0 ){
+		//默认第一个
+		curr_node_widget = &chushui_0;
+
+		//1
+		t_widget = ituSceneFindWidget(&theScene, "chushui_BackgroundButton73");
+		ituWidgetSetVisible(t_widget, false);
+
+		//2
+		//本体
+		//t_widget = ituSceneFindWidget(&theScene, "chushui_Background13");
+		//ituWidgetSetVisible(t_widget, false);
+
+		//选中背景
+		t_widget = ituSceneFindWidget(&theScene, "chushui_Background45");
+		ituWidgetSetVisible(t_widget, false);
+		//焦点
+		t_widget = ituSceneFindWidget(&theScene, "chushui_Background37");
+		ituWidgetSetVisible(t_widget, false);
+
+
+		//2
+		//t_widget = ituSceneFindWidget(&theScene, "chushui_BackgroundButton15");
+		//ituWidgetSetVisible(t_widget, false);
+
 	}
 
 }
