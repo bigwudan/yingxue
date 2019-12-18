@@ -646,7 +646,7 @@ node_widget_init(void)
 	moshiLayer_0.updown_cb = node_widget_up_down;
 	
 	moshiLayer_1.up = &moshiLayer_0;
-	moshiLayer_1.down = &moshiLayer_1;
+	moshiLayer_1.down = &moshiLayer_2;
 	moshiLayer_1.focus_back_name = "BackgroundButton80";
 	moshiLayer_1.name = "BackgroundButton10";
 	moshiLayer_1.confirm_cb = node_widget_confirm_cb;
@@ -654,8 +654,8 @@ node_widget_init(void)
 
 	moshiLayer_2.up = &moshiLayer_1;
 	moshiLayer_2.down = &moshiLayer_3;
-	moshiLayer_2.focus_back_name = "BackgroundButton11";
-	moshiLayer_2.name = "BackgroundButton79";
+	moshiLayer_2.focus_back_name = "BackgroundButton79";
+	moshiLayer_2.name = "BackgroundButton11";
 	moshiLayer_2.confirm_cb = node_widget_confirm_cb;
 	moshiLayer_2.updown_cb = node_widget_up_down;
 

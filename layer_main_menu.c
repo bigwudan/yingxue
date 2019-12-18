@@ -615,11 +615,29 @@ bool YX_MenuOnEnter(ITUWidget* widget, char* param)
 		t_widget = ituSceneFindWidget(&theScene, "BackgroundButton68");
 		ituWidgetSetVisible(t_widget, false);
 
+		t_widget = ituSceneFindWidget(&theScene, "BackgroundButton33");
+		ituWidgetSetVisible(t_widget, false);
+
+		//1
 		t_widget = ituSceneFindWidget(&theScene, "BackgroundButton80");
+		ituWidgetSetVisible(t_widget, false);
+		t_widget = ituSceneFindWidget(&theScene, "BackgroundButton10");
+		ituWidgetSetVisible(t_widget, false);
+
+		//2
+		t_widget = ituSceneFindWidget(&theScene, "BackgroundButton79");
 		ituWidgetSetVisible(t_widget, false);
 		t_widget = ituSceneFindWidget(&theScene, "BackgroundButton11");
 		ituWidgetSetVisible(t_widget, false);
-		t_widget = ituSceneFindWidget(&theScene, "BackgroundButton12");
+
+		//3
+		t_widget = ituSceneFindWidget(&theScene, "BackgroundButton81");
+		ituWidgetSetVisible(t_widget, false);
+		t_widget = ituSceneFindWidget(&theScene, "BackgroundButton13");
+		ituWidgetSetVisible(t_widget, false);
+
+		//4
+		t_widget = ituSceneFindWidget(&theScene, "BackgroundButton82");
 		ituWidgetSetVisible(t_widget, false);
 		t_widget = ituSceneFindWidget(&theScene, "BackgroundButton13");
 		ituWidgetSetVisible(t_widget, false);
