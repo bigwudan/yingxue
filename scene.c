@@ -118,6 +118,19 @@ static void node_widget_up_down(struct node_widget *widget, unsigned char state)
 			sprintf(t_buf, "%d", t_num);
 			ituTextSetString(t_widget, t_buf);
 		}
+		else if (strcmp(widget->name, "Background4") == 0){
+		
+			t_widget = ituSceneFindWidget(&theScene, "Text43");
+			t_num = atoi(ituTextGetString((ITUText*)t_widget));
+			if (state == 0){
+				t_num = t_num + 1;
+			}
+			else{
+				t_num = t_num - 1;
+			}
+			sprintf(t_buf, "%d", t_num);
+			ituTextSetString(t_widget, t_buf);
+		}
 
 
 		
@@ -591,13 +604,23 @@ node_widget_init(void)
 	yureshezhiLayer_1.type = 1;
 
 	yureshezhiLayer_2.up = &yureshezhiLayer_1;
-	yureshezhiLayer_2.down = NULL;
+	yureshezhiLayer_2.down = &yureshezhiLayer_3;
 	yureshezhiLayer_2.focus_back_name = "Background33";
 	yureshezhiLayer_2.checked_back_name = "Background105";
 	yureshezhiLayer_2.name = "Background3";
 	yureshezhiLayer_2.confirm_cb = node_widget_confirm_cb;
 	yureshezhiLayer_2.updown_cb = node_widget_up_down;
 	yureshezhiLayer_2.type = 1;
+
+
+	yureshezhiLayer_3.up = &yureshezhiLayer_2;
+	yureshezhiLayer_3.down = NULL;
+	yureshezhiLayer_3.focus_back_name = "Background40";
+	yureshezhiLayer_3.checked_back_name = "Background107";
+	yureshezhiLayer_3.name = "Background4";
+	yureshezhiLayer_3.confirm_cb = node_widget_confirm_cb;
+	yureshezhiLayer_3.updown_cb = node_widget_up_down;
+	yureshezhiLayer_3.type = 1;
 
 	//‘§»» ±º‰
 	yure_init();

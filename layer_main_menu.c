@@ -602,8 +602,13 @@ bool YX_MenuOnEnter(ITUWidget* widget, char* param)
 		ituWidgetSetVisible(t_widget, false);
 
 
-		//Background40
+		//Background4
+		//焦点
 		t_widget = ituSceneFindWidget(&theScene, "Background40");
+		ituWidgetSetVisible(t_widget, false);
+
+		//选中背景
+		t_widget = ituSceneFindWidget(&theScene, "Background107");
 		ituWidgetSetVisible(t_widget, false);
 
 	}
