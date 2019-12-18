@@ -153,9 +153,13 @@ static void node_widget_up_down(struct node_widget *widget, unsigned char state)
 			//如果之前的控件是需要整个变换背景，
 			if ((strcmp(curr_node_widget->name, "BackgroundButton47") == 0) ||
 				(strcmp(curr_node_widget->name, "BackgroundButton65") == 0) ||
-				(strcmp(curr_node_widget->name, "BackgroundButton60") == 0)
+				(strcmp(curr_node_widget->name, "BackgroundButton60") == 0) ||
+				(strcmp(curr_node_widget->name, "BackgroundButton68") == 0) ||
+				(strcmp(curr_node_widget->name, "BackgroundButton10") == 0) ||
+				(strcmp(curr_node_widget->name, "BackgroundButton79") == 0) ||
+				(strcmp(curr_node_widget->name, "BackgroundButton81") == 0) ||
+				(strcmp(curr_node_widget->name, "BackgroundButton82") == 0) 
 				){
-
 				t_widget = ituSceneFindWidget(&theScene, curr_node_widget->focus_back_name);
 				ituWidgetSetVisible(t_widget, false);
 				t_widget = ituSceneFindWidget(&theScene, curr_node_widget->name);
@@ -164,7 +168,12 @@ static void node_widget_up_down(struct node_widget *widget, unsigned char state)
 
 			if ((strcmp(t_node_widget->name, "BackgroundButton47") == 0) ||
 				(strcmp(t_node_widget->name, "BackgroundButton65") == 0) ||
-				(strcmp(t_node_widget->name, "BackgroundButton60") == 0)
+				(strcmp(t_node_widget->name, "BackgroundButton60") == 0) ||
+				(strcmp(t_node_widget->name, "BackgroundButton68") == 0) ||
+				(strcmp(t_node_widget->name, "BackgroundButton10") == 0) ||
+				(strcmp(t_node_widget->name, "BackgroundButton79") == 0) ||
+				(strcmp(t_node_widget->name, "BackgroundButton81") == 0) ||
+				(strcmp(t_node_widget->name, "BackgroundButton82") == 0)
 				){
 
 				t_widget = ituSceneFindWidget(&theScene, t_node_widget->focus_back_name);
@@ -305,7 +314,12 @@ struct node_widget yureshezhiLayer_1;
 struct node_widget yureshezhiLayer_2;
 struct node_widget yureshezhiLayer_3;
 
-
+//模式
+struct node_widget moshiLayer_0;
+struct node_widget moshiLayer_1;
+struct node_widget moshiLayer_2;
+struct node_widget moshiLayer_3;
+struct node_widget moshiLayer_4;
 
 //预热时间
 static void yure_init()
@@ -621,6 +635,43 @@ node_widget_init(void)
 	yureshezhiLayer_3.confirm_cb = node_widget_confirm_cb;
 	yureshezhiLayer_3.updown_cb = node_widget_up_down;
 	yureshezhiLayer_3.type = 1;
+
+
+	//模式
+	moshiLayer_0.up = NULL;
+	moshiLayer_0.down = &moshiLayer_1;
+	moshiLayer_0.focus_back_name = "BackgroundButton33";
+	moshiLayer_0.name = "BackgroundButton68";
+	moshiLayer_0.confirm_cb = node_widget_confirm_cb;
+	moshiLayer_0.updown_cb = node_widget_up_down;
+	
+	moshiLayer_1.up = &moshiLayer_0;
+	moshiLayer_1.down = &moshiLayer_1;
+	moshiLayer_1.focus_back_name = "BackgroundButton80";
+	moshiLayer_1.name = "BackgroundButton10";
+	moshiLayer_1.confirm_cb = node_widget_confirm_cb;
+	moshiLayer_1.updown_cb = node_widget_up_down;
+
+	moshiLayer_2.up = &moshiLayer_1;
+	moshiLayer_2.down = &moshiLayer_3;
+	moshiLayer_2.focus_back_name = "BackgroundButton11";
+	moshiLayer_2.name = "BackgroundButton79";
+	moshiLayer_2.confirm_cb = node_widget_confirm_cb;
+	moshiLayer_2.updown_cb = node_widget_up_down;
+
+	moshiLayer_3.up = &moshiLayer_2;
+	moshiLayer_3.down = &moshiLayer_4;
+	moshiLayer_3.focus_back_name = "BackgroundButton12";
+	moshiLayer_3.name = "BackgroundButton81";
+	moshiLayer_3.confirm_cb = node_widget_confirm_cb;
+	moshiLayer_3.updown_cb = node_widget_up_down;
+
+	moshiLayer_4.up = &moshiLayer_1;
+	moshiLayer_4.down = &moshiLayer_3;
+	moshiLayer_4.focus_back_name = "BackgroundButton13";
+	moshiLayer_4.name = "BackgroundButton82";
+	moshiLayer_4.confirm_cb = node_widget_confirm_cb;
+	moshiLayer_4.updown_cb = node_widget_up_down;
 
 	//预热时间
 	yure_init();

@@ -519,7 +519,7 @@ bool YX_MenuOnEnter(ITUWidget* widget, char* param)
 	//MainLayer 首页
 	if (strcmp(widget->name, "MainLayer") == 0){
 		//test
-		ituLayerGoto(ituSceneFindWidget(&theScene, "yureshezhiLayer"));
+		ituLayerGoto(ituSceneFindWidget(&theScene, "moshiLayer"));
 		return true;
 		//全部隐藏
 		t_widget = ituSceneFindWidget(&theScene, "Background100");
@@ -588,10 +588,6 @@ bool YX_MenuOnEnter(ITUWidget* widget, char* param)
 		//选中背景
 		t_widget = ituSceneFindWidget(&theScene, "Background45");
 		ituWidgetSetVisible(t_widget, false);
-
-		
-
-
 		//Background33
 		//焦点选框
 		t_widget = ituSceneFindWidget(&theScene, "Background33");
@@ -611,6 +607,22 @@ bool YX_MenuOnEnter(ITUWidget* widget, char* param)
 		t_widget = ituSceneFindWidget(&theScene, "Background107");
 		ituWidgetSetVisible(t_widget, false);
 
+	}
+	else if (strcmp(widget->name, "moshiLayer") == 0){
+		//默认选中第一个
+		curr_node_widget = &moshiLayer_0;
+
+		t_widget = ituSceneFindWidget(&theScene, "BackgroundButton68");
+		ituWidgetSetVisible(t_widget, false);
+
+		t_widget = ituSceneFindWidget(&theScene, "BackgroundButton80");
+		ituWidgetSetVisible(t_widget, false);
+		t_widget = ituSceneFindWidget(&theScene, "BackgroundButton11");
+		ituWidgetSetVisible(t_widget, false);
+		t_widget = ituSceneFindWidget(&theScene, "BackgroundButton12");
+		ituWidgetSetVisible(t_widget, false);
+		t_widget = ituSceneFindWidget(&theScene, "BackgroundButton13");
+		ituWidgetSetVisible(t_widget, false);
 	}
 
 }

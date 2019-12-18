@@ -179,7 +179,12 @@ extern struct node_widget yureshezhiLayer_1;
 extern struct node_widget yureshezhiLayer_2;
 extern struct node_widget yureshezhiLayer_3;
 
-
+//模式
+extern struct node_widget moshiLayer_0;
+extern struct node_widget moshiLayer_1;
+extern struct node_widget moshiLayer_2;
+extern struct node_widget moshiLayer_3;
+extern struct node_widget moshiLayer_4;
 
 //樱雪基础数据
 struct yingxue_base_tag{
