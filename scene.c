@@ -155,10 +155,10 @@ static void node_widget_up_down(struct node_widget *widget, unsigned char state)
 				(strcmp(curr_node_widget->name, "BackgroundButton65") == 0) ||
 				(strcmp(curr_node_widget->name, "BackgroundButton60") == 0) ||
 				(strcmp(curr_node_widget->name, "BackgroundButton68") == 0) ||
-				(strcmp(curr_node_widget->name, "BackgroundButton10") == 0) ||
-				(strcmp(curr_node_widget->name, "BackgroundButton79") == 0) ||
-				(strcmp(curr_node_widget->name, "BackgroundButton81") == 0) ||
-				(strcmp(curr_node_widget->name, "BackgroundButton82") == 0) 
+				(strcmp(curr_node_widget->name, "moshi_BackgroundButton10") == 0) ||
+				(strcmp(curr_node_widget->name, "moshi_BackgroundButton11") == 0) ||
+				(strcmp(curr_node_widget->name, "moshi_BackgroundButton12") == 0) ||
+				(strcmp(curr_node_widget->name, "moshi_BackgroundButton13") == 0) 
 				){
 				t_widget = ituSceneFindWidget(&theScene, curr_node_widget->focus_back_name);
 				ituWidgetSetVisible(t_widget, false);
@@ -170,10 +170,10 @@ static void node_widget_up_down(struct node_widget *widget, unsigned char state)
 				(strcmp(t_node_widget->name, "BackgroundButton65") == 0) ||
 				(strcmp(t_node_widget->name, "BackgroundButton60") == 0) ||
 				(strcmp(t_node_widget->name, "BackgroundButton68") == 0) ||
-				(strcmp(t_node_widget->name, "BackgroundButton10") == 0) ||
-				(strcmp(t_node_widget->name, "BackgroundButton79") == 0) ||
-				(strcmp(t_node_widget->name, "BackgroundButton81") == 0) ||
-				(strcmp(t_node_widget->name, "BackgroundButton82") == 0)
+				(strcmp(t_node_widget->name, "moshi_BackgroundButton10") == 0) ||
+				(strcmp(t_node_widget->name, "moshi_BackgroundButton11") == 0) ||
+				(strcmp(t_node_widget->name, "moshi_BackgroundButton12") == 0) ||
+				(strcmp(t_node_widget->name, "moshi_BackgroundButton13") == 0)
 				){
 
 				t_widget = ituSceneFindWidget(&theScene, t_node_widget->focus_back_name);
@@ -647,29 +647,29 @@ node_widget_init(void)
 	
 	moshiLayer_1.up = &moshiLayer_0;
 	moshiLayer_1.down = &moshiLayer_2;
-	moshiLayer_1.focus_back_name = "BackgroundButton80";
-	moshiLayer_1.name = "BackgroundButton10";
+	moshiLayer_1.focus_back_name = "moshi_BackgroundButton80";
+	moshiLayer_1.name = "moshi_BackgroundButton10";
 	moshiLayer_1.confirm_cb = node_widget_confirm_cb;
 	moshiLayer_1.updown_cb = node_widget_up_down;
 
 	moshiLayer_2.up = &moshiLayer_1;
 	moshiLayer_2.down = &moshiLayer_3;
-	moshiLayer_2.focus_back_name = "BackgroundButton79";
-	moshiLayer_2.name = "BackgroundButton11";
+	moshiLayer_2.focus_back_name = "moshi_BackgroundButton79";
+	moshiLayer_2.name = "moshi_BackgroundButton11";
 	moshiLayer_2.confirm_cb = node_widget_confirm_cb;
 	moshiLayer_2.updown_cb = node_widget_up_down;
 
 	moshiLayer_3.up = &moshiLayer_2;
 	moshiLayer_3.down = &moshiLayer_4;
-	moshiLayer_3.focus_back_name = "BackgroundButton12";
-	moshiLayer_3.name = "BackgroundButton81";
+	moshiLayer_3.focus_back_name = "moshi_BackgroundButton81";
+	moshiLayer_3.name = "moshi_BackgroundButton12";
 	moshiLayer_3.confirm_cb = node_widget_confirm_cb;
 	moshiLayer_3.updown_cb = node_widget_up_down;
 
-	moshiLayer_4.up = &moshiLayer_1;
-	moshiLayer_4.down = &moshiLayer_3;
-	moshiLayer_4.focus_back_name = "BackgroundButton13";
-	moshiLayer_4.name = "BackgroundButton82";
+	moshiLayer_4.up = &moshiLayer_3;
+	moshiLayer_4.down = NULL;
+	moshiLayer_4.focus_back_name = "moshi_BackgroundButton82";
+	moshiLayer_4.name = "moshi_BackgroundButton13";
 	moshiLayer_4.confirm_cb = node_widget_confirm_cb;
 	moshiLayer_4.updown_cb = node_widget_up_down;
 

@@ -615,32 +615,31 @@ bool YX_MenuOnEnter(ITUWidget* widget, char* param)
 		t_widget = ituSceneFindWidget(&theScene, "BackgroundButton68");
 		ituWidgetSetVisible(t_widget, false);
 
-		t_widget = ituSceneFindWidget(&theScene, "BackgroundButton33");
-		ituWidgetSetVisible(t_widget, false);
+	
 
 		//1
-		t_widget = ituSceneFindWidget(&theScene, "BackgroundButton80");
+		t_widget = ituSceneFindWidget(&theScene, "moshi_BackgroundButton80");
 		ituWidgetSetVisible(t_widget, false);
-		t_widget = ituSceneFindWidget(&theScene, "BackgroundButton10");
-		ituWidgetSetVisible(t_widget, false);
+		//t_widget = ituSceneFindWidget(&theScene, "moshi_BackgroundButton10");
+		//ituWidgetSetVisible(t_widget, false);
 
 		//2
-		t_widget = ituSceneFindWidget(&theScene, "BackgroundButton79");
+		t_widget = ituSceneFindWidget(&theScene, "moshi_BackgroundButton79");
 		ituWidgetSetVisible(t_widget, false);
-		t_widget = ituSceneFindWidget(&theScene, "BackgroundButton11");
-		ituWidgetSetVisible(t_widget, false);
+		//t_widget = ituSceneFindWidget(&theScene, "moshi_BackgroundButton11");
+		//ituWidgetSetVisible(t_widget, false);
 
 		//3
-		t_widget = ituSceneFindWidget(&theScene, "BackgroundButton81");
+		t_widget = ituSceneFindWidget(&theScene, "moshi_BackgroundButton81");
 		ituWidgetSetVisible(t_widget, false);
-		t_widget = ituSceneFindWidget(&theScene, "BackgroundButton13");
-		ituWidgetSetVisible(t_widget, false);
+		//t_widget = ituSceneFindWidget(&theScene, "moshi_BackgroundButton12");
+		//ituWidgetSetVisible(t_widget, false);
 
 		//4
-		t_widget = ituSceneFindWidget(&theScene, "BackgroundButton82");
+		t_widget = ituSceneFindWidget(&theScene, "moshi_BackgroundButton82");
 		ituWidgetSetVisible(t_widget, false);
-		t_widget = ituSceneFindWidget(&theScene, "BackgroundButton13");
-		ituWidgetSetVisible(t_widget, false);
+		//t_widget = ituSceneFindWidget(&theScene, "moshi_BackgroundButton13");
+		//ituWidgetSetVisible(t_widget, false);
 	}
 
 }
