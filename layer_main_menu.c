@@ -533,9 +533,7 @@ bool YX_MenuOnEnter(ITUWidget* widget, char* param)
 		t_widget = ituSceneFindWidget(&theScene, "Background134");
 		ituWidgetSetVisible(t_widget, false);
 
-		//第三个大框中的小框
-/*		t_widget = ituSceneFindWidget(&theScene, "Background94");
-		ituWidgetSetVisible(t_widget, false);*/
+
 
 
 		//默认选中第一个
@@ -564,7 +562,9 @@ bool YX_MenuOnEnter(ITUWidget* widget, char* param)
 		t_widget = ituSceneFindWidget(&theScene, "Background132");
 		ituWidgetSetVisible(t_widget, false);
 
-		
+		//第三个大框中的小框
+		t_widget = ituSceneFindWidget(&theScene, "Background94");
+		ituWidgetSetVisible(t_widget, false);
 
 		//默认选中第一个
 		curr_node_widget = &yureLayer_0;
