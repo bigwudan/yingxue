@@ -122,7 +122,8 @@ struct node_widget
 	char *name; //控件名称
 	char *focus_back_name; //选中控件背景
 	char *checked_back_name; //确定控件背景
-	uint8_t state; //状态0选中 1锁定
+	uint8_t state; //状态0焦点 1锁定
+	uint8_t type; //类型 0 普通 1可以锁定 2长按
 	node_widget_cb updown_cb; //点击向上回调
 	node_widget_cb confirm_cb; //确认回调
 };

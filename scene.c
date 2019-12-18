@@ -82,80 +82,112 @@ extern void ScreenSetDoubleClick(void);
 
 //点击上下键，回调函数
 //@param widget 点击空间
-//@param state 0向下 1向上
+//@param state 0向上 1向下
 static void node_widget_up_down(struct node_widget *widget, unsigned char state)
 {
 	struct node_widget *t_node_widget = NULL;
 	struct ITUWidget *t_widget = NULL;
+	char t_buf[20] = { 0 };
 
-	if (state == 0){
-		if (widget->up)
-			t_node_widget = widget->up;
+	int t_num = 0;
+
+
+	//如果已经锁定
+	if (widget->state == 1){
+		if (strcmp(widget->name, "Background2") == 0){
+			t_widget = ituSceneFindWidget(&theScene, "Text3");
+			t_num = atoi(ituTextGetString((ITUText*)t_widget));
+			if (state == 0){
+				t_num = t_num + 1;
+			}
+			else{
+				t_num = t_num - 1;
+			}
+			sprintf(t_buf, "%d", t_num);
+			ituTextSetString(t_widget, t_buf);
+		}
+		else if (strcmp(widget->name, "Background3") == 0){
+			t_widget = ituSceneFindWidget(&theScene, "Text42");
+			t_num = atoi(ituTextGetString((ITUText*)t_widget));
+			if (state == 0){
+				t_num = t_num + 1;
+			}
+			else{
+				t_num = t_num - 1;
+			}
+			sprintf(t_buf, "%d", t_num);
+			ituTextSetString(t_widget, t_buf);
+		}
+
+
+		
+
+
 	}
 	else{
-		if (widget->down){
-			t_node_widget = widget->down;
-		}
-			
-	}
-
-	if (t_node_widget){
-		//如果之前的控件是需要整个变换背景，
-		if ((strcmp(curr_node_widget->name, "BackgroundButton47") == 0) ||
-			(strcmp(curr_node_widget->name, "BackgroundButton65") == 0) ||
-			(strcmp(curr_node_widget->name, "BackgroundButton60") == 0)
-			){
-
-			t_widget = ituSceneFindWidget(&theScene, curr_node_widget->focus_back_name);
-			ituWidgetSetVisible(t_widget, false);
-			t_widget = ituSceneFindWidget(&theScene, curr_node_widget->name);
-			ituWidgetSetVisible(t_widget, true);
-		}
-
-		if ((strcmp(t_node_widget->name, "BackgroundButton47") == 0) ||
-			(strcmp(t_node_widget->name, "BackgroundButton65") == 0) ||
-			(strcmp(t_node_widget->name, "BackgroundButton60") == 0)
-			){
-
-			t_widget = ituSceneFindWidget(&theScene, t_node_widget->focus_back_name);
-			ituWidgetSetVisible(t_widget, true);
-			t_widget = ituSceneFindWidget(&theScene, t_node_widget->name);
-			ituWidgetSetVisible(t_widget, false);
-			curr_node_widget = t_node_widget;
-		}
-		else if (strcmp(t_node_widget->focus_back_name, "radio") == 0){
-			t_widget = ituSceneFindWidget(&theScene, t_node_widget->name);
-			ituFocusWidget(t_widget);
-			curr_node_widget = t_node_widget;
+		if (state == 0){
+			if (widget->up)
+				t_node_widget = widget->up;
 		}
 		else{
-			//隐藏当前控件选中状态
-			t_widget = ituSceneFindWidget(&theScene, curr_node_widget->focus_back_name);
-			ituWidgetSetVisible(t_widget, false);
-			/*if ((strcmp(curr_node_widget->name, "BackgroundButton47") == 0) || 
+			if (widget->down){
+				t_node_widget = widget->down;
+			}
+
+		}
+
+		if (t_node_widget){
+			//如果之前的控件是需要整个变换背景，
+			if ((strcmp(curr_node_widget->name, "BackgroundButton47") == 0) ||
+				(strcmp(curr_node_widget->name, "BackgroundButton65") == 0) ||
+				(strcmp(curr_node_widget->name, "BackgroundButton60") == 0)
+				){
+
+				t_widget = ituSceneFindWidget(&theScene, curr_node_widget->focus_back_name);
+				ituWidgetSetVisible(t_widget, false);
+				t_widget = ituSceneFindWidget(&theScene, curr_node_widget->name);
+				ituWidgetSetVisible(t_widget, true);
+			}
+
+			if ((strcmp(t_node_widget->name, "BackgroundButton47") == 0) ||
+				(strcmp(t_node_widget->name, "BackgroundButton65") == 0) ||
+				(strcmp(t_node_widget->name, "BackgroundButton60") == 0)
+				){
+
+				t_widget = ituSceneFindWidget(&theScene, t_node_widget->focus_back_name);
+				ituWidgetSetVisible(t_widget, true);
+				t_widget = ituSceneFindWidget(&theScene, t_node_widget->name);
+				ituWidgetSetVisible(t_widget, false);
+				curr_node_widget = t_node_widget;
+			}
+			else if (strcmp(t_node_widget->focus_back_name, "radio") == 0){
+				t_widget = ituSceneFindWidget(&theScene, t_node_widget->name);
+				ituFocusWidget(t_widget);
+				curr_node_widget = t_node_widget;
+			}
+			else{
+				//隐藏当前控件选中状态
+				t_widget = ituSceneFindWidget(&theScene, curr_node_widget->focus_back_name);
+				ituWidgetSetVisible(t_widget, false);
+				/*if ((strcmp(curr_node_widget->name, "BackgroundButton47") == 0) ||
 				(strcmp(curr_node_widget->name, "BackgroundButton30") == 0)){
 				t_widget = ituSceneFindWidget(&theScene, curr_node_widget->name);
 				ituWidgetSetVisible(t_widget, true);
-			}*/
-			//显示当前的控件
-			t_widget = ituSceneFindWidget(&theScene, t_node_widget->focus_back_name);
-			ituWidgetSetVisible(t_widget, true);
-			curr_node_widget = t_node_widget;
-			/*if ( (strcmp(curr_node_widget->name, "BackgroundButton47") == 0) ||
+				}*/
+				//显示当前的控件
+				t_widget = ituSceneFindWidget(&theScene, t_node_widget->focus_back_name);
+				ituWidgetSetVisible(t_widget, true);
+				curr_node_widget = t_node_widget;
+				/*if ( (strcmp(curr_node_widget->name, "BackgroundButton47") == 0) ||
 				(strcmp(curr_node_widget->name, "BackgroundButton30") == 0)){
 				t_widget = ituSceneFindWidget(&theScene, curr_node_widget->focus_back_name);
 				ituWidgetSetVisible(t_widget, true);
 				t_widget = ituSceneFindWidget(&theScene, curr_node_widget->name);
 				ituWidgetSetVisible(t_widget, false);
 
-			}*/
+				}*/
+			}
 		}
-
-		
-		
-
-
-
 	}
 
 }
@@ -172,8 +204,6 @@ static void node_widget_confirm_cb(struct node_widget *widget, u8_t state)
 	}
 	//点击单项按键
 	else if (strcmp(widget->focus_back_name, "radio") == 0){
-		
-
 		//如果两次点击都是同一，取消
 		if (widget == yingxue_base.yure_time_widget){
 			t_widget = ituSceneFindWidget(&theScene, widget->name);
@@ -191,7 +221,21 @@ static void node_widget_confirm_cb(struct node_widget *widget, u8_t state)
 		}
 		yingxue_base.yure_time_widget = widget;
 	}
-
+	//支持长按
+	else if (widget->type == 1){
+		if (widget->state == 0){
+			//锁定
+			widget->state = 1;
+			t_widget = ituSceneFindWidget(&theScene, widget->checked_back_name);
+			ituWidgetSetVisible(t_widget, true);
+		}
+		else{
+			//解除锁定
+			widget->state = 0;
+			t_widget = ituSceneFindWidget(&theScene, widget->checked_back_name);
+			ituWidgetSetVisible(t_widget, false);
+		}
+	}
 }
 
 
@@ -544,6 +588,7 @@ node_widget_init(void)
 	yureshezhiLayer_1.name = "Background2";
 	yureshezhiLayer_1.confirm_cb = node_widget_confirm_cb;
 	yureshezhiLayer_1.updown_cb = node_widget_up_down;
+	yureshezhiLayer_1.type = 1;
 
 	yureshezhiLayer_2.up = &yureshezhiLayer_1;
 	yureshezhiLayer_2.down = NULL;
@@ -552,6 +597,7 @@ node_widget_init(void)
 	yureshezhiLayer_2.name = "Background3";
 	yureshezhiLayer_2.confirm_cb = node_widget_confirm_cb;
 	yureshezhiLayer_2.updown_cb = node_widget_up_down;
+	yureshezhiLayer_2.type = 1;
 
 	//预热时间
 	yure_init();
