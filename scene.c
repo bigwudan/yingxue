@@ -495,12 +495,28 @@ node_widget_init(void)
 	yureLayer_2.confirm_cb = node_widget_confirm_cb;
 	yureLayer_2.updown_cb = node_widget_up_down;
 
+
 	yureLayer_3.up = &yureLayer_2;
-	yureLayer_3.down = NULL;
-	yureLayer_3.focus_back_name = "Background46";
-	yureLayer_3.name = "BackgroundButton21";
+	yureLayer_3.down = &yureLayer_4;
+	yureLayer_3.focus_back_name = "Background132";
+	yureLayer_3.name = "BackgroundButton20";
 	yureLayer_3.confirm_cb = node_widget_confirm_cb;
 	yureLayer_3.updown_cb = node_widget_up_down;
+
+	yureLayer_4.up = &yureLayer_3;
+	yureLayer_4.down = &yureLayer_5;
+	yureLayer_4.focus_back_name = "Background94";
+	yureLayer_4.name = "BackgroundButton2";
+	yureLayer_4.confirm_cb = node_widget_confirm_cb;
+	yureLayer_4.updown_cb = node_widget_up_down;
+
+	yureLayer_5.up = &yureLayer_4;
+	yureLayer_5.down = NULL;
+	yureLayer_5.focus_back_name = "Background46";
+	yureLayer_5.name = "BackgroundButton21";
+	yureLayer_5.confirm_cb = node_widget_confirm_cb;
+	yureLayer_5.updown_cb = node_widget_up_down;
+
 
 	//‘§»» ±º‰
 	yure_init();
