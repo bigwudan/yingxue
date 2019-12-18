@@ -519,53 +519,36 @@ bool YX_MenuOnEnter(ITUWidget* widget, char* param)
 	//MainLayer 首页
 	if (strcmp(widget->name, "MainLayer") == 0){
 		//test
-		ituLayerGoto(ituSceneFindWidget(&theScene, "yureLayer"));
+		ituLayerGoto(ituSceneFindWidget(&theScene, "yureshezhiLayer"));
 		return true;
-
 		//全部隐藏
 		t_widget = ituSceneFindWidget(&theScene, "Background100");
 		ituWidgetSetVisible(t_widget, false);
-
 		t_widget = ituSceneFindWidget(&theScene, "Background102");
 		ituWidgetSetVisible(t_widget, false);
-
 		//第三个大框
 		t_widget = ituSceneFindWidget(&theScene, "Background134");
 		ituWidgetSetVisible(t_widget, false);
-
-
-
-
 		//默认选中第一个
 		curr_node_widget = &mainlayer_0;
 		t_widget = ituSceneFindWidget(&theScene, curr_node_widget->focus_back_name);
 		ituWidgetSetVisible(t_widget, true);
-
-
-
-
 	}
 	else if (strcmp(widget->name, "yureLayer") == 0){
 		//全部隐藏
 		t_widget = ituSceneFindWidget(&theScene, "BackgroundButton78");
 		ituWidgetSetVisible(t_widget, false);
-
 		t_widget = ituSceneFindWidget(&theScene, "Background27");
 		ituWidgetSetVisible(t_widget, false);
-
 		t_widget = ituSceneFindWidget(&theScene, "Background30");
 		ituWidgetSetVisible(t_widget, false);
 		t_widget = ituSceneFindWidget(&theScene, "Background46");
 		ituWidgetSetVisible(t_widget, false);
-
-
 		t_widget = ituSceneFindWidget(&theScene, "Background132");
 		ituWidgetSetVisible(t_widget, false);
-
 		//第三个大框中的小框
 		t_widget = ituSceneFindWidget(&theScene, "Background94");
 		ituWidgetSetVisible(t_widget, false);
-
 		//默认选中第一个
 		curr_node_widget = &yureLayer_0;
 		t_widget = ituSceneFindWidget(&theScene, curr_node_widget->focus_back_name);
@@ -576,17 +559,52 @@ bool YX_MenuOnEnter(ITUWidget* widget, char* param)
 	else if (strcmp(widget->name, "yureshijianLayer") == 0 ){
 		//默认选中第一个
 		curr_node_widget = &yureshijian_widget_0;
-
 		//显示选中
 		t_widget = ituSceneFindWidget(&theScene, curr_node_widget->focus_back_name);
 		ituWidgetSetVisible(t_widget, true);
-
 		//屏蔽未选中
 		t_widget = ituSceneFindWidget(&theScene, curr_node_widget->name);
 		ituWidgetSetVisible(t_widget, false);
+	}
+	else if (strcmp(widget->name, "yureshezhiLayer") == 0){
+		//默认选中第一个
+		curr_node_widget = &yureshezhiLayer_0;
+
+		//没有选中
+		t_widget = ituSceneFindWidget(&theScene, "BackgroundButton60");
+		ituWidgetSetVisible(t_widget, false);
+		
+		//焦点在
+		t_widget = ituSceneFindWidget(&theScene, "BackgroundButton85");
+		ituWidgetSetVisible(t_widget, true);
 
 
 
+		//Background37
+		//焦点选框
+		t_widget = ituSceneFindWidget(&theScene, "Background37");
+		ituWidgetSetVisible(t_widget, false);
+
+		//选中背景
+		t_widget = ituSceneFindWidget(&theScene, "Background45");
+		ituWidgetSetVisible(t_widget, false);
+
+		
+
+
+		//Background33
+		//焦点选框
+		t_widget = ituSceneFindWidget(&theScene, "Background33");
+		ituWidgetSetVisible(t_widget, false);
+
+		//选中背景Background105
+		t_widget = ituSceneFindWidget(&theScene, "Background105");
+		ituWidgetSetVisible(t_widget, false);
+
+
+		//Background40
+		t_widget = ituSceneFindWidget(&theScene, "Background40");
+		ituWidgetSetVisible(t_widget, false);
 
 	}
 

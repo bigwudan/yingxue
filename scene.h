@@ -120,7 +120,8 @@ struct node_widget
 	struct node_widget *up; //上一个控件
 	struct node_widget *down; //下一个控件
 	char *name; //控件名称
-	char *focus_back_name; //选中空间背景
+	char *focus_back_name; //选中控件背景
+	char *checked_back_name; //确定控件背景
 	uint8_t state; //状态0选中 1锁定
 	node_widget_cb updown_cb; //点击向上回调
 	node_widget_cb confirm_cb; //确认回调
@@ -170,6 +171,14 @@ extern struct node_widget yureshijian_widget_num_21; //预热时间控制控件6
 extern struct node_widget yureshijian_widget_num_22; //预热时间控制控件6
 extern struct node_widget yureshijian_widget_num_23; //预热时间控制控件6
 extern struct node_widget yureshijian_widget_num_24; //预热时间控制控件6
+
+//预约时间
+extern struct node_widget yureshezhiLayer_0;
+extern struct node_widget yureshezhiLayer_1;
+extern struct node_widget yureshezhiLayer_2;
+extern struct node_widget yureshezhiLayer_3;
+
+
 
 //樱雪基础数据
 struct yingxue_base_tag{

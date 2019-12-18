@@ -102,7 +102,9 @@ static void node_widget_up_down(struct node_widget *widget, unsigned char state)
 	if (t_node_widget){
 		//如果之前的控件是需要整个变换背景，
 		if ((strcmp(curr_node_widget->name, "BackgroundButton47") == 0) ||
-			(strcmp(curr_node_widget->name, "BackgroundButton65") == 0)){
+			(strcmp(curr_node_widget->name, "BackgroundButton65") == 0) ||
+			(strcmp(curr_node_widget->name, "BackgroundButton60") == 0)
+			){
 
 			t_widget = ituSceneFindWidget(&theScene, curr_node_widget->focus_back_name);
 			ituWidgetSetVisible(t_widget, false);
@@ -111,7 +113,9 @@ static void node_widget_up_down(struct node_widget *widget, unsigned char state)
 		}
 
 		if ((strcmp(t_node_widget->name, "BackgroundButton47") == 0) ||
-			(strcmp(t_node_widget->name, "BackgroundButton65") == 0)){
+			(strcmp(t_node_widget->name, "BackgroundButton65") == 0) ||
+			(strcmp(t_node_widget->name, "BackgroundButton60") == 0)
+			){
 
 			t_widget = ituSceneFindWidget(&theScene, t_node_widget->focus_back_name);
 			ituWidgetSetVisible(t_widget, true);
@@ -237,6 +241,14 @@ struct node_widget yureshijian_widget_num_21; //预热时间控制控件6
 struct node_widget yureshijian_widget_num_22; //预热时间控制控件6
 struct node_widget yureshijian_widget_num_23; //预热时间控制控件6
 struct node_widget yureshijian_widget_num_24; //预热时间控制控件6
+
+//预约时间
+struct node_widget yureshezhiLayer_0;
+struct node_widget yureshezhiLayer_1;
+struct node_widget yureshezhiLayer_2;
+struct node_widget yureshezhiLayer_3;
+
+
 
 //预热时间
 static void yure_init()
@@ -517,6 +529,29 @@ node_widget_init(void)
 	yureLayer_5.confirm_cb = node_widget_confirm_cb;
 	yureLayer_5.updown_cb = node_widget_up_down;
 
+	//预约时间
+	yureshezhiLayer_0.up = NULL;
+	yureshezhiLayer_0.down = &yureshezhiLayer_1;
+	yureshezhiLayer_0.focus_back_name = "BackgroundButton85";
+	yureshezhiLayer_0.name = "BackgroundButton60";
+	yureshezhiLayer_0.confirm_cb = node_widget_confirm_cb;
+	yureshezhiLayer_0.updown_cb = node_widget_up_down;
+
+	yureshezhiLayer_1.up = &yureshezhiLayer_0;
+	yureshezhiLayer_1.down = &yureshezhiLayer_2;
+	yureshezhiLayer_1.focus_back_name = "Background37";
+	yureshezhiLayer_1.checked_back_name = "Background45";
+	yureshezhiLayer_1.name = "Background2";
+	yureshezhiLayer_1.confirm_cb = node_widget_confirm_cb;
+	yureshezhiLayer_1.updown_cb = node_widget_up_down;
+
+	yureshezhiLayer_2.up = &yureshezhiLayer_1;
+	yureshezhiLayer_2.down = NULL;
+	yureshezhiLayer_2.focus_back_name = "Background33";
+	yureshezhiLayer_2.checked_back_name = "Background105";
+	yureshezhiLayer_2.name = "Background3";
+	yureshezhiLayer_2.confirm_cb = node_widget_confirm_cb;
+	yureshezhiLayer_2.updown_cb = node_widget_up_down;
 
 	//预热时间
 	yure_init();
