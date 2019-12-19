@@ -188,11 +188,13 @@ static void node_widget_up_down(struct node_widget *widget, unsigned char state)
 				t_widget = ituSceneFindWidget(&theScene, t_node_widget->name);
 				ituWidgetSetVisible(t_widget, false);
 
-				//原来的数据去掉边框
+				//原来的控件去掉边框
+				//原来控件是radio
 				if (strcmp(curr_node_widget->focus_back_name, "radio") == 0){
-					t_widget = ituSceneFindWidget(&theScene, t_node_widget->name);
-					ituFocusWidget(t_node_widget);
+					t_widget = ituSceneFindWidget(&theScene, curr_node_widget->name);
+					ituWidgetSetActive(t_widget, false);
 				}
+				//控件普通
 				else{
 					t_widget = ituSceneFindWidget(&theScene, curr_node_widget->focus_back_name);
 					ituWidgetSetVisible(t_widget, false);
@@ -268,7 +270,7 @@ static void node_widget_confirm_cb(struct node_widget *widget, u8_t state)
 	}
 }
 
-//点击事件
+//预热点击事件
 static void yure_node_widget_confirm_cb(struct node_widget *widget, u8_t state)
 {
 	ITUWidget *t_widget = NULL;
@@ -316,6 +318,52 @@ static void yure_node_widget_confirm_cb(struct node_widget *widget, u8_t state)
 		//设置预约时间
 		t_widget = ituSceneFindWidget(&theScene, "yureshijianLayer");
 		ituLayerGoto((ITULayer *)t_widget);
+	}
+}
+
+//预热时间设置事件
+static void yure_settime_widget_confirm_cb(struct node_widget *widget, u8_t state)
+{
+	ITUWidget *t_widget = NULL;
+	if (strcmp(widget->name, "BackgroundButton65") == 0){
+		t_widget = ituSceneFindWidget(&theScene, "yureLayer");
+		ituLayerGoto((ITULayer *)t_widget);
+	}	
+	//点击单项按键
+	else if (strcmp(widget->focus_back_name, "radio") == 0){
+		//如果两次点击都是同一，取消
+		if (widget == yingxue_base.yure_time_widget){
+			t_widget = ituSceneFindWidget(&theScene, widget->name);
+			ituCheckBoxSetChecked((ITUCheckBox *)t_widget, false);
+			yingxue_base.yure_time_widget = NULL;
+			yingxue_base.yure_set_count = 0;
+		}
+		//如果不一样，先去掉以前的状态
+		else{
+			if (yingxue_base.yure_time_widget){
+				t_widget = ituSceneFindWidget(&theScene, yingxue_base.yure_time_widget->name);
+				ituCheckBoxSetChecked((ITUCheckBox *)t_widget, false);
+			}
+			t_widget = ituSceneFindWidget(&theScene, widget->name);
+			ituCheckBoxSetChecked((ITUCheckBox *)t_widget, true);
+			yingxue_base.yure_set_count = widget->value;
+		}
+		yingxue_base.yure_time_widget = widget;
+	}
+	//支持长按
+	else if (widget->type == 1){
+		if (widget->state == 0){
+			//锁定
+			widget->state = 1;
+			t_widget = ituSceneFindWidget(&theScene, widget->checked_back_name);
+			ituWidgetSetVisible(t_widget, true);
+		}
+		else{
+			//解除锁定
+			widget->state = 0;
+			t_widget = ituSceneFindWidget(&theScene, widget->checked_back_name);
+			ituWidgetSetVisible(t_widget, false);
+		}
 	}
 }
 
@@ -387,14 +435,14 @@ struct node_widget chushui_2;
 
 
 //预热时间
-static void yure_init()
+static void yure_settime_init()
 {
 
 	yureshijian_widget_0.up = NULL;
 	yureshijian_widget_0.down = &yureshijian_widget_num_1;
 	yureshijian_widget_0.focus_back_name = "BackgroundButton30"; //选中
 	yureshijian_widget_0.name = "BackgroundButton65";//未选中
-	yureshijian_widget_0.confirm_cb = node_widget_confirm_cb;
+	yureshijian_widget_0.confirm_cb = yure_settime_widget_confirm_cb;
 	yureshijian_widget_0.updown_cb = node_widget_up_down;
 
 
@@ -404,7 +452,7 @@ static void yure_init()
 	yureshijian_widget_num_1.down = &yureshijian_widget_num_2;
 	yureshijian_widget_num_1.focus_back_name = "radio";
 	yureshijian_widget_num_1.name = "RadioBox2";
-	yureshijian_widget_num_1.confirm_cb = node_widget_confirm_cb;
+	yureshijian_widget_num_1.confirm_cb = yure_settime_widget_confirm_cb;
 	yureshijian_widget_num_1.updown_cb = node_widget_up_down;
 
 	yureshijian_widget_num_2.value = 2;
@@ -412,7 +460,7 @@ static void yure_init()
 	yureshijian_widget_num_2.down = &yureshijian_widget_num_3;
 	yureshijian_widget_num_2.focus_back_name = "radio";
 	yureshijian_widget_num_2.name = "RadioBox5";
-	yureshijian_widget_num_2.confirm_cb = node_widget_confirm_cb;
+	yureshijian_widget_num_2.confirm_cb = yure_settime_widget_confirm_cb;
 	yureshijian_widget_num_2.updown_cb = node_widget_up_down;
 
 	yureshijian_widget_num_3.value = 3;
@@ -420,7 +468,7 @@ static void yure_init()
 	yureshijian_widget_num_3.down = &yureshijian_widget_num_4;
 	yureshijian_widget_num_3.focus_back_name = "radio";
 	yureshijian_widget_num_3.name = "RadioBox31";
-	yureshijian_widget_num_3.confirm_cb = node_widget_confirm_cb;
+	yureshijian_widget_num_3.confirm_cb = yure_settime_widget_confirm_cb;
 	yureshijian_widget_num_3.updown_cb = node_widget_up_down;
 
 	yureshijian_widget_num_4.value = 4;
@@ -428,7 +476,7 @@ static void yure_init()
 	yureshijian_widget_num_4.down = &yureshijian_widget_num_5;
 	yureshijian_widget_num_4.focus_back_name = "radio";
 	yureshijian_widget_num_4.name = "RadioBox32";
-	yureshijian_widget_num_4.confirm_cb = node_widget_confirm_cb;
+	yureshijian_widget_num_4.confirm_cb = yure_settime_widget_confirm_cb;
 	yureshijian_widget_num_4.updown_cb = node_widget_up_down;
 
 	yureshijian_widget_num_5.value = 5;
@@ -436,7 +484,7 @@ static void yure_init()
 	yureshijian_widget_num_5.down = &yureshijian_widget_num_6;
 	yureshijian_widget_num_5.focus_back_name = "radio";
 	yureshijian_widget_num_5.name = "RadioBox59";
-	yureshijian_widget_num_5.confirm_cb = node_widget_confirm_cb;
+	yureshijian_widget_num_5.confirm_cb = yure_settime_widget_confirm_cb;
 	yureshijian_widget_num_5.updown_cb = node_widget_up_down;
 
 	yureshijian_widget_num_6.value = 6;
@@ -444,7 +492,7 @@ static void yure_init()
 	yureshijian_widget_num_6.down = &yureshijian_widget_num_7;
 	yureshijian_widget_num_6.focus_back_name = "radio";
 	yureshijian_widget_num_6.name = "RadioBox58";
-	yureshijian_widget_num_6.confirm_cb = node_widget_confirm_cb;
+	yureshijian_widget_num_6.confirm_cb = yure_settime_widget_confirm_cb;
 	yureshijian_widget_num_6.updown_cb = node_widget_up_down;
 
 	yureshijian_widget_num_7.value = 7;
@@ -452,7 +500,7 @@ static void yure_init()
 	yureshijian_widget_num_7.down = &yureshijian_widget_num_8;
 	yureshijian_widget_num_7.focus_back_name = "radio";
 	yureshijian_widget_num_7.name = "RadioBox57";
-	yureshijian_widget_num_7.confirm_cb = node_widget_confirm_cb;
+	yureshijian_widget_num_7.confirm_cb = yure_settime_widget_confirm_cb;
 	yureshijian_widget_num_7.updown_cb = node_widget_up_down;
 
 	yureshijian_widget_num_8.value = 8;
@@ -460,7 +508,7 @@ static void yure_init()
 	yureshijian_widget_num_8.down = &yureshijian_widget_num_9;
 	yureshijian_widget_num_8.focus_back_name = "radio";
 	yureshijian_widget_num_8.name = "RadioBox56";
-	yureshijian_widget_num_8.confirm_cb = node_widget_confirm_cb;
+	yureshijian_widget_num_8.confirm_cb = yure_settime_widget_confirm_cb;
 	yureshijian_widget_num_8.updown_cb = node_widget_up_down;
 
 	yureshijian_widget_num_9.value = 9;
@@ -468,7 +516,7 @@ static void yure_init()
 	yureshijian_widget_num_9.down = &yureshijian_widget_num_10;
 	yureshijian_widget_num_9.focus_back_name = "radio";
 	yureshijian_widget_num_9.name = "RadioBox75";
-	yureshijian_widget_num_9.confirm_cb = node_widget_confirm_cb;
+	yureshijian_widget_num_9.confirm_cb = yure_settime_widget_confirm_cb;
 	yureshijian_widget_num_9.updown_cb = node_widget_up_down;
 
 
@@ -477,7 +525,7 @@ static void yure_init()
 	yureshijian_widget_num_10.down = &yureshijian_widget_num_11;
 	yureshijian_widget_num_10.focus_back_name = "radio";
 	yureshijian_widget_num_10.name = "RadioBox74";
-	yureshijian_widget_num_10.confirm_cb = node_widget_confirm_cb;
+	yureshijian_widget_num_10.confirm_cb = yure_settime_widget_confirm_cb;
 	yureshijian_widget_num_10.updown_cb = node_widget_up_down;
 
 	yureshijian_widget_num_11.value = 11;
@@ -485,7 +533,7 @@ static void yure_init()
 	yureshijian_widget_num_11.down = &yureshijian_widget_num_12;
 	yureshijian_widget_num_11.focus_back_name = "radio";
 	yureshijian_widget_num_11.name = "RadioBox73";
-	yureshijian_widget_num_11.confirm_cb = node_widget_confirm_cb;
+	yureshijian_widget_num_11.confirm_cb = yure_settime_widget_confirm_cb;
 	yureshijian_widget_num_11.updown_cb = node_widget_up_down;
 
 	yureshijian_widget_num_12.value = 12;
@@ -493,7 +541,7 @@ static void yure_init()
 	yureshijian_widget_num_12.down = &yureshijian_widget_num_13;
 	yureshijian_widget_num_12.focus_back_name = "radio";
 	yureshijian_widget_num_12.name = "RadioBox72";
-	yureshijian_widget_num_12.confirm_cb = node_widget_confirm_cb;
+	yureshijian_widget_num_12.confirm_cb = yure_settime_widget_confirm_cb;
 	yureshijian_widget_num_12.updown_cb = node_widget_up_down;
 
 	yureshijian_widget_num_13.value = 13;
@@ -501,7 +549,7 @@ static void yure_init()
 	yureshijian_widget_num_13.down = &yureshijian_widget_num_14;
 	yureshijian_widget_num_13.focus_back_name = "radio";
 	yureshijian_widget_num_13.name = "RadioBox67";
-	yureshijian_widget_num_13.confirm_cb = node_widget_confirm_cb;
+	yureshijian_widget_num_13.confirm_cb = yure_settime_widget_confirm_cb;
 	yureshijian_widget_num_13.updown_cb = node_widget_up_down;
 
 	yureshijian_widget_num_14.value = 14;
@@ -509,7 +557,7 @@ static void yure_init()
 	yureshijian_widget_num_14.down = &yureshijian_widget_num_15;
 	yureshijian_widget_num_14.focus_back_name = "radio";
 	yureshijian_widget_num_14.name = "RadioBox66";
-	yureshijian_widget_num_14.confirm_cb = node_widget_confirm_cb;
+	yureshijian_widget_num_14.confirm_cb = yure_settime_widget_confirm_cb;
 	yureshijian_widget_num_14.updown_cb = node_widget_up_down;
 
 	yureshijian_widget_num_15.value = 15;
@@ -517,7 +565,7 @@ static void yure_init()
 	yureshijian_widget_num_15.down = &yureshijian_widget_num_16;
 	yureshijian_widget_num_15.focus_back_name = "radio";
 	yureshijian_widget_num_15.name = "RadioBox65";
-	yureshijian_widget_num_15.confirm_cb = node_widget_confirm_cb;
+	yureshijian_widget_num_15.confirm_cb = yure_settime_widget_confirm_cb;
 	yureshijian_widget_num_15.updown_cb = node_widget_up_down;
 
 	yureshijian_widget_num_16.value = 16;
@@ -525,7 +573,7 @@ static void yure_init()
 	yureshijian_widget_num_16.down = &yureshijian_widget_num_17;
 	yureshijian_widget_num_16.focus_back_name = "radio";
 	yureshijian_widget_num_16.name = "RadioBox64";
-	yureshijian_widget_num_16.confirm_cb = node_widget_confirm_cb;
+	yureshijian_widget_num_16.confirm_cb = yure_settime_widget_confirm_cb;
 	yureshijian_widget_num_16.updown_cb = node_widget_up_down;
 
 	yureshijian_widget_num_17.value = 17;
@@ -533,7 +581,7 @@ static void yure_init()
 	yureshijian_widget_num_17.down = &yureshijian_widget_num_18;
 	yureshijian_widget_num_17.focus_back_name = "radio";
 	yureshijian_widget_num_17.name = "RadioBox92";
-	yureshijian_widget_num_17.confirm_cb = node_widget_confirm_cb;
+	yureshijian_widget_num_17.confirm_cb = yure_settime_widget_confirm_cb;
 	yureshijian_widget_num_17.updown_cb = node_widget_up_down;
 
 	yureshijian_widget_num_18.value = 18;
@@ -541,7 +589,7 @@ static void yure_init()
 	yureshijian_widget_num_18.down = &yureshijian_widget_num_19;
 	yureshijian_widget_num_18.focus_back_name = "radio";
 	yureshijian_widget_num_18.name = "RadioBox91";
-	yureshijian_widget_num_18.confirm_cb = node_widget_confirm_cb;
+	yureshijian_widget_num_18.confirm_cb = yure_settime_widget_confirm_cb;
 	yureshijian_widget_num_18.updown_cb = node_widget_up_down;
 
 	yureshijian_widget_num_19.value = 19;
@@ -549,7 +597,7 @@ static void yure_init()
 	yureshijian_widget_num_19.down = &yureshijian_widget_num_20;
 	yureshijian_widget_num_19.focus_back_name = "radio";
 	yureshijian_widget_num_19.name = "RadioBox90";
-	yureshijian_widget_num_19.confirm_cb = node_widget_confirm_cb;
+	yureshijian_widget_num_19.confirm_cb = yure_settime_widget_confirm_cb;
 	yureshijian_widget_num_19.updown_cb = node_widget_up_down;
 
 	yureshijian_widget_num_20.value = 20;
@@ -557,7 +605,7 @@ static void yure_init()
 	yureshijian_widget_num_20.down = &yureshijian_widget_num_21;
 	yureshijian_widget_num_20.focus_back_name = "radio";
 	yureshijian_widget_num_20.name = "RadioBox89";
-	yureshijian_widget_num_20.confirm_cb = node_widget_confirm_cb;
+	yureshijian_widget_num_20.confirm_cb = yure_settime_widget_confirm_cb;
 	yureshijian_widget_num_20.updown_cb = node_widget_up_down;
 
 	yureshijian_widget_num_21.value = 21;
@@ -565,7 +613,7 @@ static void yure_init()
 	yureshijian_widget_num_21.down = &yureshijian_widget_num_22;
 	yureshijian_widget_num_21.focus_back_name = "radio";
 	yureshijian_widget_num_21.name = "RadioBox83";
-	yureshijian_widget_num_21.confirm_cb = node_widget_confirm_cb;
+	yureshijian_widget_num_21.confirm_cb = yure_settime_widget_confirm_cb;
 	yureshijian_widget_num_21.updown_cb = node_widget_up_down;
 
 	yureshijian_widget_num_22.value = 22;
@@ -573,7 +621,7 @@ static void yure_init()
 	yureshijian_widget_num_22.down = &yureshijian_widget_num_23;
 	yureshijian_widget_num_22.focus_back_name = "radio";
 	yureshijian_widget_num_22.name = "RadioBox82";
-	yureshijian_widget_num_22.confirm_cb = node_widget_confirm_cb;
+	yureshijian_widget_num_22.confirm_cb = yure_settime_widget_confirm_cb;
 	yureshijian_widget_num_22.updown_cb = node_widget_up_down;
 
 	yureshijian_widget_num_23.value = 23;
@@ -581,7 +629,7 @@ static void yure_init()
 	yureshijian_widget_num_23.down = &yureshijian_widget_num_24;
 	yureshijian_widget_num_23.focus_back_name = "radio";
 	yureshijian_widget_num_23.name = "RadioBox81";
-	yureshijian_widget_num_23.confirm_cb = node_widget_confirm_cb;
+	yureshijian_widget_num_23.confirm_cb = yure_settime_widget_confirm_cb;
 	yureshijian_widget_num_23.updown_cb = node_widget_up_down;
 
 	yureshijian_widget_num_24.value = 24;
@@ -589,7 +637,7 @@ static void yure_init()
 	yureshijian_widget_num_24.down = NULL;
 	yureshijian_widget_num_24.focus_back_name = "radio";
 	yureshijian_widget_num_24.name = "RadioBox80";
-	yureshijian_widget_num_24.confirm_cb = node_widget_confirm_cb;
+	yureshijian_widget_num_24.confirm_cb = yure_settime_widget_confirm_cb;
 	yureshijian_widget_num_24.updown_cb = node_widget_up_down;
 }
 
@@ -756,7 +804,7 @@ node_widget_init(void)
 	chushui_1.type = 1;
 
 	//预热时间
-	yure_init();
+	yure_settime_init();
 }
 
 void SceneInit(void)
