@@ -616,6 +616,28 @@ bool YX_MenuOnEnter(ITUWidget* widget, char* param)
 		//默认选中第一个
 		curr_node_widget = &moshiLayer_0;
 
+
+		//显示所有
+		t_widget = ituSceneFindWidget(&theScene, "BackgroundButton33");
+		ituWidgetSetVisible(t_widget, true);
+		//1
+		t_widget = ituSceneFindWidget(&theScene, "moshi_BackgroundButton10");
+		ituWidgetSetVisible(t_widget, true);
+
+		//2
+		t_widget = ituSceneFindWidget(&theScene, "moshi_BackgroundButton11");
+		ituWidgetSetVisible(t_widget, true);
+
+		//3
+		t_widget = ituSceneFindWidget(&theScene, "moshi_BackgroundButton12");
+		ituWidgetSetVisible(t_widget, true);
+
+		//4
+		t_widget = ituSceneFindWidget(&theScene, "moshi_BackgroundButton13");
+		ituWidgetSetVisible(t_widget, true);
+
+
+
 		t_widget = ituSceneFindWidget(&theScene, "BackgroundButton68");
 		ituWidgetSetVisible(t_widget, false);
 		//1
