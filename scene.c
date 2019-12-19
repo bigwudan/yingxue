@@ -226,7 +226,7 @@ static void node_widget_up_down(struct node_widget *widget, unsigned char state)
 //点击回调事件
 //@param widget 点击空间
 //@param state 
-static void node_widget_confirm_cb(struct node_widget *widget, u8_t state)
+static void main_widget_confirm_cb(struct node_widget *widget, u8_t state)
 {
 	ITUWidget *t_widget = NULL;
 	if (strcmp(widget->name, "BackgroundButton47") ==0 ){
@@ -236,6 +236,12 @@ static void node_widget_confirm_cb(struct node_widget *widget, u8_t state)
 	else if (strcmp(widget->name, "yureSprite") == 0){
 		t_widget = ituSceneFindWidget(&theScene, "yureLayer");
 		ituLayerGoto((ITULayer *)t_widget);
+	}
+	else if (strcmp(widget->name, "moshiSprite") == 0){
+		t_widget = ituSceneFindWidget(&theScene, "moshiLayer");
+		ituLayerGoto((ITULayer *)t_widget);
+
+	
 	}
 	//点击单项按键
 	else if (strcmp(widget->focus_back_name, "radio") == 0){
@@ -819,21 +825,21 @@ node_widget_init(void)
 	mainlayer_0.down = &mainlayer_1;
 	mainlayer_0.focus_back_name = "Background100";
 	mainlayer_0.name = "yureSprite";
-	mainlayer_0.confirm_cb = node_widget_confirm_cb;
+	mainlayer_0.confirm_cb = main_widget_confirm_cb;
 	mainlayer_0.updown_cb = node_widget_up_down;
 
 	mainlayer_1.up = &mainlayer_0;
 	mainlayer_1.down = &mainlayer_2;
 	mainlayer_1.focus_back_name = "Background134";
 	mainlayer_1.name = "BackgroundButton3";
-	mainlayer_1.confirm_cb = node_widget_confirm_cb;
+	mainlayer_1.confirm_cb = main_widget_confirm_cb;
 	mainlayer_1.updown_cb = node_widget_up_down;
 
 	mainlayer_2.up = &mainlayer_1;
 	mainlayer_2.down = NULL;
 	mainlayer_2.focus_back_name = "Background102";
 	mainlayer_2.name = "moshiSprite";
-	mainlayer_2.confirm_cb = node_widget_confirm_cb;
+	mainlayer_2.confirm_cb = main_widget_confirm_cb;
 	mainlayer_2.updown_cb = node_widget_up_down;
 
 

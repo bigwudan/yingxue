@@ -511,32 +511,68 @@ void MainMenuAnimationSetPlay(bool toPlay)
 	}
 }
 
-//樱雪每个页面初始化
 
+
+
+//主页面初始哈
+static void MainLayer_init()
+{
+	static int test_flag = 0;
+	ITUWidget *t_widget = NULL;
+	char t_buf[30] = { 0 };
+
+	//test
+	/*		if (test_flag == 0){
+	test_flag++;
+	ituLayerGoto(ituSceneFindWidget(&theScene, "moshiLayer"));
+	return true;
+	}*/
+
+	//预热模式 0 预热 1单巡航 2全天候巡航 3下次预热时间
+	t_widget = ituSceneFindWidget(&theScene, "yureSprite");
+
+	if (yingxue_base.yure_mode == 0){
+		ituSpriteGoto(t_widget, 0);
+	}
+	else if (yingxue_base.yure_mode == 1){
+		ituSpriteGoto(t_widget, 1);
+	}
+	else if (yingxue_base.yure_mode == 2){
+		ituSpriteGoto(t_widget, 2);
+	}
+	else if (yingxue_base.yure_mode == 3){
+		ituSpriteGoto(t_widget, 3);
+		if (yingxue_base.yure_set_count){
+			t_widget = ituSceneFindWidget(&theScene, "Text35");
+			sprintf(t_buf, "%d:00~%d:00", yingxue_base.yure_set_count, yingxue_base.yure_set_count + 1);
+			ituTextSetString(t_widget, t_buf);
+		}
+	}
+
+
+	//全部隐藏
+	t_widget = ituSceneFindWidget(&theScene, "Background100");
+	ituWidgetSetVisible(t_widget, false);
+	t_widget = ituSceneFindWidget(&theScene, "Background102");
+	ituWidgetSetVisible(t_widget, false);
+	//第三个大框
+	t_widget = ituSceneFindWidget(&theScene, "Background134");
+	ituWidgetSetVisible(t_widget, false);
+	//默认选中第一个
+	curr_node_widget = &mainlayer_0;
+	t_widget = ituSceneFindWidget(&theScene, curr_node_widget->focus_back_name);
+	ituWidgetSetVisible(t_widget, true);
+}
+
+
+//樱雪每个页面初始化
 bool YX_MenuOnEnter(ITUWidget* widget, char* param)
 {
 	static int test_flag = 0;
 	ITUWidget *t_widget = NULL;
 	//MainLayer 首页
 	if (strcmp(widget->name, "MainLayer") == 0){
-		//test
-		if (test_flag == 0){
-			test_flag++;
-			ituLayerGoto(ituSceneFindWidget(&theScene, "moshiLayer"));
-			return true;
-		}
-		//全部隐藏
-		t_widget = ituSceneFindWidget(&theScene, "Background100");
-		ituWidgetSetVisible(t_widget, false);
-		t_widget = ituSceneFindWidget(&theScene, "Background102");
-		ituWidgetSetVisible(t_widget, false);
-		//第三个大框
-		t_widget = ituSceneFindWidget(&theScene, "Background134");
-		ituWidgetSetVisible(t_widget, false);
-		//默认选中第一个
-		curr_node_widget = &mainlayer_0;
-		t_widget = ituSceneFindWidget(&theScene, curr_node_widget->focus_back_name);
-		ituWidgetSetVisible(t_widget, true);
+		MainLayer_init();
 	}
 	else if (strcmp(widget->name, "yureLayer") == 0){
 		//全部隐藏
