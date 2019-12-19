@@ -402,28 +402,27 @@ static void yure_yureshezhiLayer_widget_confirm_cb(struct node_widget *widget, u
 				yingxue_base.huishui_temp = num;
 			}
 			//北京时间小时
-			else if (strcmp(widget->name, "Background3") == 0){
-				t_widget = ituSceneFindWidget(&theScene, "Text42");
-				t_buf = ituTextGetString(t_widget);
-				num = atoi(t_buf);
+			else if ( (strcmp(widget->name, "Background3") == 0) || (strcmp(widget->name, "Background4") == 0)){
 				struct timeval curr_time;
 				struct tm *t_tm;
 				gettimeofday(&curr_time, NULL);
-
 				t_tm = localtime(&curr_time);
-				t_tm->tm_hour = num;
+				if (strcmp(widget->name, "Background3") == 0){
+					t_widget = ituSceneFindWidget(&theScene, "Text42");
+					t_buf = ituTextGetString(t_widget);
+					num = atoi(t_buf);
+					t_tm->tm_hour = num;
+				}
+				else{
+					t_widget = ituSceneFindWidget(&theScene, "Text43");
+					t_buf = ituTextGetString(t_widget);
+					num = atoi(t_buf);
+					t_tm->tm_min = num;
+				}
+				curr_time.tv_sec = mktime(t_tm);
+				settimeofday(&curr_time, NULL);
 				
 			}
-			//北京时间分钟
-			else if (strcmp(widget->name, "Background4") == 0){
-				t_widget = ituSceneFindWidget(&theScene, "Text43");
-				t_buf = ituTextGetString(t_widget);
-				num = atoi(t_buf);
-				
-			}
-
-
-
 			widget->state = 0;
 			t_widget = ituSceneFindWidget(&theScene, widget->checked_back_name);
 			ituWidgetSetVisible(t_widget, false);
