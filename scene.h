@@ -127,6 +127,7 @@ struct node_widget
 	uint8_t type; //类型 0 普通 1可以锁定 2长按
 	node_widget_cb updown_cb; //点击向上回调
 	node_widget_cb confirm_cb; //确认回调
+	node_widget_cb long_press_cb; //长按
 };
 
 //当前选中的空间

@@ -163,7 +163,9 @@ static void node_widget_up_down(struct node_widget *widget, unsigned char state)
 				(strcmp(curr_node_widget->name, "moshi_BackgroundButton11") == 0) ||
 				(strcmp(curr_node_widget->name, "moshi_BackgroundButton12") == 0) ||
 				(strcmp(curr_node_widget->name, "moshi_BackgroundButton13") == 0) ||
-				(strcmp(curr_node_widget->name, "chushui_BackgroundButton73") == 0)
+				(strcmp(curr_node_widget->name, "chushui_BackgroundButton73") == 0)||
+				(strcmp(curr_node_widget->name, "chushui_BackgroundButton1") == 0)
+				
 				
 				){
 				t_widget = ituSceneFindWidget(&theScene, curr_node_widget->focus_back_name);
@@ -181,7 +183,8 @@ static void node_widget_up_down(struct node_widget *widget, unsigned char state)
 				(strcmp(t_node_widget->name, "moshi_BackgroundButton11") == 0) ||
 				(strcmp(t_node_widget->name, "moshi_BackgroundButton12") == 0) ||
 				(strcmp(t_node_widget->name, "moshi_BackgroundButton13") == 0) || 
-				(strcmp(t_node_widget->name, "chushui_BackgroundButton73") == 0) 
+				(strcmp(t_node_widget->name, "chushui_BackgroundButton73") == 0) ||
+				(strcmp(t_node_widget->name, "chushui_BackgroundButton1") == 0)
 				){
 				t_widget = ituSceneFindWidget(&theScene, t_node_widget->focus_back_name);
 				ituWidgetSetVisible(t_widget, true);
@@ -458,6 +461,28 @@ static void moshi_widget_confirm_cb(struct node_widget *widget, u8_t state)
 		t_widget = ituSceneFindWidget(&theScene, "MainLayer");
 		ituLayerGoto((ITULayer *)t_widget);
 	}
+}
+
+
+//长按模式
+static void moshi_widget_longpress_cb(struct node_widget *widget, u8_t state)
+{
+	ITUWidget *t_widget = NULL;
+	t_widget = ituSceneFindWidget(&theScene, "chushui");
+	//chushui
+	if (strcmp(widget->name, "moshi_BackgroundButton10") == 0){
+		yingxue_base.select_set_moshi_mode = 1;
+	}
+	else if (strcmp(widget->name, "moshi_BackgroundButton11") == 0){
+		yingxue_base.select_set_moshi_mode = 2;
+	}
+	else if (strcmp(widget->name, "moshi_BackgroundButton12") == 0){
+		yingxue_base.select_set_moshi_mode = 3;
+	}
+	else if (strcmp(widget->name, "moshi_BackgroundButton13") == 0){
+		yingxue_base.select_set_moshi_mode = 4;
+	}
+	ituLayerGoto(t_widget);
 }
 
 
@@ -857,6 +882,7 @@ node_widget_init(void)
 	moshiLayer_1.name = "moshi_BackgroundButton10";
 	moshiLayer_1.confirm_cb = moshi_widget_confirm_cb;
 	moshiLayer_1.updown_cb = node_widget_up_down;
+	moshiLayer_1.long_press_cb = moshi_widget_longpress_cb;
 
 	moshiLayer_2.up = &moshiLayer_1;
 	moshiLayer_2.down = &moshiLayer_3;
@@ -864,6 +890,7 @@ node_widget_init(void)
 	moshiLayer_2.name = "moshi_BackgroundButton11";
 	moshiLayer_2.confirm_cb = moshi_widget_confirm_cb;
 	moshiLayer_2.updown_cb = node_widget_up_down;
+	moshiLayer_2.long_press_cb = moshi_widget_longpress_cb;
 
 	moshiLayer_3.up = &moshiLayer_2;
 	moshiLayer_3.down = &moshiLayer_4;
@@ -871,6 +898,7 @@ node_widget_init(void)
 	moshiLayer_3.name = "moshi_BackgroundButton12";
 	moshiLayer_3.confirm_cb = moshi_widget_confirm_cb;
 	moshiLayer_3.updown_cb = node_widget_up_down;
+	moshiLayer_3.long_press_cb = moshi_widget_longpress_cb;
 
 	moshiLayer_4.up = &moshiLayer_3;
 	moshiLayer_4.down = NULL;
@@ -878,6 +906,7 @@ node_widget_init(void)
 	moshiLayer_4.name = "moshi_BackgroundButton13";
 	moshiLayer_4.confirm_cb = moshi_widget_confirm_cb;
 	moshiLayer_4.updown_cb = node_widget_up_down;
+	moshiLayer_4.long_press_cb = moshi_widget_longpress_cb;
 
 	//出水
 	chushui_0.up = NULL;
@@ -888,13 +917,22 @@ node_widget_init(void)
 	chushui_0.updown_cb = node_widget_up_down;
 
 	chushui_1.up = &chushui_0;
-	chushui_1.down = NULL;
+	chushui_1.down = &chushui_2;
 	chushui_1.focus_back_name = "chushui_Background37";
 	chushui_1.checked_back_name = "chushui_Background45";
 	chushui_1.name = "chushui_Background13";
 	chushui_1.confirm_cb = node_widget_confirm_cb;
 	chushui_1.updown_cb = node_widget_up_down;
 	chushui_1.type = 1;
+
+	chushui_2.up = &chushui_1;
+	chushui_2.down = NULL;
+	chushui_2.focus_back_name = "chushui_Background51";
+	chushui_2.name = "chushui_BackgroundButton1";
+	chushui_2.confirm_cb = node_widget_confirm_cb;
+	chushui_2.updown_cb = node_widget_up_down;
+	
+
 
 	//预热时间
 	yure_settime_init();
@@ -1353,9 +1391,10 @@ int SceneRun(void)
 					printf("curr_widget=%s\n", curr_node_widget->name);
 				case 13:
 					curr_node_widget->confirm_cb(curr_node_widget, 2);
-
+				//长按
                 case SDLK_LEFT:
-                    ituSceneSendEvent(&theScene, EVENT_CUSTOM_KEY2, NULL);
+					if (curr_node_widget->long_press_cb)
+						curr_node_widget->long_press_cb(curr_node_widget, 1);
                     break;
 
                 case SDLK_RIGHT:

@@ -522,7 +522,7 @@ bool YX_MenuOnEnter(ITUWidget* widget, char* param)
 		//test
 		if (test_flag == 0){
 			test_flag++;
-			ituLayerGoto(ituSceneFindWidget(&theScene, "moshiLayer"));
+			ituLayerGoto(ituSceneFindWidget(&theScene, "chushui"));
 			return true;
 		}
 		//全部隐藏
@@ -656,9 +656,11 @@ bool YX_MenuOnEnter(ITUWidget* widget, char* param)
 		ituWidgetSetVisible(t_widget, false);
 
 
-		//2
-		//t_widget = ituSceneFindWidget(&theScene, "chushui_BackgroundButton15");
-		//ituWidgetSetVisible(t_widget, false);
+
+		//确定按键
+		t_widget = ituSceneFindWidget(&theScene, "chushui_Background51");
+		ituWidgetSetVisible(t_widget, false);
+
 
 	}
 
