@@ -549,6 +549,24 @@ static void MainLayer_init()
 		}
 	}
 
+	//模式 0 常规 1超热 2 eco 3水果
+	t_widget = ituSceneFindWidget(&theScene, "moshiSprite");
+
+	if (yingxue_base.moshi_mode == 0 || yingxue_base.moshi_mode == 1){
+		ituSpriteGoto(t_widget, 0);
+	}
+	else if (yingxue_base.moshi_mode == 2){
+		ituSpriteGoto(t_widget, 1);
+	}
+	else if (yingxue_base.moshi_mode == 3){
+		ituSpriteGoto(t_widget, 2);
+	}
+	else if (yingxue_base.moshi_mode == 4){
+		ituSpriteGoto(t_widget, 3);
+	}
+
+	
+
 
 	//全部隐藏
 	t_widget = ituSceneFindWidget(&theScene, "Background100");
