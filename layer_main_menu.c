@@ -522,7 +522,7 @@ bool YX_MenuOnEnter(ITUWidget* widget, char* param)
 		//test
 		if (test_flag == 0){
 			test_flag++;
-			ituLayerGoto(ituSceneFindWidget(&theScene, "chushui"));
+			ituLayerGoto(ituSceneFindWidget(&theScene, "moshiLayer"));
 			return true;
 		}
 		//全部隐藏

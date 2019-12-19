@@ -1439,8 +1439,10 @@ int SceneRun(void)
                     break;
 				case 27:
 					printf("curr_widget=%s\n", curr_node_widget->name);
+					break;
 				case 13:
 					curr_node_widget->confirm_cb(curr_node_widget, 2);
+					break;
 				//³¤°´
                 case SDLK_LEFT:
 					if (curr_node_widget->long_press_cb)
