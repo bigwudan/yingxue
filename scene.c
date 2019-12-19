@@ -464,6 +464,56 @@ static void moshi_widget_confirm_cb(struct node_widget *widget, u8_t state)
 }
 
 
+//出水回调事件
+static void chushui_widget_confirm_cb(struct node_widget *widget, u8_t state)
+{
+	ITUWidget *t_widget = NULL;
+	char *t_buf;
+	int num = 0;
+	t_widget = ituSceneFindWidget(&theScene, "moshiLayer");
+	if (strcmp(widget->name, "chushui_BackgroundButton73") == 0){
+		ituLayerGoto((ITULayer *)t_widget);
+	}
+	//支持长按
+	else if (widget->type == 1){
+		if (widget->state == 0){
+			//锁定
+			widget->state = 1;
+			t_widget = ituSceneFindWidget(&theScene, widget->checked_back_name);
+			ituWidgetSetVisible(t_widget, true);
+		}
+		else{
+			//解除锁定
+			widget->state = 0;
+			t_widget = ituSceneFindWidget(&theScene, widget->checked_back_name);
+			ituWidgetSetVisible(t_widget, false);
+		}
+	}
+	else if (strcmp(widget->name, "chushui_BackgroundButton1") == 0 ){
+		//Text38
+		t_widget = ituSceneFindWidget(&theScene, "Text38");
+		t_buf = ituTextGetString((ITUText*)t_widget);
+		num = atoi(t_buf);
+		if (yingxue_base.select_set_moshi_mode > 0){
+			if (yingxue_base.select_set_moshi_mode == 1){
+				yingxue_base.normal_moshi.temp = num;
+			}
+			else if (yingxue_base.select_set_moshi_mode == 2){
+				yingxue_base.super_moshi.temp = num;
+			}
+			else if (yingxue_base.select_set_moshi_mode == 3){
+				yingxue_base.eco_moshi.temp = num;
+			}
+			else if (yingxue_base.select_set_moshi_mode == 4){
+				yingxue_base.fruit_moshi.temp = num;
+			}
+		}
+		t_widget = ituSceneFindWidget(&theScene, "moshiLayer");
+		ituLayerGoto((ITULayer *)t_widget);
+	}
+}
+
+
 //长按模式
 static void moshi_widget_longpress_cb(struct node_widget *widget, u8_t state)
 {
@@ -913,7 +963,7 @@ node_widget_init(void)
 	chushui_0.down = &chushui_1;
 	chushui_0.focus_back_name = "chushui_BackgroundButton7";
 	chushui_0.name = "chushui_BackgroundButton73";
-	chushui_0.confirm_cb = node_widget_confirm_cb;
+	chushui_0.confirm_cb = chushui_widget_confirm_cb;
 	chushui_0.updown_cb = node_widget_up_down;
 
 	chushui_1.up = &chushui_0;
@@ -921,7 +971,7 @@ node_widget_init(void)
 	chushui_1.focus_back_name = "chushui_Background37";
 	chushui_1.checked_back_name = "chushui_Background45";
 	chushui_1.name = "chushui_Background13";
-	chushui_1.confirm_cb = node_widget_confirm_cb;
+	chushui_1.confirm_cb = chushui_widget_confirm_cb;
 	chushui_1.updown_cb = node_widget_up_down;
 	chushui_1.type = 1;
 
@@ -929,7 +979,7 @@ node_widget_init(void)
 	chushui_2.down = NULL;
 	chushui_2.focus_back_name = "chushui_Background51";
 	chushui_2.name = "chushui_BackgroundButton1";
-	chushui_2.confirm_cb = node_widget_confirm_cb;
+	chushui_2.confirm_cb = chushui_widget_confirm_cb;
 	chushui_2.updown_cb = node_widget_up_down;
 	
 
