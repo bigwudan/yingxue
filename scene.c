@@ -88,10 +88,7 @@ static void node_widget_up_down(struct node_widget *widget, unsigned char state)
 	struct node_widget *t_node_widget = NULL;
 	struct ITUWidget *t_widget = NULL;
 	char t_buf[20] = { 0 };
-
 	int t_num = 0;
-
-
 	//如果已经锁定
 	if (widget->state == 1){
 		if (strcmp(widget->name, "Background2") == 0){
@@ -144,11 +141,6 @@ static void node_widget_up_down(struct node_widget *widget, unsigned char state)
 			ituTextSetString(t_widget, t_buf);
 		
 		}
-
-
-		
-
-
 	}
 	else{
 		if (state == 0){
@@ -159,7 +151,6 @@ static void node_widget_up_down(struct node_widget *widget, unsigned char state)
 			if (widget->down){
 				t_node_widget = widget->down;
 			}
-
 		}
 
 		if (t_node_widget){
@@ -181,6 +172,7 @@ static void node_widget_up_down(struct node_widget *widget, unsigned char state)
 				ituWidgetSetVisible(t_widget, true);
 			}
 
+			//如果现在的控件是需要变换背景
 			if ((strcmp(t_node_widget->name, "BackgroundButton47") == 0) ||
 				(strcmp(t_node_widget->name, "BackgroundButton65") == 0) ||
 				(strcmp(t_node_widget->name, "BackgroundButton60") == 0) ||
@@ -191,12 +183,15 @@ static void node_widget_up_down(struct node_widget *widget, unsigned char state)
 				(strcmp(t_node_widget->name, "moshi_BackgroundButton13") == 0) || 
 				(strcmp(t_node_widget->name, "chushui_BackgroundButton73") == 0) 
 				){
-
-
 				t_widget = ituSceneFindWidget(&theScene, t_node_widget->focus_back_name);
 				ituWidgetSetVisible(t_widget, true);
 				t_widget = ituSceneFindWidget(&theScene, t_node_widget->name);
 				ituWidgetSetVisible(t_widget, false);
+
+				//原来的数据去掉边框
+				t_widget = ituSceneFindWidget(&theScene, curr_node_widget->focus_back_name);
+				ituWidgetSetVisible(t_widget, false);
+
 				curr_node_widget = t_node_widget;
 			}
 			else if (strcmp(t_node_widget->focus_back_name, "radio") == 0){
@@ -208,23 +203,10 @@ static void node_widget_up_down(struct node_widget *widget, unsigned char state)
 				//隐藏当前控件选中状态
 				t_widget = ituSceneFindWidget(&theScene, curr_node_widget->focus_back_name);
 				ituWidgetSetVisible(t_widget, false);
-				/*if ((strcmp(curr_node_widget->name, "BackgroundButton47") == 0) ||
-				(strcmp(curr_node_widget->name, "BackgroundButton30") == 0)){
-				t_widget = ituSceneFindWidget(&theScene, curr_node_widget->name);
-				ituWidgetSetVisible(t_widget, true);
-				}*/
 				//显示当前的控件
 				t_widget = ituSceneFindWidget(&theScene, t_node_widget->focus_back_name);
 				ituWidgetSetVisible(t_widget, true);
 				curr_node_widget = t_node_widget;
-				/*if ( (strcmp(curr_node_widget->name, "BackgroundButton47") == 0) ||
-				(strcmp(curr_node_widget->name, "BackgroundButton30") == 0)){
-				t_widget = ituSceneFindWidget(&theScene, curr_node_widget->focus_back_name);
-				ituWidgetSetVisible(t_widget, true);
-				t_widget = ituSceneFindWidget(&theScene, curr_node_widget->name);
-				ituWidgetSetVisible(t_widget, false);
-
-				}*/
 			}
 		}
 	}
@@ -237,7 +219,11 @@ static void node_widget_up_down(struct node_widget *widget, unsigned char state)
 static void node_widget_confirm_cb(struct node_widget *widget, u8_t state)
 {
 	ITUWidget *t_widget = NULL;
-	if (strcmp(widget->name, "yureSprite") == 0){
+	if (strcmp(widget->name, "BackgroundButton47") ==0 ){
+		t_widget = ituSceneFindWidget(&theScene, "MainLayer");
+		ituLayerGoto((ITULayer *)t_widget);
+	}
+	else if (strcmp(widget->name, "yureSprite") == 0){
 		t_widget = ituSceneFindWidget(&theScene, "yureLayer");
 		ituLayerGoto((ITULayer *)t_widget);
 	}

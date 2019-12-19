@@ -515,12 +515,16 @@ void MainMenuAnimationSetPlay(bool toPlay)
 
 bool YX_MenuOnEnter(ITUWidget* widget, char* param)
 {
+	static int test_flag = 0;
 	ITUWidget *t_widget = NULL;
 	//MainLayer 首页
 	if (strcmp(widget->name, "MainLayer") == 0){
 		//test
-		ituLayerGoto(ituSceneFindWidget(&theScene, "chushui"));
-		return true;
+		if (test_flag == 0){
+			test_flag++;
+			ituLayerGoto(ituSceneFindWidget(&theScene, "yureLayer"));
+			return true;
+		}
 		//全部隐藏
 		t_widget = ituSceneFindWidget(&theScene, "Background100");
 		ituWidgetSetVisible(t_widget, false);

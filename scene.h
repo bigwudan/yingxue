@@ -14,6 +14,7 @@
 
 #include "ite/itu.h"
 #include "ctrlboard.h"
+#include <sys/time.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -194,7 +195,11 @@ extern struct node_widget chushui_2;
 
 //樱雪基础数据
 struct yingxue_base_tag{
+	//预热
 	struct node_widget *yure_time_widget; //预热时间
+	unsigned char yure_mode; //预热模式 0单巡航模式 1 全天候模式 2 预约模式
+	struct timeval yure_begtime; //预热开始时间
+	struct timeval yure_endtime; //预热结束时间
 };
 
 extern struct yingxue_base_tag yingxue_base;
