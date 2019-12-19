@@ -192,6 +192,10 @@ extern struct node_widget chushui_0;
 extern struct node_widget chushui_1;
 extern struct node_widget chushui_2;
 
+//模式
+struct moshi_data{
+	unsigned char temp;
+};
 
 //樱雪基础数据
 struct yingxue_base_tag{
@@ -202,6 +206,14 @@ struct yingxue_base_tag{
 	struct timeval yure_endtime; //预热结束时间
 	unsigned char yure_set_count; //预热设置开始时间
 	unsigned char huishui_temp; //回水温度
+
+	//moshi
+	unsigned char moshi_mode; // 模式 0无模式 1 普通模式 2 超级模式 3 节能模式 4 水果模式
+	unsigned char select_set_moshi_mode;// 选择设置模式 0无模式 1 普通模式 2 超级模式 3 节能模式 4 水果模式
+	struct moshi_data normal_moshi; //普通模式
+	struct moshi_data super_moshi; //超级模式
+	struct moshi_data eco_moshi; //节能模式
+	struct moshi_data fruit_moshi; //水果模式
 };
 
 extern struct yingxue_base_tag yingxue_base;

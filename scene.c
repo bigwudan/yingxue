@@ -306,7 +306,7 @@ static void yure_node_widget_confirm_cb(struct node_widget *widget, u8_t state)
 		*/
 		yingxue_base.yure_mode = 3;
 		gettimeofday(&yingxue_base.yure_begtime, NULL);
-		struct tm *tm, mytime;
+		struct tm *tm;
 		tm = localtime(&yingxue_base.yure_begtime.tv_sec);
 		tm->tm_hour = yingxue_base.yure_set_count;
 		yingxue_base.yure_endtime.tv_sec = mktime(tm);
@@ -429,6 +429,37 @@ static void yure_yureshezhiLayer_widget_confirm_cb(struct node_widget *widget, u
 		}
 	}
 }
+
+//模式设置回调事件
+static void moshi_widget_confirm_cb(struct node_widget *widget, u8_t state)
+{
+	ITUWidget *t_widget = NULL;
+	if (strcmp(widget->name, "BackgroundButton68") == 0){
+		t_widget = ituSceneFindWidget(&theScene, "MainLayer");
+		ituLayerGoto((ITULayer *)t_widget);
+	}
+	else if (strcmp(widget->name, "moshi_BackgroundButton10") == 0){
+		yingxue_base.moshi_mode = 1;
+		t_widget = ituSceneFindWidget(&theScene, "MainLayer");
+		ituLayerGoto((ITULayer *)t_widget);
+	}
+	else if (strcmp(widget->name, "moshi_BackgroundButton11") == 0){
+		yingxue_base.moshi_mode = 2;
+		t_widget = ituSceneFindWidget(&theScene, "MainLayer");
+		ituLayerGoto((ITULayer *)t_widget);
+	}
+	else if (strcmp(widget->name, "moshi_BackgroundButton12") == 0){
+		yingxue_base.moshi_mode = 3;
+		t_widget = ituSceneFindWidget(&theScene, "MainLayer");
+		ituLayerGoto((ITULayer *)t_widget);
+	}
+	else if (strcmp(widget->name, "moshi_BackgroundButton13") == 0){
+		yingxue_base.moshi_mode = 4;
+		t_widget = ituSceneFindWidget(&theScene, "MainLayer");
+		ituLayerGoto((ITULayer *)t_widget);
+	}
+}
+
 
 //樱雪基础数据
 struct yingxue_base_tag yingxue_base;
@@ -817,35 +848,35 @@ node_widget_init(void)
 	moshiLayer_0.down = &moshiLayer_1;
 	moshiLayer_0.focus_back_name = "BackgroundButton33";
 	moshiLayer_0.name = "BackgroundButton68";
-	moshiLayer_0.confirm_cb = node_widget_confirm_cb;
+	moshiLayer_0.confirm_cb = moshi_widget_confirm_cb;
 	moshiLayer_0.updown_cb = node_widget_up_down;
 	
 	moshiLayer_1.up = &moshiLayer_0;
 	moshiLayer_1.down = &moshiLayer_2;
 	moshiLayer_1.focus_back_name = "moshi_BackgroundButton80";
 	moshiLayer_1.name = "moshi_BackgroundButton10";
-	moshiLayer_1.confirm_cb = node_widget_confirm_cb;
+	moshiLayer_1.confirm_cb = moshi_widget_confirm_cb;
 	moshiLayer_1.updown_cb = node_widget_up_down;
 
 	moshiLayer_2.up = &moshiLayer_1;
 	moshiLayer_2.down = &moshiLayer_3;
 	moshiLayer_2.focus_back_name = "moshi_BackgroundButton79";
 	moshiLayer_2.name = "moshi_BackgroundButton11";
-	moshiLayer_2.confirm_cb = node_widget_confirm_cb;
+	moshiLayer_2.confirm_cb = moshi_widget_confirm_cb;
 	moshiLayer_2.updown_cb = node_widget_up_down;
 
 	moshiLayer_3.up = &moshiLayer_2;
 	moshiLayer_3.down = &moshiLayer_4;
 	moshiLayer_3.focus_back_name = "moshi_BackgroundButton81";
 	moshiLayer_3.name = "moshi_BackgroundButton12";
-	moshiLayer_3.confirm_cb = node_widget_confirm_cb;
+	moshiLayer_3.confirm_cb = moshi_widget_confirm_cb;
 	moshiLayer_3.updown_cb = node_widget_up_down;
 
 	moshiLayer_4.up = &moshiLayer_3;
 	moshiLayer_4.down = NULL;
 	moshiLayer_4.focus_back_name = "moshi_BackgroundButton82";
 	moshiLayer_4.name = "moshi_BackgroundButton13";
-	moshiLayer_4.confirm_cb = node_widget_confirm_cb;
+	moshiLayer_4.confirm_cb = moshi_widget_confirm_cb;
 	moshiLayer_4.updown_cb = node_widget_up_down;
 
 	//出水
