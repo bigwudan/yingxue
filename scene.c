@@ -313,11 +313,17 @@ static void yure_node_widget_confirm_cb(struct node_widget *widget, u8_t state)
 		t_widget = ituSceneFindWidget(&theScene, "MainLayer");
 		ituLayerGoto((ITULayer *)t_widget);
 	}
-	//BackgroundButton2
+	//设置预热时间
 	else if ( strcmp(widget->name, "BackgroundButton2") == 0){
 		//设置预约时间
 		t_widget = ituSceneFindWidget(&theScene, "yureshijianLayer");
 		ituLayerGoto((ITULayer *)t_widget);
+	}
+	//设置预热回水温度和北京时间
+	else if ( strcmp(widget->name, "BackgroundButton21") == 0 ){
+		t_widget = ituSceneFindWidget(&theScene, "yureshezhiLayer");
+		ituLayerGoto((ITULayer *)t_widget);
+
 	}
 }
 
@@ -367,6 +373,63 @@ static void yure_settime_widget_confirm_cb(struct node_widget *widget, u8_t stat
 	}
 }
 
+//预热回水温度和北京时间
+static void yure_yureshezhiLayer_widget_confirm_cb(struct node_widget *widget, u8_t state)
+{
+	ITUWidget *t_widget = NULL;
+	char *t_buf = NULL;
+	unsigned char num = 0;
+	if (strcmp(widget->name, "BackgroundButton60") == 0){
+		t_widget = ituSceneFindWidget(&theScene, "yureLayer");
+		ituLayerGoto((ITULayer *)t_widget);
+	}	
+	//支持长按
+	else if (widget->type == 1){
+		if (widget->state == 0){
+			//锁定
+			widget->state = 1;
+			t_widget = ituSceneFindWidget(&theScene, widget->checked_back_name);
+			ituWidgetSetVisible(t_widget, true);
+		}
+		else{
+			//解除锁定Background2 Background3 Background4
+			//改变数据
+			//回水温度
+			if (strcmp(widget->name, "Background2") == 0){
+				t_widget = ituSceneFindWidget(&theScene, "Text3");
+				t_buf = ituTextGetString(t_widget);
+				num = atoi(t_buf);
+				yingxue_base.huishui_temp = num;
+			}
+			//北京时间小时
+			else if (strcmp(widget->name, "Background3") == 0){
+				t_widget = ituSceneFindWidget(&theScene, "Text42");
+				t_buf = ituTextGetString(t_widget);
+				num = atoi(t_buf);
+				struct timeval curr_time;
+				struct tm *t_tm;
+				gettimeofday(&curr_time, NULL);
+
+				t_tm = localtime(&curr_time);
+				t_tm->tm_hour = num;
+				
+			}
+			//北京时间分钟
+			else if (strcmp(widget->name, "Background4") == 0){
+				t_widget = ituSceneFindWidget(&theScene, "Text43");
+				t_buf = ituTextGetString(t_widget);
+				num = atoi(t_buf);
+				
+			}
+
+
+
+			widget->state = 0;
+			t_widget = ituSceneFindWidget(&theScene, widget->checked_back_name);
+			ituWidgetSetVisible(t_widget, false);
+		}
+	}
+}
 
 //樱雪基础数据
 struct yingxue_base_tag yingxue_base;
@@ -718,7 +781,7 @@ node_widget_init(void)
 	yureshezhiLayer_0.down = &yureshezhiLayer_1;
 	yureshezhiLayer_0.focus_back_name = "BackgroundButton85";
 	yureshezhiLayer_0.name = "BackgroundButton60";
-	yureshezhiLayer_0.confirm_cb = node_widget_confirm_cb;
+	yureshezhiLayer_0.confirm_cb = yure_yureshezhiLayer_widget_confirm_cb;
 	yureshezhiLayer_0.updown_cb = node_widget_up_down;
 
 	yureshezhiLayer_1.up = &yureshezhiLayer_0;
@@ -726,7 +789,7 @@ node_widget_init(void)
 	yureshezhiLayer_1.focus_back_name = "Background37";
 	yureshezhiLayer_1.checked_back_name = "Background45";
 	yureshezhiLayer_1.name = "Background2";
-	yureshezhiLayer_1.confirm_cb = node_widget_confirm_cb;
+	yureshezhiLayer_1.confirm_cb = yure_yureshezhiLayer_widget_confirm_cb;
 	yureshezhiLayer_1.updown_cb = node_widget_up_down;
 	yureshezhiLayer_1.type = 1;
 
@@ -735,7 +798,7 @@ node_widget_init(void)
 	yureshezhiLayer_2.focus_back_name = "Background33";
 	yureshezhiLayer_2.checked_back_name = "Background105";
 	yureshezhiLayer_2.name = "Background3";
-	yureshezhiLayer_2.confirm_cb = node_widget_confirm_cb;
+	yureshezhiLayer_2.confirm_cb = yure_yureshezhiLayer_widget_confirm_cb;
 	yureshezhiLayer_2.updown_cb = node_widget_up_down;
 	yureshezhiLayer_2.type = 1;
 
@@ -745,7 +808,7 @@ node_widget_init(void)
 	yureshezhiLayer_3.focus_back_name = "Background40";
 	yureshezhiLayer_3.checked_back_name = "Background107";
 	yureshezhiLayer_3.name = "Background4";
-	yureshezhiLayer_3.confirm_cb = node_widget_confirm_cb;
+	yureshezhiLayer_3.confirm_cb = yure_yureshezhiLayer_widget_confirm_cb;
 	yureshezhiLayer_3.updown_cb = node_widget_up_down;
 	yureshezhiLayer_3.type = 1;
 

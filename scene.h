@@ -201,6 +201,7 @@ struct yingxue_base_tag{
 	struct timeval yure_begtime; //预热开始时间
 	struct timeval yure_endtime; //预热结束时间
 	unsigned char yure_set_count; //预热设置开始时间
+	unsigned char huishui_temp; //回水温度
 };
 
 extern struct yingxue_base_tag yingxue_base;
