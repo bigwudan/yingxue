@@ -189,9 +189,14 @@ static void node_widget_up_down(struct node_widget *widget, unsigned char state)
 				ituWidgetSetVisible(t_widget, false);
 
 				//原来的数据去掉边框
-				t_widget = ituSceneFindWidget(&theScene, curr_node_widget->focus_back_name);
-				ituWidgetSetVisible(t_widget, false);
-
+				if (strcmp(curr_node_widget->focus_back_name, "radio") == 0){
+					t_widget = ituSceneFindWidget(&theScene, t_node_widget->name);
+					ituFocusWidget(t_node_widget);
+				}
+				else{
+					t_widget = ituSceneFindWidget(&theScene, curr_node_widget->focus_back_name);
+					ituWidgetSetVisible(t_widget, false);
+				}
 				curr_node_widget = t_node_widget;
 			}
 			else if (strcmp(t_node_widget->focus_back_name, "radio") == 0){
@@ -260,6 +265,57 @@ static void node_widget_confirm_cb(struct node_widget *widget, u8_t state)
 			t_widget = ituSceneFindWidget(&theScene, widget->checked_back_name);
 			ituWidgetSetVisible(t_widget, false);
 		}
+	}
+}
+
+//点击事件
+static void yure_node_widget_confirm_cb(struct node_widget *widget, u8_t state)
+{
+	ITUWidget *t_widget = NULL;
+	if (strcmp(widget->name, "BackgroundButton47") == 0){
+		t_widget = ituSceneFindWidget(&theScene, "MainLayer");
+		ituLayerGoto((ITULayer *)t_widget);
+	}
+	//Background27
+	else if (strcmp(widget->name, "BackgroundButton14") == 0){
+		//单次巡航 从现在到2个小时结束
+		yingxue_base.yure_mode = 1;
+		gettimeofday(&yingxue_base.yure_begtime, NULL);
+		//2个小时 
+		yingxue_base.yure_endtime.tv_sec = yingxue_base.yure_begtime.tv_sec + 60 * 60 * 2;
+		t_widget = ituSceneFindWidget(&theScene, "MainLayer");
+		ituLayerGoto((ITULayer *)t_widget);
+	}
+	else if ( strcmp(widget->name, "BackgroundButton19") == 0 ){
+		//全天候模式：
+		//启动：从点击巡航模式，即刻开始，发送一次串口命令：预热中的数据2“循环预热”
+		yingxue_base.yure_mode = 2;
+		gettimeofday(&yingxue_base.yure_begtime, NULL);
+		yingxue_base.yure_endtime.tv_sec = 9999;
+		t_widget = ituSceneFindWidget(&theScene, "MainLayer");
+		ituLayerGoto((ITULayer *)t_widget);
+	}
+	//BackgroundButton20
+	else if (strcmp(widget->name, "BackgroundButton20") == 0){
+		/*
+		预约模式：
+		启动：定时时间到达，发送一次串口命令：预热中的数据2“循环预热”，
+		结束：自动延迟1个小时，发送一次串口命令，TFT在发送 预热命令  0- 预热关闭是吧
+		*/
+		yingxue_base.yure_mode = 3;
+		gettimeofday(&yingxue_base.yure_begtime, NULL);
+		struct tm *tm, mytime;
+		tm = localtime(&yingxue_base.yure_begtime.tv_sec);
+		tm->tm_hour = yingxue_base.yure_set_count;
+		yingxue_base.yure_endtime.tv_sec = mktime(tm);
+		t_widget = ituSceneFindWidget(&theScene, "MainLayer");
+		ituLayerGoto((ITULayer *)t_widget);
+	}
+	//BackgroundButton2
+	else if ( strcmp(widget->name, "BackgroundButton2") == 0){
+		//设置预约时间
+		t_widget = ituSceneFindWidget(&theScene, "yureshijianLayer");
+		ituLayerGoto((ITULayer *)t_widget);
 	}
 }
 
@@ -570,21 +626,21 @@ node_widget_init(void)
 	yureLayer_0.down = &yureLayer_1;
 	yureLayer_0.focus_back_name = "BackgroundButton78";
 	yureLayer_0.name = "BackgroundButton47";
-	yureLayer_0.confirm_cb = node_widget_confirm_cb;
+	yureLayer_0.confirm_cb = yure_node_widget_confirm_cb;
 	yureLayer_0.updown_cb = node_widget_up_down;
 
 	yureLayer_1.up = &yureLayer_0;
 	yureLayer_1.down = &yureLayer_2;
 	yureLayer_1.focus_back_name = "Background27";
 	yureLayer_1.name = "BackgroundButton14";
-	yureLayer_1.confirm_cb = node_widget_confirm_cb;
+	yureLayer_1.confirm_cb = yure_node_widget_confirm_cb;
 	yureLayer_1.updown_cb = node_widget_up_down;
 
 	yureLayer_2.up = &yureLayer_1;
 	yureLayer_2.down = &yureLayer_3;
 	yureLayer_2.focus_back_name = "Background30";
 	yureLayer_2.name = "BackgroundButton19";
-	yureLayer_2.confirm_cb = node_widget_confirm_cb;
+	yureLayer_2.confirm_cb = yure_node_widget_confirm_cb;
 	yureLayer_2.updown_cb = node_widget_up_down;
 
 
@@ -592,21 +648,21 @@ node_widget_init(void)
 	yureLayer_3.down = &yureLayer_4;
 	yureLayer_3.focus_back_name = "Background132";
 	yureLayer_3.name = "BackgroundButton20";
-	yureLayer_3.confirm_cb = node_widget_confirm_cb;
+	yureLayer_3.confirm_cb = yure_node_widget_confirm_cb;
 	yureLayer_3.updown_cb = node_widget_up_down;
 
 	yureLayer_4.up = &yureLayer_3;
 	yureLayer_4.down = &yureLayer_5;
 	yureLayer_4.focus_back_name = "Background94";
 	yureLayer_4.name = "BackgroundButton2";
-	yureLayer_4.confirm_cb = node_widget_confirm_cb;
+	yureLayer_4.confirm_cb = yure_node_widget_confirm_cb;
 	yureLayer_4.updown_cb = node_widget_up_down;
 
 	yureLayer_5.up = &yureLayer_4;
 	yureLayer_5.down = NULL;
 	yureLayer_5.focus_back_name = "Background46";
 	yureLayer_5.name = "BackgroundButton21";
-	yureLayer_5.confirm_cb = node_widget_confirm_cb;
+	yureLayer_5.confirm_cb = yure_node_widget_confirm_cb;
 	yureLayer_5.updown_cb = node_widget_up_down;
 
 	//预约时间
