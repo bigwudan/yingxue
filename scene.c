@@ -601,6 +601,9 @@ static void moshi_widget_longpress_cb(struct node_widget *widget, u8_t state)
 //串口消息
 mqd_t uartQueue = -1;
 
+struct main_data g_main_data;
+
+
 //樱雪基础数据
 struct yingxue_base_tag yingxue_base;
 
@@ -1058,6 +1061,29 @@ node_widget_init(void)
 	//预热时间
 	yure_settime_init();
 }
+//接受主板来的命令 0成功 1未完成 -1失败
+char recv_uart_cmd()
+{
+	g_main_data.state = 16;
+
+	//第0针
+	g_main_data.data[0] = 0x00;
+	g_main_data.data[1] = 0x00;
+	//帧
+	g_main_data.data[2] = 0x00 << 4 | 0x11;
+	//数据
+	g_main_data.data[3] = 0x00;
+	//水流显示	Bit4	1 — 有水    
+	//风机显示	Bit5	1 — 风机开
+	//火焰显示	Bit6	1 — 有火
+	g_main_data.data[4] = 0x00;
+	//[0][5]	出水温度   6
+	g_main_data.data[8] = 0x11;
+	//[0][8]   错误代码 故障代码故障状态([0][1].2=1) — 故障代码
+	g_main_data.data[11] = 0x11;
+	return 0;
+}
+
 
 void SceneInit(void)
 {

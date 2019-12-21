@@ -139,6 +139,16 @@ struct operate_data
 
 };
 
+//控制板回复数据结构
+struct main_data
+{
+	//数据
+	unsigned char data[17];
+	//state 0开始
+	unsigned char state;
+
+};
+
 
 //控制控件
 struct node_widget
@@ -245,6 +255,10 @@ struct yingxue_base_tag{
 
 //发送串口命令
 void send_uart_cmd(struct operate_data *var_opt_data);
+
+//接受主板来的命令 0成功 1未完成 -1失败
+char recv_uart_cmd();
+
 
 
 extern struct yingxue_base_tag yingxue_base;
