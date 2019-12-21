@@ -111,8 +111,34 @@ void ScenePredraw(int arg);
 extern ITUScene theScene;
 
 //樱雪
+//消息
 //控制键回调函数
 typedef void(*node_widget_cb)(struct node_widget *widget, unsigned char state);
+
+//控制板回复数据结构
+struct operate_data
+{
+	unsigned char data_0;
+
+	//固定信息
+	unsigned char data_1;
+	unsigned char data_2;
+
+	//回复数据
+	unsigned char data_3;
+	unsigned char data_4;
+	unsigned char data_5;
+
+	unsigned char data_6;
+	unsigned char data_7;
+	unsigned char data_8;
+	//crc
+	unsigned char data_9;
+	unsigned char data_10;
+	
+
+};
+
 
 //控制控件
 struct node_widget

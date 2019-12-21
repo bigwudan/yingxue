@@ -542,6 +542,9 @@ static void moshi_widget_longpress_cb(struct node_widget *widget, u8_t state)
 }
 
 
+//串口消息
+mqd_t uartQueue = -1;
+
 //樱雪基础数据
 struct yingxue_base_tag yingxue_base;
 

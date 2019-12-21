@@ -715,6 +715,8 @@ bool YX_MenuOnEnter(ITUWidget* widget, char* param)
 		//默认第一个
 		curr_node_widget = &chushui_0;
 
+		t_widget = ituSceneFindWidget(&theScene, "chushui_BackgroundButton7");
+		ituWidgetSetVisible(t_widget, true);
 		//1
 		t_widget = ituSceneFindWidget(&theScene, "chushui_BackgroundButton73");
 		ituWidgetSetVisible(t_widget, false);
