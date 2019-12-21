@@ -32,6 +32,8 @@ void* UartFunc(void* arg)
 	struct timeval cur_time;
 	gettimeofday(&cur_time, NULL);
 
+
+
 	//如果有开始时间
 	if (yingxue_base.yure_begtime.tv_sec != 0){
 		if ( (yingxue_base.yure_begtime.tv_sec <= cur_time.tv_sec + 60 * 2) && 
@@ -65,6 +67,18 @@ void* UartFunc(void* arg)
 			yingxue_base.yure_endtime.tv_sec = 0;
 			yingxue_base.yure_endtime.tv_usec = 0;
 		}
+	}
+	//ssize_t mq_receive(mqd_t msgid, char *msg, size_t msg_len, unsigned int *msg_prio)
+	else if (mq_receive(uartQueue, &oper_data, sizeof(struct operate_data), 0) != -1){
+		send_uart_cmd(&oper_data);
+	}
+	//发送应答
+	else{
+		oper_data.data_0 = 0xEB;
+		oper_data.data_1 = 0x03 << 5 | 0x07 << 2 | 0x01;
+		oper_data.data_2 = 0x00;
+		oper_data.data_3 = 0x00;
+		send_uart_cmd(&oper_data);
 	}
 
 	
