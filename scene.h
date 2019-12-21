@@ -243,7 +243,14 @@ struct yingxue_base_tag{
 	struct moshi_data fruit_moshi; //水果模式
 };
 
+//发送串口命令
+void send_uart_cmd(struct operate_data *var_opt_data);
+
+
 extern struct yingxue_base_tag yingxue_base;
+
+
+
 
 /** @} */ // end of ctrlboard_scene
 

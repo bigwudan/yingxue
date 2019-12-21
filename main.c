@@ -44,12 +44,27 @@ void* UartFunc(void* arg)
 			oper_data.data_2 = 0x09;
 			oper_data.data_3 = 0x02;
 			oper_data.data_5 = yingxue_base.huishui_temp;
-
-
-		
+			send_uart_cmd(&oper_data);
+			yingxue_base.yure_begtime.tv_sec = 0;
+			yingxue_base.yure_begtime.tv_usec = 0;
 		}
-
-
+	}
+	//结束时间
+	else if (yingxue_base.yure_endtime.tv_sec != 0){
+		if ((yingxue_base.yure_endtime.tv_sec <= cur_time.tv_sec + 60 * 2) &&
+			(yingxue_base.yure_endtime.tv_sec <= cur_time.tv_sec - 60 * 2)
+			)
+		{
+			//发送关闭
+			oper_data.data_0 = 0xEB;
+			oper_data.data_1 = 0x03 << 5 | 0x07 << 2 | 0x01;
+			oper_data.data_2 = 0x09;
+			oper_data.data_3 = 0x00;
+			oper_data.data_5 = yingxue_base.huishui_temp;
+			send_uart_cmd(&oper_data);
+			yingxue_base.yure_endtime.tv_sec = 0;
+			yingxue_base.yure_endtime.tv_usec = 0;
+		}
 	}
 
 	

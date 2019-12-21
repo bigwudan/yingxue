@@ -33,6 +33,8 @@
 
 extern ITUActionFunction actionFunctions[];
 extern void resetScene(void);
+//信息对象
+extern mqd_t uartQueue;
 
 // status
 static QuitValue    quitValue;
@@ -442,12 +444,27 @@ static void yure_yureshezhiLayer_widget_confirm_cb(struct node_widget *widget, u
 //模式设置回调事件
 static void moshi_widget_confirm_cb(struct node_widget *widget, u8_t state)
 {
+	//初始化一个控制板数据
+	struct operate_data oper_data;
+
 	ITUWidget *t_widget = NULL;
 	if (strcmp(widget->name, "BackgroundButton68") == 0){
 		t_widget = ituSceneFindWidget(&theScene, "MainLayer");
 		ituLayerGoto((ITULayer *)t_widget);
 	}
 	else if (strcmp(widget->name, "moshi_BackgroundButton10") == 0){
+		//发送模式命令就发指令 4 ： 模式设置  ： 默认 0 ，设置温度 ： XX ， 定升设定  ： 默认值时发0 
+		memset(&oper_data, 0, sizeof(struct operate_data));
+		oper_data.data_0 = 0xEB;
+		oper_data.data_1 = 0x03 << 5 | 0x07 << 2 | 0x01;
+		oper_data.data_2 = 0x04;
+		oper_data.data_3 = 0x00;
+		oper_data.data_4 = yingxue_base.normal_moshi.temp;
+		struct timespec tm;
+		memset(&tm, 0, sizeof(struct timespec));
+		tm.tv_sec += 2;
+		mq_timedsend(uartQueue, &oper_data, sizeof(struct operate_data), 1, &tm);
+
 		yingxue_base.moshi_mode = 1;
 		t_widget = ituSceneFindWidget(&theScene, "MainLayer");
 		ituLayerGoto((ITULayer *)t_widget);
@@ -610,6 +627,12 @@ struct node_widget chushui_0;
 struct node_widget chushui_1;
 struct node_widget chushui_2;
 
+//发送串口命令
+void send_uart_cmd(struct operate_data *var_opt_data)
+{
+	printf("send to uart\n");
+	return;
+}
 
 //预热时间
 static void yure_settime_init()
