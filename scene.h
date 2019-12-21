@@ -37,7 +37,8 @@ typedef enum
     EVENT_CUSTOM_KEY1,                              ///< #6: Key #1 pressed.
 	EVENT_CUSTOM_KEY2,                              ///< #7: Key #2 pressed.
     EVENT_CUSTOM_KEY3,                              ///< #8: Key #3 pressed.
-    EVENT_CUSTOM_UART                               ///< #9: UART message.
+    EVENT_CUSTOM_UART,                               ///< #9: UART message.
+	EVENT_CUSTOM_MAINCHG                               ///< #9: main改变
 
 } CustomEvent;
 
@@ -114,6 +115,19 @@ extern ITUScene theScene;
 //消息
 //控制键回调函数
 typedef void(*node_widget_cb)(struct node_widget *widget, unsigned char state);
+
+//主页串口改变显示
+struct main_uart_chg
+{
+	//水流显示 0显示 1不显示
+	unsigned char water_show;
+	//火焰显示 0显示 1不显示
+	unsigned char fire_show;
+	//风机显示 0显示 1不显示
+	unsigned char wind_show;
+	//出水温度
+	unsigned char chushui_temp;
+};
 
 //控制板回复数据结构
 struct operate_data

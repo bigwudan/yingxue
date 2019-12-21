@@ -1084,6 +1084,7 @@ char recv_uart_cmd()
 	return 0;
 }
 
+struct main_uart_chg g_main_uart_chg_data;
 
 void SceneInit(void)
 {
@@ -1536,6 +1537,12 @@ int SceneRun(void)
                     break;
 				case 27:
 					printf("curr_widget=%s\n", curr_node_widget->name);
+
+
+					printf("g_main_uart_chg_data=%p\n", &g_main_uart_chg_data);
+					ituSceneSendEvent(&theScene, EVENT_CUSTOM_MAINCHG, NULL);
+
+
 					break;
 				case 13:
 					curr_node_widget->confirm_cb(curr_node_widget, 2);
