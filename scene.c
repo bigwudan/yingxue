@@ -228,7 +228,7 @@ static void node_widget_up_down(struct node_widget *widget, unsigned char state)
 //点击回调事件
 //@param widget 点击空间
 //@param state 
-static void main_widget_confirm_cb(struct node_widget *widget, u8_t state)
+static void main_widget_confirm_cb(struct node_widget *widget, unsigned char state)
 {
 	ITUWidget *t_widget = NULL;
 	if (strcmp(widget->name, "BackgroundButton47") ==0 ){
@@ -282,7 +282,7 @@ static void main_widget_confirm_cb(struct node_widget *widget, u8_t state)
 }
 
 //预热点击事件
-static void yure_node_widget_confirm_cb(struct node_widget *widget, u8_t state)
+static void yure_node_widget_confirm_cb(struct node_widget *widget, unsigned char state)
 {
 	ITUWidget *t_widget = NULL;
 	if (strcmp(widget->name, "BackgroundButton47") == 0){
@@ -339,7 +339,7 @@ static void yure_node_widget_confirm_cb(struct node_widget *widget, u8_t state)
 }
 
 //预热时间设置事件
-static void yure_settime_widget_confirm_cb(struct node_widget *widget, u8_t state)
+static void yure_settime_widget_confirm_cb(struct node_widget *widget, unsigned char state)
 {
 	ITUWidget *t_widget = NULL;
 	if (strcmp(widget->name, "BackgroundButton65") == 0){
@@ -385,7 +385,7 @@ static void yure_settime_widget_confirm_cb(struct node_widget *widget, u8_t stat
 }
 
 //预热回水温度和北京时间
-static void yure_yureshezhiLayer_widget_confirm_cb(struct node_widget *widget, u8_t state)
+static void yure_yureshezhiLayer_widget_confirm_cb(struct node_widget *widget, unsigned char state)
 {
 	ITUWidget *t_widget = NULL;
 	char *t_buf = NULL;
@@ -442,7 +442,7 @@ static void yure_yureshezhiLayer_widget_confirm_cb(struct node_widget *widget, u
 }
 
 //模式设置回调事件
-static void moshi_widget_confirm_cb(struct node_widget *widget, u8_t state)
+static void moshi_widget_confirm_cb(struct node_widget *widget, unsigned char state)
 {
 	//初始化一个控制板数据
 	struct operate_data oper_data;
@@ -527,7 +527,7 @@ static void moshi_widget_confirm_cb(struct node_widget *widget, u8_t state)
 
 
 //出水回调事件
-static void chushui_widget_confirm_cb(struct node_widget *widget, u8_t state)
+static void chushui_widget_confirm_cb(struct node_widget *widget, unsigned char state)
 {
 	ITUWidget *t_widget = NULL;
 	char *t_buf;
@@ -577,7 +577,7 @@ static void chushui_widget_confirm_cb(struct node_widget *widget, u8_t state)
 
 
 //长按模式
-static void moshi_widget_longpress_cb(struct node_widget *widget, u8_t state)
+static void moshi_widget_longpress_cb(struct node_widget *widget, unsigned char state)
 {
 	ITUWidget *t_widget = NULL;
 	t_widget = ituSceneFindWidget(&theScene, "chushui");
@@ -1471,6 +1471,22 @@ static void CheckMouse(void)
 
 #endif // defined(CFG_USB_MOUSE) || defined(_WIN32)
 
+#define TEST_PORT       ITP_DEVICE_UART3
+#define TEST_DEVICE     itpDeviceUart3	
+#define TEST_BAUDRATE   "115200"
+
+static void UartCallback(void* arg1, uint32_t arg2)
+{
+	unsigned char getstr1 = 0;
+	unsigned char sendtr1[8] = { 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A };
+	int len = 0;
+	len = read(TEST_PORT, getstr1, 1);
+	printf("read num=%d,getstr1=%s\n", len, getstr1);
+	write(TEST_PORT, getstr1, 1);
+
+
+}
+
 int SceneRun(void)
 {
     SDL_Event   ev;
@@ -1483,6 +1499,12 @@ int SceneRun(void)
 
     /* Watch keystrokes */
     dblclk = frames = lasttick = lastx = lasty = mouseDownTick = 0;
+
+	//test uart3
+	itpRegisterDevice(TEST_PORT, &TEST_DEVICE);
+	ioctl(TEST_PORT, ITP_IOCTL_INIT, NULL);
+	ioctl(TEST_PORT, ITP_IOCTL_RESET, (void *)CFG_UART3_BAUDRATE);
+	ioctl(TEST_PORT, ITP_IOCTL_REG_UART_CB, (void*)UartCallback);
 
 	node_widget_init();
 
@@ -1528,12 +1550,12 @@ int SceneRun(void)
                 {
                 case SDLK_UP:
 					curr_node_widget->updown_cb(curr_node_widget, 0);
-                    //ituSceneSendEvent(&theScene, EVENT_CUSTOM_KEY0, NULL);
+                    
                     break;
 
                 case SDLK_DOWN:
 					curr_node_widget->updown_cb(curr_node_widget, 1);
-                    //ituSceneSendEvent(&theScene, EVENT_CUSTOM_KEY1, NULL);
+                    
                     break;
 				case 27:
 					printf("curr_widget=%s\n", curr_node_widget->name);
@@ -1836,12 +1858,12 @@ int SceneRun(void)
 
         if (sleepModeDoubleClick)
         {
-            if (theConfig.screensaver_type != SCREENSAVER_NONE &&
+            /*if (theConfig.screensaver_type != SCREENSAVER_NONE &&
                 ScreenSaverCheckForDoubleClick())
             {
                 if (theConfig.screensaver_type == SCREENSAVER_BLANK)
                     ScreenOffContinue();
-            }
+            }*/
         }
 #endif
         delay = periodPerFrame - (SDL_GetTicks() - tick);

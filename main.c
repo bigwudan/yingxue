@@ -24,6 +24,7 @@ extern mqd_t uartQueue;
 //线程串口回调函数
 void* UartFunc(void* arg)
 {
+
 	//初始化一个控制板数据
 	struct operate_data oper_data;
 	memset(&oper_data, 0, sizeof(struct operate_data));
@@ -107,8 +108,6 @@ int SDL_main(int argc, char *argv[])
 
 	pthread_attr_init(&attr);
 	pthread_create(&task, &attr, UartFunc, NULL);
-
-	pthread_join(task, NULL);
 	//end
 
     int ret = 0;
