@@ -1479,16 +1479,20 @@ static void UartCallback(void* arg1, uint32_t arg2)
 {
 	unsigned char getstr1 = 0;
 	unsigned char sendtr1[8] = { 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A };
+	struct timeval tm_val;
 	int len = 0;
 	len = read(TEST_PORT, getstr1, 1);
-	printf("read num=%d,getstr1=%s\n", len, getstr1);
+	//printf("read num=%d,getstr1=%s\n", len, getstr1);
 	write(TEST_PORT, getstr1, 1);
+	gettimeofday(&tm_val, NULL);
 
+	printf("cur_time=%ld\n", tm_val.tv_sec);
 
 }
 
 int SceneRun(void)
 {
+	
     SDL_Event   ev;
     int         delay, frames, lastx, lasty;
     uint32_t    tick, dblclk, lasttick, mouseDownTick;
@@ -1506,10 +1510,17 @@ int SceneRun(void)
 	ioctl(TEST_PORT, ITP_IOCTL_RESET, (void *)CFG_UART3_BAUDRATE);
 	ioctl(TEST_PORT, ITP_IOCTL_REG_UART_CB, (void*)UartCallback);
 
+	ithRtcSetTime(1577176623);
+
+
 	node_widget_init();
 
     for (;;)
     {
+		unsigned long CurrRtcTime = 0;
+		CurrRtcTime = ithRtcGetTime();
+		//printf("Current internal RTC Time= %d sec\n", CurrRtcTime);
+
         bool result = false;
 
         if (CheckQuitValue())
@@ -1541,6 +1552,7 @@ int SceneRun(void)
 #ifdef CFG_LCD_ENABLE
         while (SDL_PollEvent(&ev))
         {
+			printf("SDL_SCANCODE_F1=%d,SDL_SCANCODE_F2=%d\n", SDL_SCANCODE_F1, SDL_SCANCODE_F2);
             switch (ev.type)
             {
             case SDL_KEYDOWN:
@@ -1548,6 +1560,31 @@ int SceneRun(void)
                 result = ituSceneUpdate(&theScene, ITU_EVENT_KEYDOWN, ev.key.keysym.sym, 0, 0);
                 switch (ev.key.keysym.sym)
                 {
+                //1.1
+				case 1073741885:
+					printf("1.1\n");
+					curr_node_widget->updown_cb(curr_node_widget, 0);
+					
+					break;
+				//1.2
+				case 1073741886:
+					printf("1.2\n");
+					curr_node_widget->updown_cb(curr_node_widget, 1);
+					
+					break;
+				//2.1 确认
+				case 1073741884:
+					printf("2.1\n");
+					curr_node_widget->confirm_cb(curr_node_widget, 2);
+					
+					break;
+				//2.2 长按
+				case 1073741883:
+					printf("2.2\n");
+					if (curr_node_widget->long_press_cb)
+						curr_node_widget->long_press_cb(curr_node_widget, 1);
+					break;
+
                 case SDLK_UP:
 					curr_node_widget->updown_cb(curr_node_widget, 0);
                     
