@@ -36,6 +36,8 @@ extern void resetScene(void);
 //信息对象
 extern mqd_t uartQueue;
 
+unsigned long confirm_down_time = 0;
+
 // status
 static QuitValue    quitValue;
 static bool         inVideoState;
@@ -1552,7 +1554,6 @@ int SceneRun(void)
 #ifdef CFG_LCD_ENABLE
         while (SDL_PollEvent(&ev))
         {
-			printf("SDL_SCANCODE_F1=%d,SDL_SCANCODE_F2=%d\n", SDL_SCANCODE_F1, SDL_SCANCODE_F2);
             switch (ev.type)
             {
             case SDL_KEYDOWN:
@@ -1561,26 +1562,19 @@ int SceneRun(void)
                 switch (ev.key.keysym.sym)
                 {
                 //1.1
-				case 1073741885:
-					printf("1.1\n");
+				case SDLK_F4://1073741885:
 					curr_node_widget->updown_cb(curr_node_widget, 0);
-					
 					break;
 				//1.2
-				case 1073741886:
-					printf("1.2\n");
+				case SDLK_F5://1073741886:
 					curr_node_widget->updown_cb(curr_node_widget, 1);
-					
 					break;
 				//2.1 确认
-				case 1073741884:
-					printf("2.1\n");
-					curr_node_widget->confirm_cb(curr_node_widget, 2);
-					
+				case SDLK_F3://1073741884:
+					confirm_down_time = ithRtcGetTime();
 					break;
 				//2.2 长按
-				case 1073741883:
-					printf("2.2\n");
+				case SDLK_F2://1073741883:
 					if (curr_node_widget->long_press_cb)
 						curr_node_widget->long_press_cb(curr_node_widget, 1);
 					break;
@@ -1595,13 +1589,7 @@ int SceneRun(void)
                     
                     break;
 				case 27:
-					printf("curr_widget=%s\n", curr_node_widget->name);
-
-
-					printf("g_main_uart_chg_data=%p\n", &g_main_uart_chg_data);
 					ituSceneSendEvent(&theScene, EVENT_CUSTOM_MAINCHG, NULL);
-
-
 					break;
 				case 13:
 					curr_node_widget->confirm_cb(curr_node_widget, 2);
@@ -1654,8 +1642,32 @@ int SceneRun(void)
 
             case SDL_KEYUP:
                 result = ituSceneUpdate(&theScene, ITU_EVENT_KEYUP, ev.key.keysym.sym, 0, 0);
+				switch (ev.key.keysym.sym)
+				{
+						//1.1
+					case 1073741885:
+						break;
+					case 1073741886:
+						break;
+					case 1073741884:
+					{
+						//如果长按
+						unsigned long t_curr = ithRtcGetTime();
+						t_curr = t_curr - confirm_down_time;
+						//长按
+						if (t_curr >= 2){
+							if (curr_node_widget->long_press_cb)
+								curr_node_widget->long_press_cb(curr_node_widget, 1);
+						}
+						else{
+							curr_node_widget->confirm_cb(curr_node_widget, 2);
+						}
+						break;
+					}
+					case 1073741883:
+						break;
+				}
                 break;
-
             case SDL_MOUSEMOTION:
                 ScreenSaverRefresh();
     #if defined(CFG_USB_MOUSE) || defined(_WIN32)
