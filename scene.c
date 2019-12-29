@@ -1479,6 +1479,7 @@ static void CheckMouse(void)
 
 static void UartCallback(void* arg1, uint32_t arg2)
 {
+	/*
 	unsigned char getstr1 = 0;
 	unsigned char sendtr1[8] = { 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A };
 	struct timeval tm_val;
@@ -1489,12 +1490,40 @@ static void UartCallback(void* arg1, uint32_t arg2)
 	gettimeofday(&tm_val, NULL);
 
 	printf("cur_time=%ld\n", tm_val.tv_sec);
+	*/
+	
+	uint8_t getstr1;
 
+	int len = 0;
+	len = read(TEST_PORT, &getstr1, 1);
+	printf("data=%02X\n", &getstr1);
+	//write(TEST_PORT, &getstr1, 1);
+}
+
+//线程串口回调函数
+static void* UartFunc(void* arg)
+{
+	uint8_t getstr1[20] = {0};
+	int len = 0;
+	while (1){
+		memset(getstr1, 0, 20);
+		len = read(TEST_PORT, &getstr1, 20);
+		if (len > 0){
+			printf("data len=%d\n", len);
+		}
+		usleep(5000);
+	}
 }
 
 int SceneRun(void)
 {
-	
+	//新建一个线程
+	pthread_t task;
+	pthread_attr_t attr;
+
+	pthread_attr_init(&attr);
+	pthread_create(&task, &attr, UartFunc, NULL);
+
     SDL_Event   ev;
     int         delay, frames, lastx, lasty;
     uint32_t    tick, dblclk, lasttick, mouseDownTick;
@@ -1510,7 +1539,7 @@ int SceneRun(void)
 	itpRegisterDevice(TEST_PORT, &TEST_DEVICE);
 	ioctl(TEST_PORT, ITP_IOCTL_INIT, NULL);
 	ioctl(TEST_PORT, ITP_IOCTL_RESET, (void *)CFG_UART3_BAUDRATE);
-	ioctl(TEST_PORT, ITP_IOCTL_REG_UART_CB, (void*)UartCallback);
+	//ioctl(TEST_PORT, ITP_IOCTL_REG_UART_CB, (void*)UartCallback);
 
 	ithRtcSetTime(1577176623);
 
