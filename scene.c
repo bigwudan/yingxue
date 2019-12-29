@@ -41,6 +41,9 @@ unsigned long confirm_down_time = 0;
 //串口的数据
 struct uart_data_tag uart_data;
 
+//环形队列缓存
+struct chain_list_tag chain_list;
+
 static const unsigned short crc16tab[256] = {
 	0x0000, 0x1021, 0x2042, 0x3063, 0x4084, 0x50a5, 0x60c6, 0x70e7,
 	0x8108, 0x9129, 0xa14a, 0xb16b, 0xc18c, 0xd1ad, 0xe1ce, 0xf1ef,
@@ -1538,7 +1541,38 @@ static void UartCallback(void* arg1, uint32_t arg2)
 	//write(TEST_PORT, &getstr1, 1);
 }
 
+static int create_chain_list(struct chain_list_tag *p_chain_list)
+{
+	p_chain_list->rear = 0;
+	p_chain_list->front = 0;
+	p_chain_list->count = 0;
+	memset(p_chain_list->buf, 0, sizeof(p_chain_list->buf));
+	return 0;
+}
 
+static int in_chain_list(struct chain_list_tag *p_chain_list, unsigned char src)
+{
+	int position = (p_chain_list->rear + 1) % MAX_CHAIN_NUM;
+	//已经满
+	if (position == p_chain_list->front){
+		return 0;
+	}
+	*(p_chain_list->buf + p_chain_list->rear) = src;
+	p_chain_list->rear = position;
+	return 1;
+}
+
+
+static int out_chain_list(struct chain_list_tag *p_chain_list, unsigned char *src)
+{
+	//空
+	if (p_chain_list->rear == p_chain_list->front){
+		return 0;
+	}
+	*src = *(p_chain_list->buf + p_chain_list->front);
+	p_chain_list->front = (p_chain_list->front + 1) % MAX_CHAIN_NUM;
+	return 1;
+}
 unsigned short crc16_ccitt(const char *buf, int len)
 {
 	register int counter;
@@ -1550,62 +1584,70 @@ unsigned short crc16_ccitt(const char *buf, int len)
 
 //分析数据
 unsigned char
-process_data(struct uart_data_tag *dst, unsigned char src)
+process_data(struct uart_data_tag *dst, struct chain_list_tag *p_chain_list)
 {
 	unsigned char flag = 0;
 	unsigned short crc = 0;
-	//上一个数据错误，等待一下个0xEA
-	if (dst->state == 1){
-		//下一个0xEA 重新计算
-		if (src == 0xEA){
-			(dst->buf_data)[dst->count++] = src;
-			dst->state = 0;
+	unsigned char buf = 0;
+
+	while (out_chain_list(p_chain_list, &buf)){
+		//上一个数据错误，等待一下个0xEA
+		if (dst->state == 1){
+			//下一个0xEA 重新计算
+			if (buf == 0xEA){
+				(dst->buf_data)[dst->count++] = buf;
+				dst->state = 0;
+			}
 		}
-	}
-	else{
-		dst->buf_data[dst->count++] = src;
-		//接受完17个数据 结束
-		if (dst->count == 17){
-			//检查crc 
-			//检查crc 
-			crc = crc16_ccitt(dst->buf_data + 1, 14);
-			if (((unsigned char)(crc >> 8) == dst->buf_data[15]) &&
-				((unsigned char)crc == dst->buf_data[16])
-
-				){
-				flag = 0;
-			}
-			else{
-
-				flag = 1;
-			}
-
-			//如果出错
-			if (flag == 1){
-				dst->state = 1;
-				dst->count = 0;
-			}
-			else{
-				dst->state = 2;
+		else{
+			dst->buf_data[dst->count++] = buf;
+			//接受完17个数据 结束
+			if (dst->count == 17){
+				//检查crc 
+				//检查crc 
+				crc = crc16_ccitt(dst->buf_data + 1, 14);
+				if (((unsigned char)(crc >> 8) == dst->buf_data[15]) &&
+					((unsigned char)crc == dst->buf_data[16])
+					){
+					flag = 0;
+				}
+				else{
+					flag = 1;
+				}
+				//如果出错
+				if (flag == 1){
+					dst->state = 1;
+					dst->count = 0;
+				}
+				else{
+					dst->state = 2;
+					return 0;
+				}
 			}
 		}
 	}
 	return 0;
-
 }
+
+
 
 //线程串口回调函数
 static void* UartFunc(void* arg)
 {
-	uint8_t getstr1 = 0;
+	uint8_t getstr1[10];
 	int len = 0;
 	int flag = 0;
 	while (1){
-		memset(&getstr1, 0, sizeof(getstr1));
-		len = read(TEST_PORT, &getstr1, sizeof(getstr1));
+		memset(getstr1, 0, sizeof(getstr1));
+		len = read(TEST_PORT, getstr1, sizeof(getstr1));
 		//如果串口有数据
 		if (len > 0){
-			process_data(&uart_data, getstr1);
+
+			//写入环形缓存
+			for (int i = 0; i < len; i++){
+				flag = in_chain_list(&chain_list, getstr1[i]);
+			}
+			process_data(&uart_data, &chain_list);
 			if (uart_data.state == 2){
 				for (int j = 0; j< uart_data.count; j++){
 					printf("0x%02X ", uart_data.buf_data[j]);
@@ -1616,7 +1658,7 @@ static void* UartFunc(void* arg)
 				uart_data.count = 0;
 			}
 		}
-		usleep(1000);
+		usleep(6000);
 	}
 }
 
@@ -1624,6 +1666,9 @@ int SceneRun(void)
 {
 	//初始化串口数据
 	memset(&uart_data, 0, sizeof(struct uart_data_tag));
+
+	//初始化环形队列
+	create_chain_list(&chain_list);
 
 	//新建一个线程
 	pthread_t task;

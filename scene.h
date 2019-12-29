@@ -283,7 +283,14 @@ struct uart_data_tag{
 	unsigned char buf_data[17]; //当前缓存
 	unsigned char state; //状态  0正常 1错误 2已经完成
 };
-
+#define MAX_CHAIN_NUM 50
+//环形队列
+struct chain_list_tag{
+	unsigned char rear; //尾结点
+	unsigned char front; //头结点
+	unsigned char count; //当前数量
+	unsigned char buf[MAX_CHAIN_NUM];
+};
 
 /** @} */ // end of ctrlboard_scene
 
