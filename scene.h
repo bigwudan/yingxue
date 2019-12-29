@@ -277,7 +277,12 @@ char recv_uart_cmd();
 
 extern struct yingxue_base_tag yingxue_base;
 
-
+//串口的数据
+struct uart_data_tag{
+	unsigned char count;//当前数据数
+	unsigned char buf_data[17]; //当前缓存
+	unsigned char state; //状态  0正常 1错误 2已经完成
+};
 
 
 /** @} */ // end of ctrlboard_scene
