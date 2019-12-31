@@ -96,14 +96,14 @@ int SDL_main(int argc, char *argv[])
 
 
 	//建立一个消息
-/*	struct mq_attr mq_uart_attr;
+	struct mq_attr mq_uart_attr;
 	mq_uart_attr.mq_flags = 0;
 	mq_uart_attr.mq_maxmsg = 1;
 	mq_uart_attr.mq_msgsize = 2;
 	uartQueue = mq_open("scene", O_CREAT | O_NONBLOCK, 0644, &mq_uart_attr);
 
 
-	pthread_t task;
+/*	pthread_t task;
 	pthread_attr_t attr;
 
 	pthread_attr_init(&attr);

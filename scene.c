@@ -1620,6 +1620,7 @@ process_data(struct uart_data_tag *dst, struct chain_list_tag *p_chain_list)
 					dst->count = 0;
 				}
 				else{
+					dst->count = 0;
 					dst->state = 2;
 					return 0;
 				}
@@ -1658,7 +1659,7 @@ static void* UartFunc(void* arg)
 				uart_data.count = 0;
 			}
 		}
-		usleep(6000);
+		usleep(1000);
 	}
 }
 
@@ -1674,8 +1675,8 @@ int SceneRun(void)
 	pthread_t task;
 	pthread_attr_t attr;
 
-	pthread_attr_init(&attr);
-	pthread_create(&task, &attr, UartFunc, NULL);
+	//pthread_attr_init(&attr);
+	//pthread_create(&task, &attr, UartFunc, NULL);
 
     SDL_Event   ev;
     int         delay, frames, lastx, lasty;
