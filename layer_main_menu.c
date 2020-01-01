@@ -590,9 +590,9 @@ bool YX_MainOnChg(ITUWidget* widget, char* param)
 {
 	char t_buf[20] = { 0 };
 	ITUWidget* t_widget = NULL;
-	g_main_uart_chg_data.water_show = 1;
+	/*g_main_uart_chg_data.water_show = 1;
 	g_main_uart_chg_data.fire_show = 1;
-	g_main_uart_chg_data.wind_show = 1;
+	g_main_uart_chg_data.wind_show = 1;*/
 
 	g_main_uart_chg_data.chushui_temp = 30;
 
@@ -606,7 +606,7 @@ bool YX_MainOnChg(ITUWidget* widget, char* param)
 
 
 	//Background34
-	if (g_main_uart_chg_data.water_show == 0){
+	if (g_main_uart_chg_data.state_show & 0x01){
 		//显示
 		t_widget = ituSceneFindWidget(&theScene, "Background34");
 		ituWidgetSetVisible(t_widget, true);
@@ -619,7 +619,7 @@ bool YX_MainOnChg(ITUWidget* widget, char* param)
 	}
 
 	//Background35
-	if (g_main_uart_chg_data.fire_show == 0){
+	if (g_main_uart_chg_data.state_show & 0x04){
 		//显示
 		t_widget = ituSceneFindWidget(&theScene, "Background35");
 		ituWidgetSetVisible(t_widget, true);
@@ -632,7 +632,7 @@ bool YX_MainOnChg(ITUWidget* widget, char* param)
 	}
 
 	//Background36
-	if (g_main_uart_chg_data.wind_show == 0){
+	if (g_main_uart_chg_data.state_show & 0x02){
 		//显示
 		t_widget = ituSceneFindWidget(&theScene, "Background36");
 		ituWidgetSetVisible(t_widget, true);

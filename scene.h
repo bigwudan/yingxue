@@ -119,14 +119,21 @@ typedef void(*node_widget_cb)(struct node_widget *widget, unsigned char state);
 //主页串口改变显示
 struct main_uart_chg
 {
-	//水流显示 0显示 1不显示
-	unsigned char water_show;
-	//火焰显示 0显示 1不显示
-	unsigned char fire_show;
-	//风机显示 0显示 1不显示
-	unsigned char wind_show;
+	//第0位 有水  第1位 风机 第2位 火焰 第3位 风压
+	unsigned char state_show;
+	//设置温度
+	unsigned char shezhi_temp;
 	//出水温度
 	unsigned char chushui_temp;
+	//进水温度
+	unsigned char jinshui_temp;
+	//错误代码
+	unsigned char err_no;
+	//主机状态 0关机 1待机 2正常燃烧 3
+	unsigned char machine_state;
+	//是否故障
+	unsigned char is_err;
+
 };
 
 //控制板回复数据结构
@@ -291,6 +298,9 @@ struct chain_list_tag{
 	unsigned char count; //当前数量
 	unsigned char buf[MAX_CHAIN_NUM];
 };
+
+//分析得到的数组
+void process_frame(struct main_uart_chg *dst, const unsigned char *src);
 
 /** @} */ // end of ctrlboard_scene
 

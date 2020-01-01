@@ -1518,29 +1518,6 @@ static void CheckMouse(void)
 #define TEST_DEVICE     itpDeviceUart3	
 #define TEST_BAUDRATE   "115200"
 
-static void UartCallback(void* arg1, uint32_t arg2)
-{
-	/*
-	unsigned char getstr1 = 0;
-	unsigned char sendtr1[8] = { 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A };
-	struct timeval tm_val;
-	int len = 0;
-	len = read(TEST_PORT, getstr1, 1);
-	//printf("read num=%d,getstr1=%s\n", len, getstr1);
-	write(TEST_PORT, getstr1, 1);
-	gettimeofday(&tm_val, NULL);
-
-	printf("cur_time=%ld\n", tm_val.tv_sec);
-	*/
-	
-	uint8_t getstr1;
-
-	int len = 0;
-	len = read(TEST_PORT, &getstr1, 1);
-	printf("data=%02X\n", &getstr1);
-	//write(TEST_PORT, &getstr1, 1);
-}
-
 static int create_chain_list(struct chain_list_tag *p_chain_list)
 {
 	p_chain_list->rear = 0;
@@ -1632,6 +1609,77 @@ process_data(struct uart_data_tag *dst, struct chain_list_tag *p_chain_list)
 
 
 
+//分析得到的数组
+void process_frame(struct main_uart_chg *dst, const unsigned char *src)
+{
+	src = src + 2;
+	//判断第几个帧
+	//第0帧
+	if ((*src & 0x0f) == 0x00){
+
+		//初始化
+		dst->state_show = 0;
+
+		//[2]主板信息   [0][0] 
+		src += 2;
+
+		//[0][1]
+		//得到主机状态
+		dst->machine_state = *src & 0x03;
+
+		//判断是否故障
+		dst->is_err = *src & 0x04;
+
+		//判断状态 流水
+		if (*src & 0x10){
+			dst->state_show = 0x01;
+			//风机
+		}
+		else if (*src & 0x20){
+			dst->state_show = dst->state_show | 0x2;
+			//火焰
+		}
+		else if (*src & 0x40){
+			dst->state_show = dst->state_show | 0x4;
+			//风压
+		}
+		else if (*src & 80){
+			dst->state_show = dst->state_show | 0x8;
+		}
+
+		//设置温度 [0][4]
+		src += 3;
+		dst->shezhi_temp = *src++;
+
+		//出水温度[0][5]
+		dst->chushui_temp = *src++;
+
+		//进水温度[0][6]
+		dst->jinshui_temp = *src++;
+
+		//错误代码或者比例阀电流
+		src++;
+		dst->err_no = *src++;
+		
+		printf("frame 00\n");
+		//第1帧
+	}
+	else if ((*src & 0x0f) == 0x01){
+		printf("frame 01\n");
+
+		//第2帧
+	}
+	else if ((*src & 0x0f) == 0x02){
+		printf("frame 02\n");
+
+	}
+	else if ((*src & 0x0f) == 0x03){
+		printf("frame 03\n");
+
+	}
+}
+
+
 //线程串口回调函数
 static void* UartFunc(void* arg)
 {
@@ -1649,6 +1697,7 @@ static void* UartFunc(void* arg)
 				flag = in_chain_list(&chain_list, getstr1[i]);
 			}
 			process_data(&uart_data, &chain_list);
+			//已经完成
 			if (uart_data.state == 2){
 				for (int j = 0; j< uart_data.count; j++){
 					printf("0x%02X ", uart_data.buf_data[j]);
@@ -1657,14 +1706,27 @@ static void* UartFunc(void* arg)
 				printf("\nfinish \n");
 				uart_data.state = 0;
 				uart_data.count = 0;
+
+				//分析收到的数
+				//process_frame(&g_main_uart_chg_data, uart_data.buf_data);
+
+				//发送回复信息
+
 			}
 		}
-		usleep(1000);
+		usleep(1);
 	}
 }
 
 int SceneRun(void)
 {
+	//建议一个消息
+	struct mq_attr mq_uart_attr;
+	mq_uart_attr.mq_flags = 0;
+	mq_uart_attr.mq_maxmsg = 1;
+	mq_uart_attr.mq_msgsize = 2;
+	uartQueue = mq_open("scene", O_CREAT | O_NONBLOCK, 0644, &mq_uart_attr);
+
 	//初始化串口数据
 	memset(&uart_data, 0, sizeof(struct uart_data_tag));
 
@@ -1675,8 +1737,8 @@ int SceneRun(void)
 	pthread_t task;
 	pthread_attr_t attr;
 
-	//pthread_attr_init(&attr);
-	//pthread_create(&task, &attr, UartFunc, NULL);
+	pthread_attr_init(&attr);
+	pthread_create(&task, &attr, UartFunc, NULL);
 
     SDL_Event   ev;
     int         delay, frames, lastx, lasty;
@@ -1690,21 +1752,21 @@ int SceneRun(void)
     dblclk = frames = lasttick = lastx = lasty = mouseDownTick = 0;
 
 	//test uart3
+#ifndef _WIN32
 	itpRegisterDevice(TEST_PORT, &TEST_DEVICE);
 	ioctl(TEST_PORT, ITP_IOCTL_INIT, NULL);
 	ioctl(TEST_PORT, ITP_IOCTL_RESET, (void *)CFG_UART3_BAUDRATE);
-	//ioctl(TEST_PORT, ITP_IOCTL_REG_UART_CB, (void*)UartCallback);
-
 	ithRtcSetTime(1577176623);
-
+#endif
 
 	node_widget_init();
 
     for (;;)
     {
 		unsigned long CurrRtcTime = 0;
+#ifndef _WIN32
 		CurrRtcTime = ithRtcGetTime();
-		//printf("Current internal RTC Time= %d sec\n", CurrRtcTime);
+#endif		
 
         bool result = false;
 
@@ -1754,7 +1816,9 @@ int SceneRun(void)
 					break;
 				//2.1 确认
 				case SDLK_F3://1073741884:
+#ifndef _WIN32
 					confirm_down_time = ithRtcGetTime();
+#endif
 					break;
 				//2.2 长按
 				case SDLK_F2://1073741883:
@@ -1834,8 +1898,11 @@ int SceneRun(void)
 						break;
 					case 1073741884:
 					{
+						unsigned long t_curr = 0;
+#ifndef _WIN32
 						//如果长按
-						unsigned long t_curr = ithRtcGetTime();
+						t_curr = ithRtcGetTime();
+#endif
 						t_curr = t_curr - confirm_down_time;
 						//长按
 						if (t_curr >= 2){

@@ -19,96 +19,9 @@ extern void BackupRestore(void);
 extern void BackupSyncFile(void);
 extern void BackupDestroy(void);
 
-extern mqd_t uartQueue;
-
-//线程串口回调函数
-static void* UartFunc(void* arg)
-{
-
-	//初始化一个控制板数据
-	struct operate_data oper_data;
-	memset(&oper_data, 0, sizeof(struct operate_data));
-
-	//当前时间
-	struct timeval cur_time;
-	gettimeofday(&cur_time, NULL);
-
-
-
-	//如果有开始时间
-	if (yingxue_base.yure_begtime.tv_sec != 0){
-		if ( (yingxue_base.yure_begtime.tv_sec <= cur_time.tv_sec + 60 * 2) && 
-			 (yingxue_base.yure_begtime.tv_sec <= cur_time.tv_sec - 60 * 2)
-			)
-		{
-			//发送预热命令
-			oper_data.data_0 = 0xEB;
-			oper_data.data_1 = 0x03 << 5 | 0x07 << 2 | 0x01;
-			oper_data.data_2 = 0x09;
-			oper_data.data_3 = 0x02;
-			oper_data.data_5 = yingxue_base.huishui_temp;
-			send_uart_cmd(&oper_data);
-			yingxue_base.yure_begtime.tv_sec = 0;
-			yingxue_base.yure_begtime.tv_usec = 0;
-		}
-	}
-	//结束时间
-	else if (yingxue_base.yure_endtime.tv_sec != 0){
-		if ((yingxue_base.yure_endtime.tv_sec <= cur_time.tv_sec + 60 * 2) &&
-			(yingxue_base.yure_endtime.tv_sec <= cur_time.tv_sec - 60 * 2)
-			)
-		{
-			//发送关闭
-			oper_data.data_0 = 0xEB;
-			oper_data.data_1 = 0x03 << 5 | 0x07 << 2 | 0x01;
-			oper_data.data_2 = 0x09;
-			oper_data.data_3 = 0x00;
-			oper_data.data_5 = yingxue_base.huishui_temp;
-			send_uart_cmd(&oper_data);
-			yingxue_base.yure_endtime.tv_sec = 0;
-			yingxue_base.yure_endtime.tv_usec = 0;
-		}
-	}
-	//ssize_t mq_receive(mqd_t msgid, char *msg, size_t msg_len, unsigned int *msg_prio)
-	else if (mq_receive(uartQueue, &oper_data, sizeof(struct operate_data), 0) != -1){
-		send_uart_cmd(&oper_data);
-	}
-	//发送应答
-	else{
-		oper_data.data_0 = 0xEB;
-		oper_data.data_1 = 0x03 << 5 | 0x07 << 2 | 0x01;
-		oper_data.data_2 = 0x00;
-		oper_data.data_3 = 0x00;
-		send_uart_cmd(&oper_data);
-	}
-
-	
-
-	printf("pthread run\n");
-	//usleep(1000);
-	return;
-}
 
 int SDL_main(int argc, char *argv[])
 {
-
-	//建立一个串口线程
-
-
-	//建立一个消息
-	struct mq_attr mq_uart_attr;
-	mq_uart_attr.mq_flags = 0;
-	mq_uart_attr.mq_maxmsg = 1;
-	mq_uart_attr.mq_msgsize = 2;
-	uartQueue = mq_open("scene", O_CREAT | O_NONBLOCK, 0644, &mq_uart_attr);
-
-
-/*	pthread_t task;
-	pthread_attr_t attr;
-
-	pthread_attr_init(&attr);
-	pthread_create(&task, &attr, UartFunc, NULL);*/
-	//end
 
     int ret = 0;
     int restryCount = 0;
