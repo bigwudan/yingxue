@@ -37,6 +37,9 @@ extern void resetScene(void);
 //信息对象
 extern mqd_t uartQueue;
 
+//樱雪线程锁
+static pthread_mutex_t msg_mutex = 0;//PTHREAD_MUTEX_INITIALIZER;
+
 
 unsigned long confirm_down_time = 0;
 //串口的数据
@@ -1737,13 +1740,18 @@ int SceneRun(void)
 
 
 	//樱雪
+	//初始锁
+	if (pthread_mutex_init(&msg_mutex, NULL) != 0){
+		printf("error mutex func=%s,line=%d\n", __func__, __LINE__);
+	}
+
+	//缓存时间
+	struct timeval buf_tm;
 
 	//初期关机
 	ScreenOff();
-
-
-
-
+	
+	//消息队列
 	struct mq_attr mq_uart_attr;
 	mq_uart_attr.mq_flags = 0;
 	mq_uart_attr.mq_maxmsg = 10;
@@ -1788,8 +1796,33 @@ int SceneRun(void)
 
 	for (;;)
 	{
-		//write(TEST_PORT, texBufArray, sizeof(texBufArray));
+		
 		bool result = false;
+
+		//樱雪
+		//缓存时间
+		gettimeofday(&buf_tm, NULL);
+		//判断是否开关机机
+		pthread_mutex_lock(&msg_mutex);
+		if (g_main_uart_chg_data.welcome_state == 3 ){
+
+			//延迟
+			if (g_main_uart_chg_data.welcome_t.tv_sec  < buf_tm.tv_sec){
+				ituLayerGoto(ituSceneFindWidget(&theScene, "MainLayer"), NULL);
+				g_main_uart_chg_data.welcome_state = 2;
+			}
+		}
+		else if (g_main_uart_chg_data.welcome_state == 1){
+			//延迟
+			if (g_main_uart_chg_data.welcome_t.tv_sec  < buf_tm.tv_sec){
+				ScreenOff();
+				g_main_uart_chg_data.welcome_state = 0;
+			}
+		}
+		pthread_mutex_unlock(&msg_mutex);
+
+		if (g_main_uart_chg_data.welcome_state == 3 || g_main_uart_chg_data.welcome_state == 1) continue;
+
 
 		if (CheckQuitValue())
 			break;
@@ -1844,23 +1877,33 @@ int SceneRun(void)
 					break;
 
 				case 1073741883:
-					gettimeofday(&curtime, NULL);
+					curtime = buf_tm;
 					break;
 				case 13://回车
-					gettimeofday(&curtime, NULL);
+					curtime = buf_tm;
 					break;
 				case 1073741885:
 					printf("power on\off");
 					break;
 					
 				case SDLK_LEFT: //开机和关机
+					pthread_mutex_lock(&msg_mutex);
+					if (g_main_uart_chg_data.welcome_state == 0){
+						//开机
+						ScreenOn();
+						ituLayerGoto(ituSceneFindWidget(&theScene, "welcom"));
+						g_main_uart_chg_data.welcome_state = 3;
+						g_main_uart_chg_data.welcome_t = buf_tm;
+						g_main_uart_chg_data.welcome_t.tv_sec += 1;
 
-
-					
-
-					ScreenOn();
-					ituLayerGoto(ituSceneFindWidget(&theScene, "welcom"));
-
+					}
+					else if (g_main_uart_chg_data.welcome_state == 2){
+						ituLayerGoto(ituSceneFindWidget(&theScene, "welcom"));
+						g_main_uart_chg_data.welcome_state = 1;
+						g_main_uart_chg_data.welcome_t = buf_tm;
+						g_main_uart_chg_data.welcome_t.tv_sec += 1;
+					}
+					pthread_mutex_unlock(&msg_mutex);
 
 					break;
 				case SDLK_RIGHT:

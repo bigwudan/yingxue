@@ -136,7 +136,7 @@ extern "C" {
 		//是否故障
 		unsigned char is_err;
 		//正在进去2s秒欢迎画面
-		unsigned char welcome_state; // 0运行中 1开机 2关机
+		unsigned char welcome_state; // 0关机 1正在关机 2开机 3正在开机
 		struct timeval welcome_t;  //欢迎结束时间
 
 	};
