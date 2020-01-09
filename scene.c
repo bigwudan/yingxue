@@ -13,18 +13,18 @@
 #include "ctrlboard.h"
 
 #ifdef _WIN32
-    #include <crtdbg.h>
+#include <crtdbg.h>
 
-    #ifndef CFG_VIDEO_ENABLE
-        #define DISABLE_SWITCH_VIDEO_STATE
-    #endif
+#ifndef CFG_VIDEO_ENABLE
+#define DISABLE_SWITCH_VIDEO_STATE
+#endif
 #endif // _WIN32
 
 #ifndef CFG_POWER_WAKEUP_DOUBLE_CLICK_INTERVAL
-    #define DOUBLE_KEY_INTERVAL 200
+#define DOUBLE_KEY_INTERVAL 200
 #endif
 
-//#define FPS_ENABLE
+#define FPS_ENABLE
 #define DOUBLE_KEY_ENABLE
 
 #define GESTURE_THRESHOLD           40
@@ -33,6 +33,7 @@
 
 extern ITUActionFunction actionFunctions[];
 extern void resetScene(void);
+
 //信息对象
 extern mqd_t uartQueue;
 
@@ -86,22 +87,22 @@ static bool         inVideoState;
 // command
 typedef enum
 {
-    CMD_NONE,
-    CMD_LOAD_SCENE,
-    CMD_CALL_CONNECTED,
-    CMD_GOTO_MAINMENU,
-    CMD_CHANGE_LANG,
-    CMD_PREDRAW
+	CMD_NONE,
+	CMD_LOAD_SCENE,
+	CMD_CALL_CONNECTED,
+	CMD_GOTO_MAINMENU,
+	CMD_CHANGE_LANG,
+	CMD_PREDRAW
 } CommandID;
 
 #define MAX_STRARG_LEN 32
 
 typedef struct
 {
-    CommandID   id;
-    int         arg1;
-    int         arg2;
-    char        strarg1[MAX_STRARG_LEN];
+	CommandID   id;
+	int         arg1;
+	int         arg2;
+	char        strarg1[MAX_STRARG_LEN];
 } Command;
 
 static mqd_t        commandQueue = -1;
@@ -121,9 +122,6 @@ static ITUIcon      *cursorIcon;
 #endif
 
 extern void ScreenSetDoubleClick(void);
-
-
-
 
 //点击上下键，回调函数
 //@param widget 点击空间
@@ -161,7 +159,7 @@ static void node_widget_up_down(struct node_widget *widget, unsigned char state)
 			ituTextSetString(t_widget, t_buf);
 		}
 		else if (strcmp(widget->name, "Background4") == 0){
-		
+
 			t_widget = ituSceneFindWidget(&theScene, "Text43");
 			t_num = atoi(ituTextGetString((ITUText*)t_widget));
 			if (state == 0){
@@ -184,7 +182,7 @@ static void node_widget_up_down(struct node_widget *widget, unsigned char state)
 			}
 			sprintf(t_buf, "%d", t_num);
 			ituTextSetString(t_widget, t_buf);
-		
+
 		}
 	}
 	else{
@@ -208,10 +206,10 @@ static void node_widget_up_down(struct node_widget *widget, unsigned char state)
 				(strcmp(curr_node_widget->name, "moshi_BackgroundButton11") == 0) ||
 				(strcmp(curr_node_widget->name, "moshi_BackgroundButton12") == 0) ||
 				(strcmp(curr_node_widget->name, "moshi_BackgroundButton13") == 0) ||
-				(strcmp(curr_node_widget->name, "chushui_BackgroundButton73") == 0)||
+				(strcmp(curr_node_widget->name, "chushui_BackgroundButton73") == 0) ||
 				(strcmp(curr_node_widget->name, "chushui_BackgroundButton1") == 0)
-				
-				
+
+
 				){
 				t_widget = ituSceneFindWidget(&theScene, curr_node_widget->focus_back_name);
 				ituWidgetSetVisible(t_widget, false);
@@ -227,7 +225,7 @@ static void node_widget_up_down(struct node_widget *widget, unsigned char state)
 				(strcmp(t_node_widget->name, "moshi_BackgroundButton10") == 0) ||
 				(strcmp(t_node_widget->name, "moshi_BackgroundButton11") == 0) ||
 				(strcmp(t_node_widget->name, "moshi_BackgroundButton12") == 0) ||
-				(strcmp(t_node_widget->name, "moshi_BackgroundButton13") == 0) || 
+				(strcmp(t_node_widget->name, "moshi_BackgroundButton13") == 0) ||
 				(strcmp(t_node_widget->name, "chushui_BackgroundButton73") == 0) ||
 				(strcmp(t_node_widget->name, "chushui_BackgroundButton1") == 0)
 				){
@@ -274,7 +272,7 @@ static void node_widget_up_down(struct node_widget *widget, unsigned char state)
 static void main_widget_confirm_cb(struct node_widget *widget, unsigned char state)
 {
 	ITUWidget *t_widget = NULL;
-	if (strcmp(widget->name, "BackgroundButton47") ==0 ){
+	if (strcmp(widget->name, "BackgroundButton47") == 0){
 		t_widget = ituSceneFindWidget(&theScene, "MainLayer");
 		ituLayerGoto((ITULayer *)t_widget);
 	}
@@ -286,7 +284,7 @@ static void main_widget_confirm_cb(struct node_widget *widget, unsigned char sta
 		t_widget = ituSceneFindWidget(&theScene, "moshiLayer");
 		ituLayerGoto((ITULayer *)t_widget);
 
-	
+
 	}
 	//点击单项按键
 	else if (strcmp(widget->focus_back_name, "radio") == 0){
@@ -342,7 +340,7 @@ static void yure_node_widget_confirm_cb(struct node_widget *widget, unsigned cha
 		t_widget = ituSceneFindWidget(&theScene, "MainLayer");
 		ituLayerGoto((ITULayer *)t_widget);
 	}
-	else if ( strcmp(widget->name, "BackgroundButton19") == 0 ){
+	else if (strcmp(widget->name, "BackgroundButton19") == 0){
 		//全天候模式：
 		//启动：从点击巡航模式，即刻开始，发送一次串口命令：预热中的数据2“循环预热”
 		yingxue_base.yure_mode = 2;
@@ -368,13 +366,13 @@ static void yure_node_widget_confirm_cb(struct node_widget *widget, unsigned cha
 		ituLayerGoto((ITULayer *)t_widget);
 	}
 	//设置预热时间
-	else if ( strcmp(widget->name, "BackgroundButton2") == 0){
+	else if (strcmp(widget->name, "BackgroundButton2") == 0){
 		//设置预约时间
 		t_widget = ituSceneFindWidget(&theScene, "yureshijianLayer");
 		ituLayerGoto((ITULayer *)t_widget);
 	}
 	//设置预热回水温度和北京时间
-	else if ( strcmp(widget->name, "BackgroundButton21") == 0 ){
+	else if (strcmp(widget->name, "BackgroundButton21") == 0){
 		t_widget = ituSceneFindWidget(&theScene, "yureshezhiLayer");
 		ituLayerGoto((ITULayer *)t_widget);
 
@@ -388,7 +386,7 @@ static void yure_settime_widget_confirm_cb(struct node_widget *widget, unsigned 
 	if (strcmp(widget->name, "BackgroundButton65") == 0){
 		t_widget = ituSceneFindWidget(&theScene, "yureLayer");
 		ituLayerGoto((ITULayer *)t_widget);
-	}	
+	}
 	//点击单项按键
 	else if (strcmp(widget->focus_back_name, "radio") == 0){
 		//如果两次点击都是同一，取消
@@ -436,7 +434,7 @@ static void yure_yureshezhiLayer_widget_confirm_cb(struct node_widget *widget, u
 	if (strcmp(widget->name, "BackgroundButton60") == 0){
 		t_widget = ituSceneFindWidget(&theScene, "yureLayer");
 		ituLayerGoto((ITULayer *)t_widget);
-	}	
+	}
 	//支持长按
 	else if (widget->type == 1){
 		if (widget->state == 0){
@@ -456,7 +454,7 @@ static void yure_yureshezhiLayer_widget_confirm_cb(struct node_widget *widget, u
 				yingxue_base.huishui_temp = num;
 			}
 			//北京时间小时
-			else if ( (strcmp(widget->name, "Background3") == 0) || (strcmp(widget->name, "Background4") == 0)){
+			else if ((strcmp(widget->name, "Background3") == 0) || (strcmp(widget->name, "Background4") == 0)){
 				struct timeval curr_time;
 				struct tm *t_tm;
 				gettimeofday(&curr_time, NULL);
@@ -475,7 +473,7 @@ static void yure_yureshezhiLayer_widget_confirm_cb(struct node_widget *widget, u
 				}
 				curr_time.tv_sec = mktime(t_tm);
 				settimeofday(&curr_time, NULL);
-				
+
 			}
 			widget->state = 0;
 			t_widget = ituSceneFindWidget(&theScene, widget->checked_back_name);
@@ -594,7 +592,7 @@ static void chushui_widget_confirm_cb(struct node_widget *widget, unsigned char 
 			ituWidgetSetVisible(t_widget, false);
 		}
 	}
-	else if (strcmp(widget->name, "chushui_BackgroundButton1") == 0 ){
+	else if (strcmp(widget->name, "chushui_BackgroundButton1") == 0){
 		//Text38
 		t_widget = ituSceneFindWidget(&theScene, "Text38");
 		t_buf = ituTextGetString((ITUText*)t_widget);
@@ -1042,7 +1040,7 @@ node_widget_init(void)
 	moshiLayer_0.name = "BackgroundButton68";
 	moshiLayer_0.confirm_cb = moshi_widget_confirm_cb;
 	moshiLayer_0.updown_cb = node_widget_up_down;
-	
+
 	moshiLayer_1.up = &moshiLayer_0;
 	moshiLayer_1.down = &moshiLayer_2;
 	moshiLayer_1.focus_back_name = "moshi_BackgroundButton80";
@@ -1098,7 +1096,7 @@ node_widget_init(void)
 	chushui_2.name = "chushui_BackgroundButton1";
 	chushui_2.confirm_cb = chushui_widget_confirm_cb;
 	chushui_2.updown_cb = node_widget_up_down;
-	
+
 
 
 	//预热时间
@@ -1129,387 +1127,391 @@ char recv_uart_cmd()
 
 struct main_uart_chg g_main_uart_chg_data;
 
+
+
+
 void SceneInit(void)
 {
-    struct mq_attr  attr;
-    ITURotation     rot;
+	struct mq_attr  attr;
+	ITURotation     rot;
 
 #ifdef CFG_LCD_ENABLE
-    screenWidth     = ithLcdGetWidth();
-    screenHeight    = ithLcdGetHeight();
+	screenWidth = ithLcdGetWidth();
+	screenHeight = ithLcdGetHeight();
 
-    window          = SDL_CreateWindow("Display Control Board", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, screenWidth, screenHeight, 0);
-    if (!window)
-    {
-        printf("Couldn't create window: %s\n", SDL_GetError());
-        return;
-    }
+	window = SDL_CreateWindow("Display Control Board", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, screenWidth, screenHeight, 0);
+	if (!window)
+	{
+		printf("Couldn't create window: %s\n", SDL_GetError());
+		return;
+	}
 
-    // init itu
-    ituLcdInit();
+	// init itu
+	ituLcdInit();
 
-    #ifdef CFG_M2D_ENABLE
-    ituM2dInit();
-    #else
-    ituSWInit();
-    #endif // CFG_M2D_ENABLE
+#ifdef CFG_M2D_ENABLE
+	ituM2dInit();
+#else
+	ituSWInit();
+#endif // CFG_M2D_ENABLE
 
-    ituSceneInit(&theScene, NULL);
+	ituSceneInit(&theScene, NULL);
 
-    #ifdef CFG_ENABLE_ROTATE
-    ituSceneSetRotation(&theScene, ITU_ROT_90, CFG_LCD_WIDTH, CFG_LCD_HEIGHT);
-    #endif
+#ifdef CFG_ENABLE_ROTATE
+	//ituSceneSetRotation(&theScene, ITU_ROT_90, CFG_LCD_WIDTH, CFG_LCD_HEIGHT);//for screen image and touch direction
+	ituSetRotation(ITU_ROT_270);//just for screen image
+#endif
 
-    #ifdef CFG_VIDEO_ENABLE
-    ituFrameFuncInit();
-    #endif // CFG_VIDEO_ENABLE
+#ifdef CFG_VIDEO_ENABLE
+	ituFrameFuncInit();
+#endif // CFG_VIDEO_ENABLE
 
-    #ifdef CFG_PLAY_VIDEO_ON_BOOTING
-        #ifndef CFG_BOOT_VIDEO_ENABLE_WINDOW_MODE
-    rot = itv_get_rotation();
+#ifdef CFG_PLAY_VIDEO_ON_BOOTING
+#ifndef CFG_BOOT_VIDEO_ENABLE_WINDOW_MODE
+	rot = itv_get_rotation();
 
-    if (rot == ITU_ROT_90 || rot == ITU_ROT_270)
-        PlayVideo(0, 0, ithLcdGetHeight(), ithLcdGetWidth(), CFG_BOOT_VIDEO_BGCOLOR, CFG_BOOT_VIDEO_VOLUME);
-    else
-        PlayVideo(0, 0, ithLcdGetWidth(), ithLcdGetHeight(), CFG_BOOT_VIDEO_BGCOLOR, CFG_BOOT_VIDEO_VOLUME);
-        #else
-    PlayVideo(CFG_VIDEO_WINDOW_X_POS, CFG_VIDEO_WINDOW_Y_POS, CFG_VIDEO_WINDOW_WIDTH, CFG_VIDEO_WINDOW_HEIGHT, CFG_BOOT_VIDEO_BGCOLOR, CFG_BOOT_VIDEO_VOLUME);
-        #endif
-    #endif
+	if (rot == ITU_ROT_90 || rot == ITU_ROT_270)
+		PlayVideo(0, 0, ithLcdGetHeight(), ithLcdGetWidth(), CFG_BOOT_VIDEO_BGCOLOR, CFG_BOOT_VIDEO_VOLUME);
+	else
+		PlayVideo(0, 0, ithLcdGetWidth(), ithLcdGetHeight(), CFG_BOOT_VIDEO_BGCOLOR, CFG_BOOT_VIDEO_VOLUME);
+#else
+	PlayVideo(CFG_VIDEO_WINDOW_X_POS, CFG_VIDEO_WINDOW_Y_POS, CFG_VIDEO_WINDOW_WIDTH, CFG_VIDEO_WINDOW_HEIGHT, CFG_BOOT_VIDEO_BGCOLOR, CFG_BOOT_VIDEO_VOLUME);
+#endif
+#endif
 
-    #ifdef CFG_PLAY_MJPEG_ON_BOOTING
-        #ifndef CFG_BOOT_VIDEO_ENABLE_WINDOW_MODE
-    rot = itv_get_rotation();
+#ifdef CFG_PLAY_MJPEG_ON_BOOTING
+#ifndef CFG_BOOT_VIDEO_ENABLE_WINDOW_MODE
+	rot = itv_get_rotation();
 
-    if (rot == ITU_ROT_90 || rot == ITU_ROT_270)
-        PlayMjpeg(0, 0, ithLcdGetHeight(), ithLcdGetWidth(), CFG_BOOT_VIDEO_BGCOLOR, 0);
-    else
-        PlayMjpeg(0, 0, ithLcdGetWidth(), ithLcdGetHeight(), CFG_BOOT_VIDEO_BGCOLOR, 0);
-        #else
-    PlayMjpeg(CFG_VIDEO_WINDOW_X_POS, CFG_VIDEO_WINDOW_Y_POS, CFG_VIDEO_WINDOW_WIDTH, CFG_VIDEO_WINDOW_HEIGHT, CFG_BOOT_VIDEO_BGCOLOR, 0);
-        #endif
-    #endif
+	if (rot == ITU_ROT_90 || rot == ITU_ROT_270)
+		PlayMjpeg(0, 0, ithLcdGetHeight(), ithLcdGetWidth(), CFG_BOOT_VIDEO_BGCOLOR, 0);
+	else
+		PlayMjpeg(0, 0, ithLcdGetWidth(), ithLcdGetHeight(), CFG_BOOT_VIDEO_BGCOLOR, 0);
+#else
+	PlayMjpeg(CFG_VIDEO_WINDOW_X_POS, CFG_VIDEO_WINDOW_Y_POS, CFG_VIDEO_WINDOW_WIDTH, CFG_VIDEO_WINDOW_HEIGHT, CFG_BOOT_VIDEO_BGCOLOR, 0);
+#endif
+#endif
 
-    screenSurf = ituGetDisplaySurface();
+	screenSurf = ituGetDisplaySurface();
 
-    ituFtInit();
-    ituFtLoadFont(0, CFG_PRIVATE_DRIVE ":/font/" CFG_FONT_FILENAME, ITU_GLYPH_8BPP);
+	ituFtInit();
+	ituFtLoadFont(0, CFG_PRIVATE_DRIVE ":/font/" CFG_FONT_FILENAME, ITU_GLYPH_8BPP);
 
-    //ituSceneInit(&theScene, NULL);
-    ituSceneSetFunctionTable(&theScene, actionFunctions);
+	//ituSceneInit(&theScene, NULL);
+	ituSceneSetFunctionTable(&theScene, actionFunctions);
 
-    attr.mq_flags   = 0;
-    attr.mq_maxmsg  = MAX_COMMAND_QUEUE_SIZE;
-    attr.mq_msgsize = sizeof(Command);
+	attr.mq_flags = 0;
+	attr.mq_maxmsg = MAX_COMMAND_QUEUE_SIZE;
+	attr.mq_msgsize = sizeof(Command);
 
-    commandQueue    = mq_open("scene", O_CREAT | O_NONBLOCK, 0644, &attr);
-    assert(commandQueue != -1);
+	commandQueue = mq_open("scene", O_CREAT | O_NONBLOCK, 0644, &attr);
+	assert(commandQueue != -1);
 
-    screenDistance  = sqrtf(screenWidth * screenWidth + screenHeight * screenHeight);
+	screenDistance = sqrtf(screenWidth * screenWidth + screenHeight * screenHeight);
 
-    isReady         = false;
-    periodPerFrame  = MS_PER_FRAME;
+	isReady = false;
+	periodPerFrame = MS_PER_FRAME;
 #endif
 }
 
 void SceneExit(void)
 {
 #ifdef CFG_LCD_ENABLE
-    mq_close(commandQueue);
-    commandQueue = -1;
+	mq_close(commandQueue);
+	commandQueue = -1;
 
-    resetScene();
+	resetScene();
 
-    if (theScene.root)
-    {
-        ituSceneExit(&theScene);
-    }
-    ituFtExit();
+	if (theScene.root)
+	{
+		ituSceneExit(&theScene);
+	}
+	ituFtExit();
 
-    #ifdef CFG_M2D_ENABLE
-    ituM2dExit();
-        #ifdef CFG_VIDEO_ENABLE
-    ituFrameFuncExit();
-        #endif // CFG_VIDEO_ENABLE
-    #else
-    ituSWExit();
-    #endif // CFG_M2D_ENABLE
+#ifdef CFG_M2D_ENABLE
+	ituM2dExit();
+#ifdef CFG_VIDEO_ENABLE
+	ituFrameFuncExit();
+#endif // CFG_VIDEO_ENABLE
+#else
+	ituSWExit();
+#endif // CFG_M2D_ENABLE
 
-    SDL_DestroyWindow(window);
+	SDL_DestroyWindow(window);
 #endif
 }
 
 void SceneLoad(void)
 {
-    Command cmd;
+	Command cmd;
 
-    if (commandQueue == -1)
-        return;
+	if (commandQueue == -1)
+		return;
 
-    isReady = false;
+	isReady = false;
 
-    cmd.id  = CMD_LOAD_SCENE;
+	cmd.id = CMD_LOAD_SCENE;
 
-    mq_send(commandQueue, (const char *)&cmd, sizeof(Command), 0);
+	mq_send(commandQueue, (const char *)&cmd, sizeof(Command), 0);
 }
 
 void SceneGotoMainMenu(void)
 {
-    Command cmd;
+	Command cmd;
 
-    if (commandQueue == -1)
-        return;
+	if (commandQueue == -1)
+		return;
 
-    cmd.id = CMD_GOTO_MAINMENU;
-    mq_send(commandQueue, (const char *)&cmd, sizeof(Command), 0);
+	cmd.id = CMD_GOTO_MAINMENU;
+	mq_send(commandQueue, (const char *)&cmd, sizeof(Command), 0);
 }
 
 void SceneChangeLanguage(void)
 {
-    Command cmd;
+	Command cmd;
 
-    if (commandQueue == -1)
-        return;
+	if (commandQueue == -1)
+		return;
 
-    cmd.id = CMD_CHANGE_LANG;
-    mq_send(commandQueue, (const char *)&cmd, sizeof(Command), 0);
+	cmd.id = CMD_CHANGE_LANG;
+	mq_send(commandQueue, (const char *)&cmd, sizeof(Command), 0);
 }
 
 void ScenePredraw(int arg)
 {
-    Command cmd;
+	Command cmd;
 
-    if (commandQueue == -1)
-        return;
+	if (commandQueue == -1)
+		return;
 
-    cmd.id = CMD_PREDRAW;
-    mq_send(commandQueue, (const char *)&cmd, sizeof(Command), 0);
+	cmd.id = CMD_PREDRAW;
+	mq_send(commandQueue, (const char *)&cmd, sizeof(Command), 0);
 }
 
 void SceneSetReady(bool ready)
 {
-    isReady = ready;
+	isReady = ready;
 }
 
 static void LoadScene(void)
 {
 #ifdef CFG_LCD_ENABLE
-    uint32_t tick1, tick2;
+	uint32_t tick1, tick2;
 
-    resetScene();
-    if (theScene.root)
-    {
-        ituSceneExit(&theScene);
-    }
+	resetScene();
+	if (theScene.root)
+	{
+		ituSceneExit(&theScene);
+	}
 
-    // load itu file
-    tick1 = SDL_GetTicks();
+	// load itu file
+	tick1 = SDL_GetTicks();
 
-    #ifdef CFG_LCD_MULTIPLE
-    {
-        char filepath[PATH_MAX];
+#ifdef CFG_LCD_MULTIPLE
+	{
+		char filepath[PATH_MAX];
 
-        sprintf(filepath, CFG_PRIVATE_DRIVE ":/itu/%ux%u/ctrlboard.itu", ithLcdGetWidth(), ithLcdGetHeight());
-        ituSceneLoadFileCore(&theScene, filepath);
-    }
-    #else
-    ituSceneLoadFileCore(&theScene, CFG_PRIVATE_DRIVE ":/ctrlboard.itu");
-    #endif // CFG_LCD_MULTIPLE
+		sprintf(filepath, CFG_PRIVATE_DRIVE ":/itu/%ux%u/ctrlboard.itu", ithLcdGetWidth(), ithLcdGetHeight());
+		ituSceneLoadFileCore(&theScene, filepath);
+	}
+#else
+	ituSceneLoadFileCore(&theScene, CFG_PRIVATE_DRIVE ":/ctrlboard.itu");
+#endif // CFG_LCD_MULTIPLE
 
-    tick2 = SDL_GetTicks();
-    printf("itu loading time: %dms\n", tick2 - tick1);
+	tick2 = SDL_GetTicks();
+	printf("itu loading time: %dms\n", tick2 - tick1);
 
-    if (theConfig.lang != LANG_ENG)
-        ituSceneUpdate(&theScene, ITU_EVENT_LANGUAGE, theConfig.lang, 0, 0);
+	if (theConfig.lang != LANG_ENG)
+		ituSceneUpdate(&theScene, ITU_EVENT_LANGUAGE, theConfig.lang, 0, 0);
 
-    //ituSceneSetRotation(&theScene, ITU_ROT_90, ithLcdGetWidth(), ithLcdGetHeight());
+	//ituSceneSetRotation(&theScene, ITU_ROT_90, ithLcdGetWidth(), ithLcdGetHeight());
 
-    tick1       = tick2;
+	tick1 = tick2;
 
-    #if defined(CFG_USB_MOUSE) || defined(_WIN32)
-    cursorIcon  = ituSceneFindWidget(&theScene, "cursorIcon");
-    if (cursorIcon)
-    {
-        ituWidgetSetVisible(cursorIcon, true);
-    }
-    #endif // defined(CFG_USB_MOUSE) || defined(_WIN32)
+#if defined(CFG_USB_MOUSE) || defined(_WIN32)
+	cursorIcon = ituSceneFindWidget(&theScene, "cursorIcon");
+	if (cursorIcon)
+	{
+		ituWidgetSetVisible(cursorIcon, true);
+	}
+#endif // defined(CFG_USB_MOUSE) || defined(_WIN32)
 
-    tick2 = SDL_GetTicks();
-    printf("itu init time: %dms\n", tick2 - tick1);
+	tick2 = SDL_GetTicks();
+	printf("itu init time: %dms\n", tick2 - tick1);
 
-    ExternalProcessInit();
+	ExternalProcessInit();
 #endif
 }
 
 void SceneEnterVideoState(int timePerFrm)
 {
-    if (inVideoState)
-    {
-        return;
-    }
+	if (inVideoState)
+	{
+		return;
+	}
 
 #ifndef DISABLE_SWITCH_VIDEO_STATE
-    #ifdef CFG_VIDEO_ENABLE
-    ituFrameFuncInit();
-    #endif
-    screenSurf      = ituGetDisplaySurface();
-    inVideoState    = true;
-    if (timePerFrm != 0)
-        periodPerFrame = timePerFrm;
+#ifdef CFG_VIDEO_ENABLE
+	ituFrameFuncInit();
+#endif
+	screenSurf = ituGetDisplaySurface();
+	inVideoState = true;
+	if (timePerFrm != 0)
+		periodPerFrame = timePerFrm;
 #endif
 }
 
 void SceneLeaveVideoState(void)
 {
-    if (!inVideoState)
-    {
-        return;
-    }
+	if (!inVideoState)
+	{
+		return;
+	}
 
 #ifndef DISABLE_SWITCH_VIDEO_STATE
-    #ifdef CFG_VIDEO_ENABLE
-    ituFrameFuncExit();
-    #endif
-    #ifdef CFG_LCD_ENABLE
-    ituLcdInit();
-    #endif
-    #ifdef CFG_M2D_ENABLE
-    ituM2dInit();
-    #else
-    ituSWInit();
-    #endif
-
-    screenSurf      = ituGetDisplaySurface();
-    periodPerFrame  = MS_PER_FRAME;
+#ifdef CFG_VIDEO_ENABLE
+	ituFrameFuncExit();
 #endif
-    inVideoState    = false;
+#ifdef CFG_LCD_ENABLE
+	ituLcdInit();
+#endif
+#ifdef CFG_M2D_ENABLE
+	ituM2dInit();
+#else
+	ituSWInit();
+#endif
+
+	screenSurf = ituGetDisplaySurface();
+	periodPerFrame = MS_PER_FRAME;
+#endif
+	inVideoState = false;
 }
 
 static void GotoMainMenu(void)
 {
-    ITULayer *mainMenuLayer = ituSceneFindWidget(&theScene, "mainMenuLayer");
-    assert(mainMenuLayer);
-    ituLayerGoto(mainMenuLayer);
+	ITULayer *mainMenuLayer = ituSceneFindWidget(&theScene, "mainMenuLayer");
+	assert(mainMenuLayer);
+	ituLayerGoto(mainMenuLayer);
 }
 
 static void ProcessCommand(void)
 {
-    Command cmd;
+	Command cmd;
 
-    while (mq_receive(commandQueue, (char *)&cmd, sizeof(Command), 0) > 0)
-    {
-        switch (cmd.id)
-        {
-        case CMD_LOAD_SCENE:
-            LoadScene();
+	while (mq_receive(commandQueue, (char *)&cmd, sizeof(Command), 0) > 0)
+	{
+		switch (cmd.id)
+		{
+		case CMD_LOAD_SCENE:
+			LoadScene();
 #if defined(CFG_PLAY_VIDEO_ON_BOOTING)
-            ituScenePreDraw(&theScene, screenSurf);
-            WaitPlayVideoFinish();
+			ituScenePreDraw(&theScene, screenSurf);
+			WaitPlayVideoFinish();
 #elif defined(CFG_PLAY_MJPEG_ON_BOOTING)
-            ituScenePreDraw(&theScene, screenSurf);
-            WaitPlayMjpegFinish();
+			ituScenePreDraw(&theScene, screenSurf);
+			WaitPlayMjpegFinish();
 #endif
-            ituSceneStart(&theScene);
-            break;
+			ituSceneStart(&theScene);
+			break;
 
-        case CMD_GOTO_MAINMENU:
-            GotoMainMenu();
-            break;
+		case CMD_GOTO_MAINMENU:
+			GotoMainMenu();
+			break;
 
-        case CMD_CHANGE_LANG:
-            ituSceneUpdate( &theScene,  ITU_EVENT_LANGUAGE, theConfig.lang, 0,  0);
-            ituSceneUpdate( &theScene,  ITU_EVENT_LAYOUT,   0,              0,  0);
-            break;
+		case CMD_CHANGE_LANG:
+			ituSceneUpdate(&theScene, ITU_EVENT_LANGUAGE, theConfig.lang, 0, 0);
+			ituSceneUpdate(&theScene, ITU_EVENT_LAYOUT, 0, 0, 0);
+			break;
 
 #if !defined(CFG_PLAY_VIDEO_ON_BOOTING) && !defined(CFG_PLAY_MJPEG_ON_BOOTING)
-        case CMD_PREDRAW:
-            ituScenePreDraw(&theScene, screenSurf);
-            break;
+		case CMD_PREDRAW:
+			ituScenePreDraw(&theScene, screenSurf);
+			break;
 #endif
-        }
-    }
+		}
+	}
 }
 
 static bool CheckQuitValue(void)
 {
-    if (quitValue)
-    {
-        if (ScreenSaverIsScreenSaving() && theConfig.screensaver_type == SCREENSAVER_BLANK)
-            ScreenSaverRefresh();
+	if (quitValue)
+	{
+		if (ScreenSaverIsScreenSaving() && theConfig.screensaver_type == SCREENSAVER_BLANK)
+			ScreenSaverRefresh();
 
-        return true;
-    }
-    return false;
+		return true;
+	}
+	return false;
 }
 
 static void CheckStorage(void)
 {
-    StorageAction action = StorageCheck();
+	StorageAction action = StorageCheck();
 
-    switch (action)
-    {
-    case STORAGE_SD_INSERTED:
-        ituSceneSendEvent(&theScene, EVENT_CUSTOM_SD_INSERTED, NULL);
-        break;
+	switch (action)
+	{
+	case STORAGE_SD_INSERTED:
+		ituSceneSendEvent(&theScene, EVENT_CUSTOM_SD_INSERTED, NULL);
+		break;
 
-    case STORAGE_SD_REMOVED:
-        ituSceneSendEvent(&theScene, EVENT_CUSTOM_SD_REMOVED, NULL);
-        break;
+	case STORAGE_SD_REMOVED:
+		ituSceneSendEvent(&theScene, EVENT_CUSTOM_SD_REMOVED, NULL);
+		break;
 
-    case STORAGE_USB_INSERTED:
-        ituSceneSendEvent(&theScene, EVENT_CUSTOM_USB_INSERTED, NULL);
-        break;
+	case STORAGE_USB_INSERTED:
+		ituSceneSendEvent(&theScene, EVENT_CUSTOM_USB_INSERTED, NULL);
+		break;
 
-    case STORAGE_USB_REMOVED:
-        ituSceneSendEvent(&theScene, EVENT_CUSTOM_USB_REMOVED, NULL);
-        break;
+	case STORAGE_USB_REMOVED:
+		ituSceneSendEvent(&theScene, EVENT_CUSTOM_USB_REMOVED, NULL);
+		break;
 
-    case STORAGE_USB_DEVICE_INSERTED:
-        {
-            ITULayer *usbDeviceModeLayer = ituSceneFindWidget(&theScene, "usbDeviceModeLayer");
-            assert(usbDeviceModeLayer);
+	case STORAGE_USB_DEVICE_INSERTED:
+	{
+		ITULayer *usbDeviceModeLayer = ituSceneFindWidget(&theScene, "usbDeviceModeLayer");
+		assert(usbDeviceModeLayer);
 
-            ituLayerGoto(usbDeviceModeLayer);
-        }
-        break;
+		ituLayerGoto(usbDeviceModeLayer);
+	}
+	break;
 
-    case STORAGE_USB_DEVICE_REMOVED:
-        {
-            ITULayer *mainMenuLayer = ituSceneFindWidget(&theScene, "mainMenuLayer");
-            assert(mainMenuLayer);
+	case STORAGE_USB_DEVICE_REMOVED:
+	{
+		ITULayer *mainMenuLayer = ituSceneFindWidget(&theScene, "mainMenuLayer");
+		assert(mainMenuLayer);
 
-            ituLayerGoto(mainMenuLayer);
-        }
-        break;
-    }
+		ituLayerGoto(mainMenuLayer);
+	}
+	break;
+	}
 }
 
 static void CheckExternal(void)
 {
-    ExternalEvent   ev;
-    int             ret = ExternalReceive(&ev);
+	ExternalEvent   ev;
+	int             ret = ExternalReceive(&ev);
 
-    if (ret)
-    {
-        ScreenSaverRefresh();
-        ExternalProcessEvent(&ev);
-    }
+	if (ret)
+	{
+		ScreenSaverRefresh();
+		ExternalProcessEvent(&ev);
+	}
 }
 
 #if defined(CFG_USB_MOUSE) || defined(_WIN32)
 
 static void CheckMouse(void)
 {
-    if (ioctl(ITP_DEVICE_USBMOUSE, ITP_IOCTL_IS_AVAIL, NULL))
-    {
-        if (!ituWidgetIsVisible(cursorIcon))
-            ituWidgetSetVisible(cursorIcon, true);
-    }
-    else
-    {
-        if (ituWidgetIsVisible(cursorIcon))
-            ituWidgetSetVisible(cursorIcon, false);
-    }
+	if (ioctl(ITP_DEVICE_USBMOUSE, ITP_IOCTL_IS_AVAIL, NULL))
+	{
+		if (!ituWidgetIsVisible(cursorIcon))
+			ituWidgetSetVisible(cursorIcon, true);
+	}
+	else
+	{
+		if (ituWidgetIsVisible(cursorIcon))
+			ituWidgetSetVisible(cursorIcon, false);
+	}
 }
 
 #endif // defined(CFG_USB_MOUSE) || defined(_WIN32)
@@ -1660,7 +1662,7 @@ void process_frame(struct main_uart_chg *dst, const unsigned char *src)
 		//错误代码或者比例阀电流
 		src++;
 		dst->err_no = *src++;
-		
+
 		printf("frame 00\n");
 		//第1帧
 	}
@@ -1683,10 +1685,17 @@ void process_frame(struct main_uart_chg *dst, const unsigned char *src)
 //线程串口回调函数
 static void* UartFunc(void* arg)
 {
+	//主线程发送消息队列
+	struct main_pthread_mq_tag main_pthread_mq;
 	uint8_t getstr1[10];
+	//默认应答
+	uint8_t texBufArray[] = { 0xEB, 0x1B, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0xD8, 0x2A };
 	int len = 0;
 	int flag = 0;
+	struct   timespec tm;
+	tm.tv_nsec = 1;
 	while (1){
+		
 		memset(getstr1, 0, sizeof(getstr1));
 		len = read(TEST_PORT, getstr1, sizeof(getstr1));
 		//如果串口有数据
@@ -1708,482 +1717,484 @@ static void* UartFunc(void* arg)
 				uart_data.count = 0;
 
 				//分析收到的数
-				//process_frame(&g_main_uart_chg_data, uart_data.buf_data);
+				process_frame(&g_main_uart_chg_data, uart_data.buf_data);
 
-				//发送回复信息
+				//延迟20ms 发送回复信息
+				usleep(10);
+				write(TEST_PORT, texBufArray, sizeof(texBufArray));
 
 			}
 		}
+		
 		usleep(1);
 	}
 }
 
+
+
 int SceneRun(void)
 {
-	//建议一个消息
+
+
+	//樱雪
+
+	//初期关机
+	ScreenOff();
+
+
+
+
 	struct mq_attr mq_uart_attr;
 	mq_uart_attr.mq_flags = 0;
-	mq_uart_attr.mq_maxmsg = 1;
-	mq_uart_attr.mq_msgsize = 2;
+	mq_uart_attr.mq_maxmsg = 10;
+	mq_uart_attr.mq_msgsize = sizeof(struct main_pthread_mq_tag);
 	uartQueue = mq_open("scene", O_CREAT | O_NONBLOCK, 0644, &mq_uart_attr);
 
-	//初始化串口数据
+
 	memset(&uart_data, 0, sizeof(struct uart_data_tag));
 
-	//初始化环形队列
+
+	//主线程发送消息队列
+	struct main_pthread_mq_tag main_pthread_mq;
+
+
 	create_chain_list(&chain_list);
 
-	//新建一个线程
+
 	pthread_t task;
 	pthread_attr_t attr;
 
 	pthread_attr_init(&attr);
 	pthread_create(&task, &attr, UartFunc, NULL);
 
-    SDL_Event   ev;
-    int         delay, frames, lastx, lasty;
-    uint32_t    tick, dblclk, lasttick, mouseDownTick;
-    static bool first_screenSurf = true, sleepModeDoubleClick = false;
-#if defined(CFG_POWER_WAKEUP_IR)
-    static bool sleepModeIR = false;
-#endif
-
-    /* Watch keystrokes */
-    dblclk = frames = lasttick = lastx = lasty = mouseDownTick = 0;
-
-	//test uart3
-#ifndef _WIN32
-	itpRegisterDevice(TEST_PORT, &TEST_DEVICE);
-	ioctl(TEST_PORT, ITP_IOCTL_INIT, NULL);
-	ioctl(TEST_PORT, ITP_IOCTL_RESET, (void *)CFG_UART3_BAUDRATE);
-	ithRtcSetTime(1577176623);
-#endif
-
 	node_widget_init();
 
-    for (;;)
-    {
-		unsigned long CurrRtcTime = 0;
-#ifndef _WIN32
-		CurrRtcTime = ithRtcGetTime();
-#endif		
+	unsigned char flag = 0;
 
-        bool result = false;
+	uint8_t texBufArray[] = { 0xEB, 0x1B, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0xD8, 0x2A };
+	struct timeval curtime;
+	SDL_Event   ev;
+	int         delay, frames, lastx, lasty;
+	uint32_t    tick, dblclk, lasttick, mouseDownTick;
+	static bool first_screenSurf = true, sleepModeDoubleClick = false;
+#if defined(CFG_POWER_WAKEUP_IR)
+	static bool sleepModeIR = false;
+#endif
 
-        if (CheckQuitValue())
-            break;
+	/* Watch keystrokes */
+	dblclk = frames = lasttick = lastx = lasty = mouseDownTick = 0;
+
+
+
+	for (;;)
+	{
+		//write(TEST_PORT, texBufArray, sizeof(texBufArray));
+		bool result = false;
+
+		if (CheckQuitValue())
+			break;
 
 #ifdef CFG_LCD_ENABLE
-        ProcessCommand();
+		ProcessCommand();
 #endif
-        CheckExternal();
-        CheckStorage();
+		CheckExternal();
+		CheckStorage();
 
 #if defined(CFG_USB_MOUSE) || defined(_WIN32)
-        if (cursorIcon)
-            CheckMouse();
+		if (cursorIcon)
+			CheckMouse();
 #endif     // defined(CFG_USB_MOUSE) || defined(_WIN32)
 
-        tick = SDL_GetTicks();
+		tick = SDL_GetTicks();
 
 #ifdef FPS_ENABLE
-        frames++;
-        if (tick - lasttick >= 1000)
-        {
-            printf("fps: %d\n", frames);
-            frames      = 0;
-            lasttick    = tick;
-        }
+		frames++;
+		if (tick - lasttick >= 1000)
+		{
+			//printf("fps: %d\n", frames);
+			frames = 0;
+			lasttick = tick;
+		}
 #endif     // FPS_ENABLE
 
 #ifdef CFG_LCD_ENABLE
-        while (SDL_PollEvent(&ev))
-        {
-            switch (ev.type)
-            {
-            case SDL_KEYDOWN:
-                ScreenSaverRefresh();
-                result = ituSceneUpdate(&theScene, ITU_EVENT_KEYDOWN, ev.key.keysym.sym, 0, 0);
-                switch (ev.key.keysym.sym)
-                {
-                //1.1
-				case SDLK_F4://1073741885:
-					curr_node_widget->updown_cb(curr_node_widget, 0);
-					break;
-				//1.2
-				case SDLK_F5://1073741886:
-					curr_node_widget->updown_cb(curr_node_widget, 1);
-					break;
-				//2.1 确认
-				case SDLK_F3://1073741884:
-#ifndef _WIN32
-					confirm_down_time = ithRtcGetTime();
-#endif
-					break;
-				//2.2 长按
-				case SDLK_F2://1073741883:
-					if (curr_node_widget->long_press_cb)
-						curr_node_widget->long_press_cb(curr_node_widget, 1);
-					break;
-
-                case SDLK_UP:
-					curr_node_widget->updown_cb(curr_node_widget, 0);
-                    
-                    break;
-
-                case SDLK_DOWN:
-					curr_node_widget->updown_cb(curr_node_widget, 1);
-                    
-                    break;
-				case 27:
-					ituSceneSendEvent(&theScene, EVENT_CUSTOM_MAINCHG, NULL);
-					break;
-				case 13:
-					curr_node_widget->confirm_cb(curr_node_widget, 2);
-					break;
-				//长按
-                case SDLK_LEFT:
-					if (curr_node_widget->long_press_cb)
-						curr_node_widget->long_press_cb(curr_node_widget, 1);
-                    break;
-
-                case SDLK_RIGHT:
-                    ituSceneSendEvent(&theScene, EVENT_CUSTOM_KEY3, NULL);
-                    break;
-
-                case SDLK_INSERT:
-                    break;
-
-    #ifdef _WIN32
-                case SDLK_e:
-                    result |= ituSceneUpdate(&theScene, ITU_EVENT_TOUCHPINCH, 20, 30, 40);
-                    break;
-
-                case SDLK_f:
-                    {
-                        ITULayer *usbDeviceModeLayer = ituSceneFindWidget(&theScene, "usbDeviceModeLayer");
-                        assert(usbDeviceModeLayer);
-
-                        ituLayerGoto(usbDeviceModeLayer);
-                    }
-                    break;
-
-                case SDLK_g:
-                    {
-                        ExternalEvent ev;
-
-                        ev.type = EXTERNAL_SHOW_MSG;
-                        strcpy(ev.buf1, "test");
-
-                        ScreenSaverRefresh();
-                        ExternalProcessEvent(&ev);
-                    }
-                    break;
-
-    #endif          // _WIN32
-                }
-                if (result && !ScreenIsOff() && !StorageIsInUsbDeviceMode())
-                    AudioPlayKeySound();
-
-                break;
-
-            case SDL_KEYUP:
-                result = ituSceneUpdate(&theScene, ITU_EVENT_KEYUP, ev.key.keysym.sym, 0, 0);
+		while (SDL_PollEvent(&ev))
+		{
+			switch (ev.type)
+			{
+			case SDL_KEYDOWN:
+				ScreenSaverRefresh();
+				result = ituSceneUpdate(&theScene, ITU_EVENT_KEYDOWN, ev.key.keysym.sym, 0, 0);
 				switch (ev.key.keysym.sym)
 				{
-						//1.1
-					case 1073741885:
-						break;
-					case 1073741886:
-						break;
-					case 1073741884:
-					{
-						unsigned long t_curr = 0;
-#ifndef _WIN32
-						//如果长按
-						t_curr = ithRtcGetTime();
-#endif
-						t_curr = t_curr - confirm_down_time;
-						//长按
-						if (t_curr >= 2){
-							if (curr_node_widget->long_press_cb)
-								curr_node_widget->long_press_cb(curr_node_widget, 1);
-						}
-						else{
-							curr_node_widget->confirm_cb(curr_node_widget, 2);
-						}
-						break;
-					}
-					case 1073741883:
-						break;
+					//case SDLK_UP:
+				case 1073741884:
+					curr_node_widget->updown_cb(curr_node_widget, 0);
+					break;
+				case SDLK_UP:
+					curr_node_widget->updown_cb(curr_node_widget, 0);
+					break;
+				case 1073741889:
+					//case SDLK_DOWN:
+					curr_node_widget->updown_cb(curr_node_widget, 1);
+					break;
+				case SDLK_DOWN:
+					//case SDLK_DOWN:
+					curr_node_widget->updown_cb(curr_node_widget, 1);
+					break;
+
+				case 1073741883:
+					gettimeofday(&curtime, NULL);
+					break;
+				case 13://回车
+					gettimeofday(&curtime, NULL);
+					break;
+				case 1073741885:
+					printf("power on\off");
+					break;
+					
+				case SDLK_LEFT: //开机和关机
+
+
+					
+
+					ScreenOn();
+					ituLayerGoto(ituSceneFindWidget(&theScene, "welcom"));
+
+
+					break;
+				case SDLK_RIGHT:
+					//ituSceneSendEvent(&theScene, EVENT_CUSTOM_KEY3, NULL);
+					ScreenOn();
+					break;
+
+				case SDLK_INSERT:
+					break;
+
+#ifdef _WIN32
+				case SDLK_e:
+					result |= ituSceneUpdate(&theScene, ITU_EVENT_TOUCHPINCH, 20, 30, 40);
+					break;
+
+				case SDLK_f:
+				{
+					ITULayer *usbDeviceModeLayer = ituSceneFindWidget(&theScene, "usbDeviceModeLayer");
+					assert(usbDeviceModeLayer);
+
+					ituLayerGoto(usbDeviceModeLayer);
 				}
-                break;
-            case SDL_MOUSEMOTION:
-                ScreenSaverRefresh();
-    #if defined(CFG_USB_MOUSE) || defined(_WIN32)
-                if (cursorIcon)
-                {
-                    ituWidgetSetX(cursorIcon, ev.button.x);
-                    ituWidgetSetY(cursorIcon, ev.button.y);
-                    ituWidgetSetDirty(cursorIcon, true);
-                    //printf("mouse: move %d, %d\n", ev.button.x, ev.button.y);
-                }
-    #endif             // defined(CFG_USB_MOUSE) || defined(_WIN32)
-                result = ituSceneUpdate(&theScene, ITU_EVENT_MOUSEMOVE, ev.button.button, ev.button.x, ev.button.y);
-                break;
+				break;
 
-            case SDL_MOUSEBUTTONDOWN:
-                ScreenSaverRefresh();
-                printf("mouse: down %d, %d\n", ev.button.x, ev.button.y);
-                {
-                    mouseDownTick = SDL_GetTicks();
-    #ifdef DOUBLE_KEY_ENABLE
-                    if (mouseDownTick - dblclk <= 200)
-                    {
-                        result  = ituSceneUpdate(&theScene, ITU_EVENT_MOUSEDOUBLECLICK, ev.button.button, ev.button.x, ev.button.y);
-                        dblclk  = 0;
-                    }
-                    else
-    #endif             // DOUBLE_KEY_ENABLE
-                    {
-                        result  = ituSceneUpdate(&theScene, ITU_EVENT_MOUSEDOWN, ev.button.button, ev.button.x, ev.button.y);
-                        dblclk  = mouseDownTick;
-                        lastx   = ev.button.x;
-                        lasty   = ev.button.y;
-                    }
-                    if (result && !ScreenIsOff() && !StorageIsInUsbDeviceMode())
-                        AudioPlayKeySound();
+				case SDLK_g:
+				{
+					ExternalEvent ev;
 
-    #ifdef CFG_SCREENSHOT_ENABLE
-                    if (ev.button.x < 50 && ev.button.y > CFG_LCD_HEIGHT - 50)
-                        Screenshot(screenSurf);
-    #endif             // CFG_SCREENSHOT_ENABLE
-                }
-                break;
+					ev.type = EXTERNAL_SHOW_MSG;
+					strcpy(ev.buf1, "test");
 
-            case SDL_MOUSEBUTTONUP:
-                if (SDL_GetTicks() - dblclk <= 200)
-                {
-                    int xdiff   = abs(ev.button.x - lastx);
-                    int ydiff   = abs(ev.button.y - lasty);
+					ScreenSaverRefresh();
+					ExternalProcessEvent(&ev);
+				}
+				break;
 
-                    if (xdiff >= GESTURE_THRESHOLD && xdiff > ydiff)
-                    {
-                        if (ev.button.x > lastx)
-                        {
-                            printf("mouse: slide to right\n");
-                            result |= ituSceneUpdate(&theScene, ITU_EVENT_TOUCHSLIDERIGHT, xdiff, ev.button.x, ev.button.y);
-                        }
-                        else
-                        {
-                            printf("mouse: slide to left\n");
-                            result |= ituSceneUpdate(&theScene, ITU_EVENT_TOUCHSLIDELEFT, xdiff, ev.button.x, ev.button.y);
-                        }
-                    }
-                    else if (ydiff >= GESTURE_THRESHOLD)
-                    {
-                        if (ev.button.y > lasty)
-                        {
-                            printf("mouse: slide to down\n");
-                            result |= ituSceneUpdate(&theScene, ITU_EVENT_TOUCHSLIDEDOWN, ydiff, ev.button.x, ev.button.y);
-                        }
-                        else
-                        {
-                            printf("mouse: slide to up\n");
-                            result |= ituSceneUpdate(&theScene, ITU_EVENT_TOUCHSLIDEUP, ydiff, ev.button.x, ev.button.y);
-                        }
-                    }
-                }
-                result          |= ituSceneUpdate(&theScene, ITU_EVENT_MOUSEUP, ev.button.button, ev.button.x, ev.button.y);
-                mouseDownTick   = 0;
-                break;
+#endif          // _WIN32
+				}
+				if (result && !ScreenIsOff() && !StorageIsInUsbDeviceMode())
+					AudioPlayKeySound();
 
-            case SDL_FINGERMOTION:
-                ScreenSaverRefresh();
-                printf("touch: move %d, %d\n", ev.tfinger.x, ev.tfinger.y);
-                result = ituSceneUpdate(&theScene, ITU_EVENT_MOUSEMOVE, 1, ev.tfinger.x, ev.tfinger.y);
-                break;
+				break;
 
-            case SDL_FINGERDOWN:
-                ScreenSaverRefresh();
-                printf("touch: down %d, %d\n", ev.tfinger.x, ev.tfinger.y);
-                {
-                    mouseDownTick = SDL_GetTicks();
-    #ifdef DOUBLE_KEY_ENABLE
-        #ifdef CFG_POWER_WAKEUP_DOUBLE_CLICK_INTERVAL
-                    if (mouseDownTick - dblclk <= CFG_POWER_WAKEUP_DOUBLE_CLICK_INTERVAL)
-        #else
-                    if (mouseDownTick - dblclk <= 200)
-        #endif
-                    {
-                        printf("double touch!\n");
-                        if (sleepModeDoubleClick)
-                        {
-                            ScreenSetDoubleClick();
-                            ScreenSaverRefresh();
-                            sleepModeDoubleClick = false;
-                        }
-                        result  = ituSceneUpdate(&theScene, ITU_EVENT_MOUSEDOUBLECLICK, 1, ev.tfinger.x, ev.tfinger.y);
-                        dblclk  = mouseDownTick = 0;
-                    }
-                    else
-    #endif             // DOUBLE_KEY_ENABLE
-                    {
-                        result  = ituSceneUpdate(&theScene, ITU_EVENT_MOUSEDOWN, 1, ev.tfinger.x, ev.tfinger.y);
-                        dblclk  = mouseDownTick;
-                        lastx   = ev.tfinger.x;
-                        lasty   = ev.tfinger.y;
-                    }
-                    if (result && !ScreenIsOff() && !StorageIsInUsbDeviceMode())
-                        AudioPlayKeySound();
+			case SDL_KEYUP:
+				result = ituSceneUpdate(&theScene, ITU_EVENT_KEYUP, ev.key.keysym.sym, 0, 0);
+				switch (ev.key.keysym.sym)
+				{
+				case 1073741883:
+					printf("sdlk_keyup longpress\n");
+					unsigned long t_curr = 0;
+					struct timeval t_time = { 0 };
+					gettimeofday(&t_time, NULL);
+					t_curr = t_time.tv_sec - curtime.tv_sec;
+					if (t_curr >= 2){
+						printf("long press\n");
+						if (curr_node_widget->long_press_cb)
+							curr_node_widget->long_press_cb(curr_node_widget, 1);
+					}
+					else{
+						printf("ok\n");
+						curr_node_widget->confirm_cb(curr_node_widget, 2);
+					}
 
-    #ifdef CFG_SCREENSHOT_ENABLE
-                    if (ev.tfinger.x < 50 && ev.tfinger.y > CFG_LCD_HEIGHT - 50)
-                        Screenshot(screenSurf);
-    #endif             // CFG_SCREENSHOT_ENABLE
-                       //if (ev.tfinger.x < 50 && ev.tfinger.y > CFG_LCD_HEIGHT - 50)
-                       //    SceneQuit(QUIT_UPGRADE_WEB);
-                }
-                break;
+					break;
+				}
 
-            case SDL_FINGERUP:
-                printf("touch: up %d, %d\n", ev.tfinger.x, ev.tfinger.y);
-                if (SDL_GetTicks() - dblclk <= 300)
-                {
-                    int xdiff   = abs(ev.tfinger.x - lastx);
-                    int ydiff   = abs(ev.tfinger.y - lasty);
+				break;
 
-                    if (xdiff >= GESTURE_THRESHOLD && xdiff > ydiff)
-                    {
-                        if (ev.tfinger.x > lastx)
-                        {
-                            printf("touch: slide to right %d %d\n", ev.tfinger.x, ev.tfinger.y);
-                            result |= ituSceneUpdate(&theScene, ITU_EVENT_TOUCHSLIDERIGHT, xdiff, ev.tfinger.x, ev.tfinger.y);
-                        }
-                        else
-                        {
-                            printf("touch: slide to left %d %d\n", ev.tfinger.x, ev.tfinger.y);
-                            result |= ituSceneUpdate(&theScene, ITU_EVENT_TOUCHSLIDELEFT, xdiff, ev.tfinger.x, ev.tfinger.y);
-                        }
-                    }
-                    else if (ydiff >= GESTURE_THRESHOLD)
-                    {
-                        if (ev.tfinger.y > lasty)
-                        {
-                            printf("touch: slide to down %d %d\n", ev.tfinger.x, ev.tfinger.y);
-                            result |= ituSceneUpdate(&theScene, ITU_EVENT_TOUCHSLIDEDOWN, ydiff, ev.tfinger.x, ev.tfinger.y);
-                        }
-                        else
-                        {
-                            printf("touch: slide to up %d %d\n", ev.tfinger.x, ev.tfinger.y);
-                            result |= ituSceneUpdate(&theScene, ITU_EVENT_TOUCHSLIDEUP, ydiff, ev.tfinger.x, ev.tfinger.y);
-                        }
-                    }
-                }
-                result          |= ituSceneUpdate(&theScene, ITU_EVENT_MOUSEUP, 1, ev.tfinger.x, ev.tfinger.y);
-                mouseDownTick   = 0;
-                break;
+			case SDL_MOUSEMOTION:
+				ScreenSaverRefresh();
+#if defined(CFG_USB_MOUSE) || defined(_WIN32)
+				if (cursorIcon)
+				{
+					ituWidgetSetX(cursorIcon, ev.button.x);
+					ituWidgetSetY(cursorIcon, ev.button.y);
+					ituWidgetSetDirty(cursorIcon, true);
+					//printf("mouse: move %d, %d\n", ev.button.x, ev.button.y);
+				}
+#endif             // defined(CFG_USB_MOUSE) || defined(_WIN32)
+				result = ituSceneUpdate(&theScene, ITU_EVENT_MOUSEMOVE, ev.button.button, ev.button.x, ev.button.y);
+				break;
 
-            case SDL_MULTIGESTURE:
-                printf("touch: multi %d, %d\n", ev.mgesture.x, ev.mgesture.y);
-                if (ev.mgesture.dDist > 0.0f)
-                {
-                    int dist    = (int)(screenDistance * ev.mgesture.dDist);
-                    int x       = (int)(screenWidth * ev.mgesture.x);
-                    int y       = (int)(screenHeight * ev.mgesture.y);
-                    result |= ituSceneUpdate(&theScene, ITU_EVENT_TOUCHPINCH, dist, x, y);
-                }
-                break;
-            }
-        }
-        if (!ScreenIsOff())
-        {
-            if (mouseDownTick > 0 && (SDL_GetTicks() - mouseDownTick >= MOUSEDOWN_LONGPRESS_DELAY))
-            {
-                printf("long press: %d %d\n", lastx, lasty);
-                result          |= ituSceneUpdate(&theScene, ITU_EVENT_MOUSELONGPRESS, 1, lastx, lasty);
-                mouseDownTick   = 0;
-            }
-            result |= ituSceneUpdate(&theScene, ITU_EVENT_TIMER, 0, 0, 0);
-            //printf("%d\n", result);
-            if (result)
-            {
-                ituSceneDraw(&theScene, screenSurf);
-                ituFlip(screenSurf);
-                if (first_screenSurf)
-                {
-                    ScreenSetBrightness(theConfig.brightness);
-                    first_screenSurf = false;
-                }
-            }
+			case SDL_MOUSEBUTTONDOWN:
+				ScreenSaverRefresh();
+				printf("mouse: down %d, %d\n", ev.button.x, ev.button.y);
+				{
+					mouseDownTick = SDL_GetTicks();
+#ifdef DOUBLE_KEY_ENABLE
+					if (mouseDownTick - dblclk <= 200)
+					{
+						result = ituSceneUpdate(&theScene, ITU_EVENT_MOUSEDOUBLECLICK, ev.button.button, ev.button.x, ev.button.y);
+						dblclk = 0;
+					}
+					else
+#endif             // DOUBLE_KEY_ENABLE
+					{
+						result = ituSceneUpdate(&theScene, ITU_EVENT_MOUSEDOWN, ev.button.button, ev.button.x, ev.button.y);
+						dblclk = mouseDownTick;
+						lastx = ev.button.x;
+						lasty = ev.button.y;
+					}
+					if (result && !ScreenIsOff() && !StorageIsInUsbDeviceMode())
+						AudioPlayKeySound();
 
-            if (theConfig.screensaver_type != SCREENSAVER_NONE &&
-                ScreenSaverCheck())
-            {
-                ituSceneSendEvent(&theScene, EVENT_CUSTOM_SCREENSAVER, "0");
+#ifdef CFG_SCREENSHOT_ENABLE
+					if (ev.button.x < 50 && ev.button.y > CFG_LCD_HEIGHT - 50)
+						Screenshot(screenSurf);
+#endif             // CFG_SCREENSHOT_ENABLE
+				}
+				break;
 
-                if (theConfig.screensaver_type == SCREENSAVER_BLANK)
-                {
-                    // have a change to flush action commands
-                    ituSceneUpdate(&theScene, ITU_EVENT_TIMER, 0, 0, 0);
+			case SDL_MOUSEBUTTONUP:
+				if (SDL_GetTicks() - dblclk <= 200)
+				{
+					int xdiff = abs(ev.button.x - lastx);
+					int ydiff = abs(ev.button.y - lasty);
 
-                    // draw black screen
-                    ituSceneDraw(&theScene, screenSurf);
-                    ituFlip(screenSurf);
+					if (xdiff >= GESTURE_THRESHOLD && xdiff > ydiff)
+					{
+						if (ev.button.x > lastx)
+						{
+							printf("mouse: slide to right\n");
+							result |= ituSceneUpdate(&theScene, ITU_EVENT_TOUCHSLIDERIGHT, xdiff, ev.button.x, ev.button.y);
+						}
+						else
+						{
+							printf("mouse: slide to left\n");
+							result |= ituSceneUpdate(&theScene, ITU_EVENT_TOUCHSLIDELEFT, xdiff, ev.button.x, ev.button.y);
+						}
+					}
+					else if (ydiff >= GESTURE_THRESHOLD)
+					{
+						if (ev.button.y > lasty)
+						{
+							printf("mouse: slide to down\n");
+							result |= ituSceneUpdate(&theScene, ITU_EVENT_TOUCHSLIDEDOWN, ydiff, ev.button.x, ev.button.y);
+						}
+						else
+						{
+							printf("mouse: slide to up\n");
+							result |= ituSceneUpdate(&theScene, ITU_EVENT_TOUCHSLIDEUP, ydiff, ev.button.x, ev.button.y);
+						}
+					}
+				}
+				result |= ituSceneUpdate(&theScene, ITU_EVENT_MOUSEUP, ev.button.button, ev.button.x, ev.button.y);
+				mouseDownTick = 0;
+				break;
 
-                    ScreenOff();
+			case SDL_FINGERMOTION:
+				ScreenSaverRefresh();
+				printf("touch: move %d, %d\n", ev.tfinger.x, ev.tfinger.y);
+				result = ituSceneUpdate(&theScene, ITU_EVENT_MOUSEMOVE, 1, ev.tfinger.x, ev.tfinger.y);
+				break;
 
-    #if defined(CFG_POWER_WAKEUP_IR)
-                    sleepModeIR             = true;
-    #endif
-    #if defined(CFG_POWER_WAKEUP_TOUCH_DOUBLE_CLICK)
-                    sleepModeDoubleClick    = true;
-    #endif
-                }
-            }
-        }
-
-    #if defined(CFG_POWER_WAKEUP_IR)
-        if (ScreenIsOff() && sleepModeIR)
-        {
-            printf("Wake up by remote IR!\n");
-            ScreenSaverRefresh();
-            ituSceneUpdate(&theScene, ITU_EVENT_MOUSEDOWN, 1, 0, 0);
-            ituSceneDraw(&theScene, screenSurf);
-            ituFlip(screenSurf);
-            sleepModeIR = false;
-        }
-    #endif
-
-        if (sleepModeDoubleClick)
-        {
-            /*if (theConfig.screensaver_type != SCREENSAVER_NONE &&
-                ScreenSaverCheckForDoubleClick())
-            {
-                if (theConfig.screensaver_type == SCREENSAVER_BLANK)
-                    ScreenOffContinue();
-            }*/
-        }
+			case SDL_FINGERDOWN:
+				ScreenSaverRefresh();
+				printf("touch: down %d, %d\n", ev.tfinger.x, ev.tfinger.y);
+				{
+					mouseDownTick = SDL_GetTicks();
+#ifdef DOUBLE_KEY_ENABLE
+#ifdef CFG_POWER_WAKEUP_DOUBLE_CLICK_INTERVAL
+					if (mouseDownTick - dblclk <= CFG_POWER_WAKEUP_DOUBLE_CLICK_INTERVAL)
+#else
+					if (mouseDownTick - dblclk <= 200)
 #endif
-        delay = periodPerFrame - (SDL_GetTicks() - tick);
-        //printf("scene loop delay=%d\n", delay);
-        if (delay > 0)
-        {
-            SDL_Delay(delay);
-        }
-        else
-            sched_yield();
-    }
+					{
+						printf("double touch!\n");
+						if (sleepModeDoubleClick)
+						{
+							ScreenSetDoubleClick();
+							ScreenSaverRefresh();
+							sleepModeDoubleClick = false;
+						}
+						result = ituSceneUpdate(&theScene, ITU_EVENT_MOUSEDOUBLECLICK, 1, ev.tfinger.x, ev.tfinger.y);
+						dblclk = mouseDownTick = 0;
+					}
+					else
+#endif             // DOUBLE_KEY_ENABLE
+					{
+						result = ituSceneUpdate(&theScene, ITU_EVENT_MOUSEDOWN, 1, ev.tfinger.x, ev.tfinger.y);
+						dblclk = mouseDownTick;
+						lastx = ev.tfinger.x;
+						lasty = ev.tfinger.y;
+					}
+					if (result && !ScreenIsOff() && !StorageIsInUsbDeviceMode())
+						AudioPlayKeySound();
 
-    return quitValue;
+#ifdef CFG_SCREENSHOT_ENABLE
+					if (ev.tfinger.x < 50 && ev.tfinger.y > CFG_LCD_HEIGHT - 50)
+						Screenshot(screenSurf);
+#endif             // CFG_SCREENSHOT_ENABLE
+					//if (ev.tfinger.x < 50 && ev.tfinger.y > CFG_LCD_HEIGHT - 50)
+					//    SceneQuit(QUIT_UPGRADE_WEB);
+				}
+				break;
+
+			case SDL_FINGERUP:
+				printf("touch: up %d, %d\n", ev.tfinger.x, ev.tfinger.y);
+				if (SDL_GetTicks() - dblclk <= 300)
+				{
+					int xdiff = abs(ev.tfinger.x - lastx);
+					int ydiff = abs(ev.tfinger.y - lasty);
+
+					if (xdiff >= GESTURE_THRESHOLD && xdiff > ydiff)
+					{
+						if (ev.tfinger.x > lastx)
+						{
+							printf("touch: slide to right %d %d\n", ev.tfinger.x, ev.tfinger.y);
+							result |= ituSceneUpdate(&theScene, ITU_EVENT_TOUCHSLIDERIGHT, xdiff, ev.tfinger.x, ev.tfinger.y);
+						}
+						else
+						{
+							printf("touch: slide to left %d %d\n", ev.tfinger.x, ev.tfinger.y);
+							result |= ituSceneUpdate(&theScene, ITU_EVENT_TOUCHSLIDELEFT, xdiff, ev.tfinger.x, ev.tfinger.y);
+						}
+					}
+					else if (ydiff >= GESTURE_THRESHOLD)
+					{
+						if (ev.tfinger.y > lasty)
+						{
+							printf("touch: slide to down %d %d\n", ev.tfinger.x, ev.tfinger.y);
+							result |= ituSceneUpdate(&theScene, ITU_EVENT_TOUCHSLIDEDOWN, ydiff, ev.tfinger.x, ev.tfinger.y);
+						}
+						else
+						{
+							printf("touch: slide to up %d %d\n", ev.tfinger.x, ev.tfinger.y);
+							result |= ituSceneUpdate(&theScene, ITU_EVENT_TOUCHSLIDEUP, ydiff, ev.tfinger.x, ev.tfinger.y);
+						}
+					}
+				}
+				result |= ituSceneUpdate(&theScene, ITU_EVENT_MOUSEUP, 1, ev.tfinger.x, ev.tfinger.y);
+				mouseDownTick = 0;
+				break;
+
+			case SDL_MULTIGESTURE:
+				printf("touch: multi %d, %d\n", ev.mgesture.x, ev.mgesture.y);
+				if (ev.mgesture.dDist > 0.0f)
+				{
+					int dist = (int)(screenDistance * ev.mgesture.dDist);
+					int x = (int)(screenWidth * ev.mgesture.x);
+					int y = (int)(screenHeight * ev.mgesture.y);
+					result |= ituSceneUpdate(&theScene, ITU_EVENT_TOUCHPINCH, dist, x, y);
+				}
+				break;
+			}
+		}
+		if (!ScreenIsOff())
+		{
+			if (mouseDownTick > 0 && (SDL_GetTicks() - mouseDownTick >= MOUSEDOWN_LONGPRESS_DELAY))
+			{
+				printf("long press: %d %d\n", lastx, lasty);
+				result |= ituSceneUpdate(&theScene, ITU_EVENT_MOUSELONGPRESS, 1, lastx, lasty);
+				mouseDownTick = 0;
+			}
+			result |= ituSceneUpdate(&theScene, ITU_EVENT_TIMER, 0, 0, 0);
+			//printf("%d\n", result);
+			if (result)
+			{
+				ituSceneDraw(&theScene, screenSurf);
+				ituFlip(screenSurf);
+				if (first_screenSurf)
+				{
+					ScreenSetBrightness(theConfig.brightness);
+					first_screenSurf = false;
+				}
+			}
+
+			if (theConfig.screensaver_type != SCREENSAVER_NONE &&
+				ScreenSaverCheck())
+			{
+				ituSceneSendEvent(&theScene, EVENT_CUSTOM_SCREENSAVER, "0");
+
+				if (theConfig.screensaver_type == SCREENSAVER_BLANK)
+				{
+					// have a change to flush action commands
+					ituSceneUpdate(&theScene, ITU_EVENT_TIMER, 0, 0, 0);
+
+					// draw black screen
+					ituSceneDraw(&theScene, screenSurf);
+					ituFlip(screenSurf);
+
+					ScreenOff();
+
+#if defined(CFG_POWER_WAKEUP_IR)
+					sleepModeIR = true;
+#endif
+#if defined(CFG_POWER_WAKEUP_TOUCH_DOUBLE_CLICK)
+					sleepModeDoubleClick = true;
+#endif
+				}
+			}
+		}
+
+#if defined(CFG_POWER_WAKEUP_IR)
+		if (ScreenIsOff() && sleepModeIR)
+		{
+			printf("Wake up by remote IR!\n");
+			ScreenSaverRefresh();
+			ituSceneUpdate(&theScene, ITU_EVENT_MOUSEDOWN, 1, 0, 0);
+			ituSceneDraw(&theScene, screenSurf);
+			ituFlip(screenSurf);
+			sleepModeIR = false;
+		}
+#endif
+
+		if (sleepModeDoubleClick)
+		{
+			if (theConfig.screensaver_type != SCREENSAVER_NONE &&
+				ScreenSaverCheckForDoubleClick())
+			{
+				if (theConfig.screensaver_type == SCREENSAVER_BLANK)
+					ScreenOffContinue();
+			}
+		}
+#endif
+		delay = periodPerFrame - (SDL_GetTicks() - tick);
+		//printf("scene loop delay=%d\n", delay);
+		if (delay > 0)
+		{
+			SDL_Delay(delay);
+		}
+		else
+			sched_yield();
+	}
+
+	return quitValue;
 }
 
 void SceneQuit(QuitValue value)
 {
-    quitValue = value;
+	quitValue = value;
 }
 
 QuitValue SceneGetQuitValue(void)
 {
-    return quitValue;
+	return quitValue;
 }
