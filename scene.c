@@ -1862,6 +1862,10 @@ int SceneRun(void)
 {
 
 	//樱雪
+	//最后一次按键的时间
+	static struct timeval last_tm;
+	gettimeofday(&last_tm, NULL);
+
 
 	//初始锁
 	if (pthread_mutex_init(&msg_mutex, NULL) != 0){
@@ -1922,13 +1926,20 @@ int SceneRun(void)
 		bool result = false;
 
 		//樱雪
-
 		//缓存时间
 		gettimeofday(&buf_tm, NULL);
 		
+		//如果超过3s没有动作自动回到主页面
+		if (buf_tm.tv_sec > last_tm.tv_sec + 5){
+			printf("over 5s\n");
+			memcpy(&last_tm, &buf_tm, sizeof(struct timeval));
+			//strcmp
+			if (strcmp(curr_node_widget->name, "BackgroundButton3") != 0 ){
+				ituLayerGoto(ituSceneFindWidget(&theScene, "MainLayer"));
+				continue;
+			}
+		}
 		//主页面运行
-
-
 		if (CheckQuitValue())
 			break;
 
@@ -1967,17 +1978,21 @@ int SceneRun(void)
 				{
 					//case SDLK_UP:
 				case 1073741884:
+					gettimeofday(&last_tm, NULL);
 					curr_node_widget->updown_cb(curr_node_widget, 0);
 					break;
 				case SDLK_UP:
+					gettimeofday(&last_tm, NULL);
 					curr_node_widget->updown_cb(curr_node_widget, 0);
 					break;
 				case 1073741889:
 					//case SDLK_DOWN:
+					gettimeofday(&last_tm, NULL);
 					curr_node_widget->updown_cb(curr_node_widget, 1);
 					break;
 				case SDLK_DOWN:
 					//case SDLK_DOWN:
+					gettimeofday(&last_tm, NULL);
 					curr_node_widget->updown_cb(curr_node_widget, 1);
 					break;
 
@@ -1985,14 +2000,26 @@ int SceneRun(void)
 					curtime = buf_tm;
 					break;
 				case 13://回车
+					gettimeofday(&last_tm, NULL);
 					curtime = buf_tm;
 					curr_node_widget->confirm_cb(curr_node_widget, 2);
 					break;
 				case 1073741885:
 					printf("power on\off");
+					gettimeofday(&last_tm, NULL);
+					if (yingxue_base.run_state == 1){
+						yingxue_base.run_state = 2;
+					}
+					else{
+						ScreenOn();
+						yingxue_base.run_state = 1;
+					}
+					ituLayerGoto(ituSceneFindWidget(&theScene, "welcom"));
+
 					break;
 					
 				case SDLK_LEFT: //开机和关机
+					gettimeofday(&last_tm, NULL);
 					if (yingxue_base.run_state == 1){
 						yingxue_base.run_state = 2;
 					}
