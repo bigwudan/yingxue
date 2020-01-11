@@ -136,7 +136,7 @@ extern "C" {
 		//是否故障
 		unsigned char is_err;
 		//机器运行状态
-		unsigned char run_state; //0上电 1开机 2关机
+		//unsigned char run_state; //0上电 1开机 2关机
 		
 
 	};
@@ -293,6 +293,9 @@ extern "C" {
 
 		//是否已经预热
 		unsigned char yure_state; //0 未预热 1已经预热
+
+		
+		unsigned char run_state; //0第一次上电 1开机 2关机
 
 	};
 

@@ -1993,20 +1993,14 @@ int SceneRun(void)
 					break;
 					
 				case SDLK_LEFT: //开机和关机
-					pthread_mutex_lock(&msg_mutex);
-					if (g_main_uart_chg_data.run_state == 0){
-						//开机
+					if (yingxue_base.run_state == 1){
+						yingxue_base.run_state = 2;
+					}
+					else{
 						ScreenOn();
-						ituLayerGoto(ituSceneFindWidget(&theScene, "welcom"));
-						g_main_uart_chg_data.run_state = 3;
-
+						yingxue_base.run_state = 1;
 					}
-					else if (g_main_uart_chg_data.run_state == 2){
-						ituLayerGoto(ituSceneFindWidget(&theScene, "welcom"));
-						g_main_uart_chg_data.run_state = 1;
-					}
-					pthread_mutex_unlock(&msg_mutex);
-
+					ituLayerGoto(ituSceneFindWidget(&theScene, "welcom"));
 					break;
 				case SDLK_RIGHT:
 					printf("cur=%s\n", curr_node_widget->name);

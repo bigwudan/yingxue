@@ -753,15 +753,22 @@ bool WelcomeOnTimer(ITUWidget* widget, char* param)
 	struct operate_data op_data;
 
 	//上电，等待2秒
-	if (g_main_uart_chg_data.run_state == 0){
-		sleep(0);
-		
+	if (yingxue_base.run_state == 0 || yingxue_base.run_state == 1){
+		sleep(1);
 		ituLayerGoto(ituSceneFindWidget(&theScene, "MainLayer"));
-		
 		//发送开机
 		//改变状态开机
 		send_uart_cmd(&op_data);
-		g_main_uart_chg_data.run_state = 1;
+		yingxue_base.run_state = 1;
+	}
+	//关机，等待2秒
+	else if (yingxue_base.run_state == 2){
+		//发送关机
+		//改变状态开机
+		send_uart_cmd(&op_data);
+		sleep(1);
+		ScreenOff();
+		printf("off \n");
 	}
 
 }
