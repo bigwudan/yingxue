@@ -137,6 +137,7 @@ extern "C" {
 		unsigned char is_err;
 		//机器运行状态
 		unsigned char run_state; //0上电 1开机 2关机
+		
 
 	};
 
@@ -268,11 +269,11 @@ extern "C" {
 	//樱雪基础数据
 	struct yingxue_base_tag{
 		//预热
-		struct node_widget *yure_time_widget; //预热时间
+		//struct node_widget *yure_time_widget; //预热时间
 		unsigned char yure_mode; //预热模式 0无模式 1单巡航模式 2 全天候模式 3 预约模式
 		struct timeval yure_begtime; //预热开始时间
 		struct timeval yure_endtime; //预热结束时间
-		unsigned char yure_set_count; //预热设置开始时间
+		//unsigned char yure_set_count; //预热设置开始时间
 		unsigned char huishui_temp; //回水温度
 
 		//moshi
@@ -286,6 +287,9 @@ extern "C" {
 		unsigned char lock_state; //0无操作 1开始调整温度 2 开始闪烁 3进入功能界面
 		//上次点击的时间,判断是否闪烁
 		struct timeval last_shezhi_tm;
+
+		//定时时间数组,0未开启 1开启
+		unsigned char dingshi_list[24];
 
 	};
 

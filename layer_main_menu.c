@@ -587,6 +587,8 @@ bool YX_MenuOnEnter(ITUWidget* widget, char* param)
 		MainLayer_init();
 	}
 	else if (strcmp(widget->name, "yureLayer") == 0){
+		//初始化
+		yingxue_base.lock_state = 3;
 		//全部隐藏
 		t_widget = ituSceneFindWidget(&theScene, "BackgroundButton78");
 		ituWidgetSetVisible(t_widget, false);
@@ -609,16 +611,16 @@ bool YX_MenuOnEnter(ITUWidget* widget, char* param)
 		ituWidgetSetVisible(t_widget, false);
 	}
 	else if (strcmp(widget->name, "yureshijianLayer") == 0 ){
+		//初始化
+		yingxue_base.lock_state = 3;
 		//默认选中第一个
 		curr_node_widget = &yureshijian_widget_0;
-		//显示选中
-		t_widget = ituSceneFindWidget(&theScene, curr_node_widget->focus_back_name);
-		ituWidgetSetVisible(t_widget, true);
-		//屏蔽未选中
-		t_widget = ituSceneFindWidget(&theScene, curr_node_widget->name);
-		ituWidgetSetVisible(t_widget, false);
+
 	}
 	else if (strcmp(widget->name, "yureshezhiLayer") == 0){
+		//初始化
+		yingxue_base.lock_state = 3;
+
 		//默认选中第一个
 		curr_node_widget = &yureshezhiLayer_0;
 
@@ -661,6 +663,9 @@ bool YX_MenuOnEnter(ITUWidget* widget, char* param)
 
 	}
 	else if (strcmp(widget->name, "moshiLayer") == 0){
+		//初始化
+		yingxue_base.lock_state = 3;
+
 		//默认选中第一个
 		curr_node_widget = &moshiLayer_0;
 
@@ -706,6 +711,9 @@ bool YX_MenuOnEnter(ITUWidget* widget, char* param)
 	}
 	//出水设置
 	else if ( strcmp(widget->name, "chushui") == 0 ){
+		//初始化
+		yingxue_base.lock_state = 3;
+
 		//默认第一个
 		curr_node_widget = &chushui_0;
 
@@ -747,7 +755,9 @@ bool WelcomeOnTimer(ITUWidget* widget, char* param)
 	//上电，等待2秒
 	if (g_main_uart_chg_data.run_state == 0){
 		sleep(0);
-		ituLayerGoto(ituSceneFindWidget(&theScene, "MainLayer"));
+		//
+		//ituLayerGoto(ituSceneFindWidget(&theScene, "MainLayer"));
+		ituLayerGoto(ituSceneFindWidget(&theScene, "yureshijianLayer"));
 		//发送开机
 		//改变状态开机
 		send_uart_cmd(&op_data);

@@ -309,6 +309,10 @@ static void node_widget_up_down(struct node_widget *widget, unsigned char state)
 //@param state 
 static void main_widget_confirm_cb(struct node_widget *widget, unsigned char state)
 {
+	if (yingxue_base.lock_state == 0){
+		yingxue_base.lock_state = 3;
+	}
+
 	ITUWidget *t_widget = NULL;
 	if (strcmp(widget->name, "BackgroundButton47") == 0){
 		t_widget = ituSceneFindWidget(&theScene, "MainLayer");
@@ -324,25 +328,7 @@ static void main_widget_confirm_cb(struct node_widget *widget, unsigned char sta
 
 
 	}
-	//点击单项按键
-	else if (strcmp(widget->focus_back_name, "radio") == 0){
-		//如果两次点击都是同一，取消
-		if (widget == yingxue_base.yure_time_widget){
-			t_widget = ituSceneFindWidget(&theScene, widget->name);
-			ituCheckBoxSetChecked((ITUCheckBox *)t_widget, false);
-			yingxue_base.yure_time_widget = NULL;
-		}
-		//如果不一样，先去掉以前的状态
-		else{
-			if (yingxue_base.yure_time_widget){
-				t_widget = ituSceneFindWidget(&theScene, yingxue_base.yure_time_widget->name);
-				ituCheckBoxSetChecked((ITUCheckBox *)t_widget, false);
-			}
-			t_widget = ituSceneFindWidget(&theScene, widget->name);
-			ituCheckBoxSetChecked((ITUCheckBox *)t_widget, true);
-		}
-		yingxue_base.yure_time_widget = widget;
-	}
+
 	//支持长按
 	else if (widget->type == 1){
 		if (widget->state == 0){
@@ -398,7 +384,7 @@ static void yure_node_widget_confirm_cb(struct node_widget *widget, unsigned cha
 		gettimeofday(&yingxue_base.yure_begtime, NULL);
 		struct tm *tm;
 		tm = localtime(&yingxue_base.yure_begtime.tv_sec);
-		tm->tm_hour = yingxue_base.yure_set_count;
+		//tm->tm_hour = yingxue_base.yure_set_count;
 		yingxue_base.yure_endtime.tv_sec = mktime(tm);
 		t_widget = ituSceneFindWidget(&theScene, "MainLayer");
 		ituLayerGoto((ITULayer *)t_widget);
@@ -420,47 +406,29 @@ static void yure_node_widget_confirm_cb(struct node_widget *widget, unsigned cha
 //预热时间设置事件
 static void yure_settime_widget_confirm_cb(struct node_widget *widget, unsigned char state)
 {
+	
 	ITUWidget *t_widget = NULL;
+	int value = widget->value;
+	printf("value=%d\n", value);
 	if (strcmp(widget->name, "BackgroundButton65") == 0){
 		t_widget = ituSceneFindWidget(&theScene, "yureLayer");
 		ituLayerGoto((ITULayer *)t_widget);
 	}
 	//点击单项按键
 	else if (strcmp(widget->focus_back_name, "radio") == 0){
-		//如果两次点击都是同一，取消
-		if (widget == yingxue_base.yure_time_widget){
-			t_widget = ituSceneFindWidget(&theScene, widget->name);
+		t_widget = ituSceneFindWidget(&theScene, widget->name);
+		//如果已经是点击状态，取消状态
+		if (ituRadioBoxIsChecked(t_widget)){
 			ituCheckBoxSetChecked((ITUCheckBox *)t_widget, false);
-			yingxue_base.yure_time_widget = NULL;
-			yingxue_base.yure_set_count = 0;
+			*(yingxue_base.dingshi_list + (value - 1)) = 0;
 		}
-		//如果不一样，先去掉以前的状态
+		//不是点击状态，加入点击状态
 		else{
-			if (yingxue_base.yure_time_widget){
-				t_widget = ituSceneFindWidget(&theScene, yingxue_base.yure_time_widget->name);
-				ituCheckBoxSetChecked((ITUCheckBox *)t_widget, false);
-			}
-			t_widget = ituSceneFindWidget(&theScene, widget->name);
 			ituCheckBoxSetChecked((ITUCheckBox *)t_widget, true);
-			yingxue_base.yure_set_count = widget->value;
-		}
-		yingxue_base.yure_time_widget = widget;
-	}
-	//支持长按
-	else if (widget->type == 1){
-		if (widget->state == 0){
-			//锁定
-			widget->state = 1;
-			t_widget = ituSceneFindWidget(&theScene, widget->checked_back_name);
-			ituWidgetSetVisible(t_widget, true);
-		}
-		else{
-			//解除锁定
-			widget->state = 0;
-			t_widget = ituSceneFindWidget(&theScene, widget->checked_back_name);
-			ituWidgetSetVisible(t_widget, false);
+			*(yingxue_base.dingshi_list + (value - 1)) = 1;
 		}
 	}
+
 }
 
 //预热回水温度和北京时间
@@ -1814,8 +1782,7 @@ int SceneRun(void)
 	node_widget_init();
 
 	unsigned char flag = 0;
-
-	uint8_t texBufArray[] = { 0xEB, 0x1B, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0xD8, 0x2A };
+	
 	struct timeval curtime;
 	SDL_Event   ev;
 	int         delay, frames, lastx, lasty;
@@ -1900,6 +1867,7 @@ int SceneRun(void)
 					break;
 				case 13://回车
 					curtime = buf_tm;
+					curr_node_widget->confirm_cb(curr_node_widget, 2);
 					break;
 				case 1073741885:
 					printf("power on\off");
@@ -1922,8 +1890,9 @@ int SceneRun(void)
 
 					break;
 				case SDLK_RIGHT:
+					printf("cur=%s\n", curr_node_widget->name);
 					//ituSceneSendEvent(&theScene, EVENT_CUSTOM_KEY3, NULL);
-					ScreenOn();
+					//ScreenOn();
 					break;
 
 				case SDLK_INSERT:
