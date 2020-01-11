@@ -135,9 +135,8 @@ extern "C" {
 		unsigned char machine_state;
 		//是否故障
 		unsigned char is_err;
-		//正在进去2s秒欢迎画面
-		unsigned char welcome_state; // 0关机 1正在关机 2开机 3正在开机
-		struct timeval welcome_t;  //欢迎结束时间
+		//机器运行状态
+		unsigned char run_state; //0上电 1开机 2关机
 
 	};
 
@@ -283,6 +282,14 @@ extern "C" {
 		struct moshi_data super_moshi; //超级模式
 		struct moshi_data eco_moshi; //节能模式
 		struct moshi_data fruit_moshi; //水果模式
+
+		//模式
+		unsigned char clock_state; //0上下调整温度 1进入功能界面
+		//是否闪烁
+		unsigned char is_shake;//0不闪烁 1闪烁
+		//上次点击的时间
+		struct timeval last_tm;
+
 	};
 
 	//发送串口命令

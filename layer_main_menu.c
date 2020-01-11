@@ -56,6 +56,7 @@ int MainMenuGetCurrentPosition(int, int);
 void MainMenuAnimationSetPlay(bool);
 
 extern struct main_uart_chg g_main_uart_chg_data;
+extern pthread_mutex_t msg_mutex;
 
 static void MainMenuPlay2ndRipple0(int arg)
 {
@@ -523,13 +524,6 @@ static void MainLayer_init()
 	ITUWidget *t_widget = NULL;
 	char t_buf[30] = { 0 };
 
-	//test
-	/*		if (test_flag == 0){
-	test_flag++;
-	ituLayerGoto(ituSceneFindWidget(&theScene, "moshiLayer"));
-	return true;
-	}*/
-
 	//预热模式 0 预热 1单巡航 2全天候巡航 3下次预热时间
 	t_widget = ituSceneFindWidget(&theScene, "yureSprite");
 
@@ -544,11 +538,7 @@ static void MainLayer_init()
 	}
 	else if (yingxue_base.yure_mode == 3){
 		ituSpriteGoto(t_widget, 3);
-		if (yingxue_base.yure_set_count){
-			t_widget = ituSceneFindWidget(&theScene, "Text35");
-			sprintf(t_buf, "%d:00~%d:00", yingxue_base.yure_set_count, yingxue_base.yure_set_count + 1);
-			ituTextSetString(t_widget, t_buf);
-		}
+
 	}
 
 	//模式 0 常规 1超热 2 eco 3水果
@@ -567,9 +557,6 @@ static void MainLayer_init()
 		ituSpriteGoto(t_widget, 3);
 	}
 
-	
-
-
 	//全部隐藏
 	t_widget = ituSceneFindWidget(&theScene, "Background100");
 	ituWidgetSetVisible(t_widget, false);
@@ -579,83 +566,24 @@ static void MainLayer_init()
 	t_widget = ituSceneFindWidget(&theScene, "Background134");
 	ituWidgetSetVisible(t_widget, false);
 	//默认选中第一个
-	curr_node_widget = &mainlayer_0;
+	curr_node_widget = &mainlayer_1;
 	t_widget = ituSceneFindWidget(&theScene, curr_node_widget->focus_back_name);
 	ituWidgetSetVisible(t_widget, true);
 }
 
-
-//樱雪主页串口数据改变改变
-bool YX_MainOnChg(ITUWidget* widget, char* param)
-{
-	char t_buf[20] = { 0 };
-	ITUWidget* t_widget = NULL;
-	/*g_main_uart_chg_data.water_show = 1;
-	g_main_uart_chg_data.fire_show = 1;
-	g_main_uart_chg_data.wind_show = 1;*/
-
-	g_main_uart_chg_data.chushui_temp = 30;
-
-	//显示出水温度
-	if (g_main_uart_chg_data.chushui_temp){
-		sprintf(t_buf, "%d", g_main_uart_chg_data.chushui_temp);
-		t_widget = ituSceneFindWidget(&theScene, "Text17");
-		ituTextSetString(t_widget, t_buf);
-	
-	}
-
-
-	//Background34
-	if (g_main_uart_chg_data.state_show & 0x01){
-		//显示
-		t_widget = ituSceneFindWidget(&theScene, "Background34");
-		ituWidgetSetVisible(t_widget, true);
-
-	}
-	else{
-		//不显示
-		t_widget = ituSceneFindWidget(&theScene, "Background34");
-		ituWidgetSetVisible(t_widget, false);
-	}
-
-	//Background35
-	if (g_main_uart_chg_data.state_show & 0x04){
-		//显示
-		t_widget = ituSceneFindWidget(&theScene, "Background35");
-		ituWidgetSetVisible(t_widget, true);
-
-	}
-	else{
-		//不显示
-		t_widget = ituSceneFindWidget(&theScene, "Background35");
-		ituWidgetSetVisible(t_widget, false);
-	}
-
-	//Background36
-	if (g_main_uart_chg_data.state_show & 0x02){
-		//显示
-		t_widget = ituSceneFindWidget(&theScene, "Background36");
-		ituWidgetSetVisible(t_widget, true);
-
-	}
-	else{
-		//不显示
-		t_widget = ituSceneFindWidget(&theScene, "Background36");
-		ituWidgetSetVisible(t_widget, false);
-	}
-
-	printf("wudan=%p\n", &g_main_uart_chg_data);
-	
-	return true;
-}
 
 //樱雪每个页面初始化
 bool YX_MenuOnEnter(ITUWidget* widget, char* param)
 {
 	static int test_flag = 0;
 	ITUWidget *t_widget = NULL;
+
+	//welcome页面
+	if (strcmp(widget->name, "welcom") == 0){
+
+	}
 	//MainLayer 首页
-	if (strcmp(widget->name, "MainLayer") == 0){
+	else if (strcmp(widget->name, "MainLayer") == 0){
 		MainLayer_init();
 	}
 	else if (strcmp(widget->name, "yureLayer") == 0){
@@ -807,5 +735,97 @@ bool YX_MenuOnEnter(ITUWidget* widget, char* param)
 
 
 	}
+
+}
+
+//欢迎页面，定时器
+bool WelcomeOnTimer(ITUWidget* widget, char* param)
+{
+
+	struct operate_data op_data;
+
+	//上电，等待2秒
+	if (g_main_uart_chg_data.run_state == 0){
+		sleep(0);
+		ituLayerGoto(ituSceneFindWidget(&theScene, "MainLayer"));
+		//发送开机
+		//改变状态开机
+		send_uart_cmd(&op_data);
+		g_main_uart_chg_data.run_state = 1;
+	}
+
+}
+
+//主页定时器
+bool MainLayerOnTimer(ITUWidget* widget, char* param)
+{
+	//1秒运行一次
+	static struct timeval last_tm;
+	struct timeval now_tm;
+	gettimeofday(&now_tm, NULL);
+	if (now_tm.tv_sec < last_tm.tv_sec + 1){
+		return true;
+	}
+	//加锁
+	pthread_mutex_lock(&msg_mutex);
+	char t_buf[20] = { 0 };
+	ITUWidget* t_widget = NULL;
+	/*g_main_uart_chg_data.water_show = 1;
+	g_main_uart_chg_data.fire_show = 1;
+	g_main_uart_chg_data.wind_show = 1;*/
+	g_main_uart_chg_data.state_show = 0xff;
+	//显示出水温度
+	if (g_main_uart_chg_data.chushui_temp){
+		sprintf(t_buf, "%d", g_main_uart_chg_data.chushui_temp);
+		t_widget = ituSceneFindWidget(&theScene, "Text17");
+		ituTextSetString(t_widget, t_buf);
+
+	}
+
+
+	//Background34
+	if (g_main_uart_chg_data.state_show & 0x01){
+		//显示
+		t_widget = ituSceneFindWidget(&theScene, "Background34");
+		ituWidgetSetVisible(t_widget, true);
+
+	}
+	else{
+		//不显示
+		t_widget = ituSceneFindWidget(&theScene, "Background34");
+		ituWidgetSetVisible(t_widget, false);
+	}
+
+	//Background35
+	if (g_main_uart_chg_data.state_show & 0x04){
+		//显示
+		t_widget = ituSceneFindWidget(&theScene, "Background35");
+		ituWidgetSetVisible(t_widget, true);
+
+	}
+	else{
+		//不显示
+		t_widget = ituSceneFindWidget(&theScene, "Background35");
+		ituWidgetSetVisible(t_widget, false);
+	}
+
+	//Background36
+	if (g_main_uart_chg_data.state_show & 0x02){
+		//显示
+		t_widget = ituSceneFindWidget(&theScene, "Background36");
+		ituWidgetSetVisible(t_widget, true);
+
+	}
+	else{
+		//不显示
+		t_widget = ituSceneFindWidget(&theScene, "Background36");
+		ituWidgetSetVisible(t_widget, false);
+	}
+
+	pthread_mutex_unlock(&msg_mutex);
+
+	gettimeofday(&last_tm, NULL);
+
+
 
 }

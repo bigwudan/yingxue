@@ -189,12 +189,18 @@ extern bool CheckListScrollListBoxReflesh(ITUWidget* widget, char* param);
 //每个进入页面初始化
 extern bool YX_MenuOnEnter(ITUWidget* widget, char* param);
 
-//串口收到数据后返回
-extern bool YX_MainOnChg(ITUWidget* widget, char* param);
+
+//欢迎页，定时器
+extern bool WelcomeOnTimer(ITUWidget* widget, char* param);
+
+//主页，定时器
+extern bool MainLayerOnTimer(ITUWidget* widget, char* param);
+
 
 ITUActionFunction actionFunctions[] =
 {
-	"YX_MainOnChg", YX_MainOnChg,
+	"MainLayerOnTimer", MainLayerOnTimer,
+	"WelcomeOnTimer", WelcomeOnTimer,
 	"YX_MenuOnEnter", YX_MenuOnEnter,
     "LogoOnEnter", LogoOnEnter,
     "TouchCalibrationOnEnter", TouchCalibrationOnEnter,

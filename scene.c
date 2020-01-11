@@ -38,12 +38,15 @@ extern void resetScene(void);
 extern mqd_t uartQueue;
 
 //樱雪线程锁
-static pthread_mutex_t msg_mutex = 0;//PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t msg_mutex = 0;//PTHREAD_MUTEX_INITIALIZER;
 
 
 unsigned long confirm_down_time = 0;
 //串口的数据
 struct uart_data_tag uart_data;
+
+//樱雪显示控制数据
+struct yingxue_base_tag yingxue_base;
 
 //环形队列缓存
 struct chain_list_tag chain_list;
@@ -126,6 +129,10 @@ static ITUIcon      *cursorIcon;
 
 extern void ScreenSetDoubleClick(void);
 
+
+//樱雪
+struct main_uart_chg g_main_uart_chg_data;
+
 //点击上下键，回调函数
 //@param widget 点击空间
 //@param state 0向上 1向下
@@ -135,137 +142,161 @@ static void node_widget_up_down(struct node_widget *widget, unsigned char state)
 	struct ITUWidget *t_widget = NULL;
 	char t_buf[20] = { 0 };
 	int t_num = 0;
-	//如果已经锁定
-	if (widget->state == 1){
-		if (strcmp(widget->name, "Background2") == 0){
-			t_widget = ituSceneFindWidget(&theScene, "Text3");
-			t_num = atoi(ituTextGetString((ITUText*)t_widget));
-			if (state == 0){
-				t_num = t_num + 1;
-			}
-			else{
-				t_num = t_num - 1;
-			}
-			sprintf(t_buf, "%d", t_num);
-			ituTextSetString(t_widget, t_buf);
-		}
-		else if (strcmp(widget->name, "Background3") == 0){
-			t_widget = ituSceneFindWidget(&theScene, "Text42");
-			t_num = atoi(ituTextGetString((ITUText*)t_widget));
-			if (state == 0){
-				t_num = t_num + 1;
-			}
-			else{
-				t_num = t_num - 1;
-			}
-			sprintf(t_buf, "%d", t_num);
-			ituTextSetString(t_widget, t_buf);
-		}
-		else if (strcmp(widget->name, "Background4") == 0){
 
-			t_widget = ituSceneFindWidget(&theScene, "Text43");
-			t_num = atoi(ituTextGetString((ITUText*)t_widget));
-			if (state == 0){
-				t_num = t_num + 1;
-			}
-			else{
-				t_num = t_num - 1;
-			}
-			sprintf(t_buf, "%d", t_num);
-			ituTextSetString(t_widget, t_buf);
-		}
-		else if (strcmp(widget->name, "chushui_Background13") == 0){
-			t_widget = ituSceneFindWidget(&theScene, "Text38");
-			t_num = atoi(ituTextGetString((ITUText*)t_widget));
-			if (state == 0){
-				t_num = t_num + 1;
-			}
-			else{
-				t_num = t_num - 1;
-			}
-			sprintf(t_buf, "%d", t_num);
-			ituTextSetString(t_widget, t_buf);
+	//主页面上下调整温度
+	if (yingxue_base.clock_state == 0){
 
-		}
-	}
-	else{
 		if (state == 0){
-			if (widget->up)
-				t_node_widget = widget->up;
+			g_main_uart_chg_data.shezhi_temp = g_main_uart_chg_data.shezhi_temp + 1;
 		}
 		else{
-			if (widget->down){
-				t_node_widget = widget->down;
-			}
+			g_main_uart_chg_data.shezhi_temp = g_main_uart_chg_data.shezhi_temp - 1;
 		}
 
-		if (t_node_widget){
-			//如果之前的控件是需要整个变换背景，
-			if ((strcmp(curr_node_widget->name, "BackgroundButton47") == 0) ||
-				(strcmp(curr_node_widget->name, "BackgroundButton65") == 0) ||
-				(strcmp(curr_node_widget->name, "BackgroundButton60") == 0) ||
-				(strcmp(curr_node_widget->name, "BackgroundButton68") == 0) ||
-				(strcmp(curr_node_widget->name, "moshi_BackgroundButton10") == 0) ||
-				(strcmp(curr_node_widget->name, "moshi_BackgroundButton11") == 0) ||
-				(strcmp(curr_node_widget->name, "moshi_BackgroundButton12") == 0) ||
-				(strcmp(curr_node_widget->name, "moshi_BackgroundButton13") == 0) ||
-				(strcmp(curr_node_widget->name, "chushui_BackgroundButton73") == 0) ||
-				(strcmp(curr_node_widget->name, "chushui_BackgroundButton1") == 0)
+		
 
+		t_widget = ituSceneFindWidget(&theScene, "Text17");
+		sprintf(t_buf, "%d", g_main_uart_chg_data.shezhi_temp);
+		ituTextSetString(t_widget, t_buf);
 
-				){
-				t_widget = ituSceneFindWidget(&theScene, curr_node_widget->focus_back_name);
-				ituWidgetSetVisible(t_widget, false);
-				t_widget = ituSceneFindWidget(&theScene, curr_node_widget->name);
-				ituWidgetSetVisible(t_widget, true);
-			}
-
-			//如果现在的控件是需要变换背景
-			if ((strcmp(t_node_widget->name, "BackgroundButton47") == 0) ||
-				(strcmp(t_node_widget->name, "BackgroundButton65") == 0) ||
-				(strcmp(t_node_widget->name, "BackgroundButton60") == 0) ||
-				(strcmp(t_node_widget->name, "BackgroundButton68") == 0) ||
-				(strcmp(t_node_widget->name, "moshi_BackgroundButton10") == 0) ||
-				(strcmp(t_node_widget->name, "moshi_BackgroundButton11") == 0) ||
-				(strcmp(t_node_widget->name, "moshi_BackgroundButton12") == 0) ||
-				(strcmp(t_node_widget->name, "moshi_BackgroundButton13") == 0) ||
-				(strcmp(t_node_widget->name, "chushui_BackgroundButton73") == 0) ||
-				(strcmp(t_node_widget->name, "chushui_BackgroundButton1") == 0)
-				){
-				t_widget = ituSceneFindWidget(&theScene, t_node_widget->focus_back_name);
-				ituWidgetSetVisible(t_widget, true);
-				t_widget = ituSceneFindWidget(&theScene, t_node_widget->name);
-				ituWidgetSetVisible(t_widget, false);
-
-				//原来的控件去掉边框
-				//原来控件是radio
-				if (strcmp(curr_node_widget->focus_back_name, "radio") == 0){
-					t_widget = ituSceneFindWidget(&theScene, curr_node_widget->name);
-					ituWidgetSetActive(t_widget, false);
+		send_uart_cmd(NULL);
+	}else {
+		if (widget->state == 1){ //如果已经锁定
+			if (strcmp(widget->name, "Background2") == 0){
+				t_widget = ituSceneFindWidget(&theScene, "Text3");
+				t_num = atoi(ituTextGetString((ITUText*)t_widget));
+				if (state == 0){
+					t_num = t_num + 1;
 				}
-				//控件普通
 				else{
-					t_widget = ituSceneFindWidget(&theScene, curr_node_widget->focus_back_name);
-					ituWidgetSetVisible(t_widget, false);
+					t_num = t_num - 1;
 				}
-				curr_node_widget = t_node_widget;
+				sprintf(t_buf, "%d", t_num);
+				ituTextSetString(t_widget, t_buf);
 			}
-			else if (strcmp(t_node_widget->focus_back_name, "radio") == 0){
-				t_widget = ituSceneFindWidget(&theScene, t_node_widget->name);
-				ituFocusWidget(t_widget);
-				curr_node_widget = t_node_widget;
+			else if (strcmp(widget->name, "Background3") == 0){
+				t_widget = ituSceneFindWidget(&theScene, "Text42");
+				t_num = atoi(ituTextGetString((ITUText*)t_widget));
+				if (state == 0){
+					t_num = t_num + 1;
+				}
+				else{
+					t_num = t_num - 1;
+				}
+				sprintf(t_buf, "%d", t_num);
+				ituTextSetString(t_widget, t_buf);
+			}
+			else if (strcmp(widget->name, "Background4") == 0){
+
+				t_widget = ituSceneFindWidget(&theScene, "Text43");
+				t_num = atoi(ituTextGetString((ITUText*)t_widget));
+				if (state == 0){
+					t_num = t_num + 1;
+				}
+				else{
+					t_num = t_num - 1;
+				}
+				sprintf(t_buf, "%d", t_num);
+				ituTextSetString(t_widget, t_buf);
+			}
+			else if (strcmp(widget->name, "chushui_Background13") == 0){
+				t_widget = ituSceneFindWidget(&theScene, "Text38");
+				t_num = atoi(ituTextGetString((ITUText*)t_widget));
+				if (state == 0){
+					t_num = t_num + 1;
+				}
+				else{
+					t_num = t_num - 1;
+				}
+				sprintf(t_buf, "%d", t_num);
+				ituTextSetString(t_widget, t_buf);
+
+			}
+		}
+		else{
+			if (state == 0){
+				if (widget->up)
+					t_node_widget = widget->up;
 			}
 			else{
-				//隐藏当前控件选中状态
-				t_widget = ituSceneFindWidget(&theScene, curr_node_widget->focus_back_name);
-				ituWidgetSetVisible(t_widget, false);
-				//显示当前的控件
-				t_widget = ituSceneFindWidget(&theScene, t_node_widget->focus_back_name);
-				ituWidgetSetVisible(t_widget, true);
-				curr_node_widget = t_node_widget;
+				if (widget->down){
+					t_node_widget = widget->down;
+				}
+			}
+
+			if (t_node_widget){
+				//如果之前的控件是需要整个变换背景，
+				if ((strcmp(curr_node_widget->name, "BackgroundButton47") == 0) ||
+					(strcmp(curr_node_widget->name, "BackgroundButton65") == 0) ||
+					(strcmp(curr_node_widget->name, "BackgroundButton60") == 0) ||
+					(strcmp(curr_node_widget->name, "BackgroundButton68") == 0) ||
+					(strcmp(curr_node_widget->name, "moshi_BackgroundButton10") == 0) ||
+					(strcmp(curr_node_widget->name, "moshi_BackgroundButton11") == 0) ||
+					(strcmp(curr_node_widget->name, "moshi_BackgroundButton12") == 0) ||
+					(strcmp(curr_node_widget->name, "moshi_BackgroundButton13") == 0) ||
+					(strcmp(curr_node_widget->name, "chushui_BackgroundButton73") == 0) ||
+					(strcmp(curr_node_widget->name, "chushui_BackgroundButton1") == 0)
+
+
+					){
+					t_widget = ituSceneFindWidget(&theScene, curr_node_widget->focus_back_name);
+					ituWidgetSetVisible(t_widget, false);
+					t_widget = ituSceneFindWidget(&theScene, curr_node_widget->name);
+					ituWidgetSetVisible(t_widget, true);
+				}
+
+				//如果现在的控件是需要变换背景
+				if ((strcmp(t_node_widget->name, "BackgroundButton47") == 0) ||
+					(strcmp(t_node_widget->name, "BackgroundButton65") == 0) ||
+					(strcmp(t_node_widget->name, "BackgroundButton60") == 0) ||
+					(strcmp(t_node_widget->name, "BackgroundButton68") == 0) ||
+					(strcmp(t_node_widget->name, "moshi_BackgroundButton10") == 0) ||
+					(strcmp(t_node_widget->name, "moshi_BackgroundButton11") == 0) ||
+					(strcmp(t_node_widget->name, "moshi_BackgroundButton12") == 0) ||
+					(strcmp(t_node_widget->name, "moshi_BackgroundButton13") == 0) ||
+					(strcmp(t_node_widget->name, "chushui_BackgroundButton73") == 0) ||
+					(strcmp(t_node_widget->name, "chushui_BackgroundButton1") == 0)
+					){
+					t_widget = ituSceneFindWidget(&theScene, t_node_widget->focus_back_name);
+					ituWidgetSetVisible(t_widget, true);
+					t_widget = ituSceneFindWidget(&theScene, t_node_widget->name);
+					ituWidgetSetVisible(t_widget, false);
+
+					//原来的控件去掉边框
+					//原来控件是radio
+					if (strcmp(curr_node_widget->focus_back_name, "radio") == 0){
+						t_widget = ituSceneFindWidget(&theScene, curr_node_widget->name);
+						ituWidgetSetActive(t_widget, false);
+					}
+					//控件普通
+					else{
+						t_widget = ituSceneFindWidget(&theScene, curr_node_widget->focus_back_name);
+						ituWidgetSetVisible(t_widget, false);
+					}
+					curr_node_widget = t_node_widget;
+				}
+				else if (strcmp(t_node_widget->focus_back_name, "radio") == 0){
+					t_widget = ituSceneFindWidget(&theScene, t_node_widget->name);
+					ituFocusWidget(t_widget);
+					curr_node_widget = t_node_widget;
+				}
+				else{
+					//隐藏当前控件选中状态
+					t_widget = ituSceneFindWidget(&theScene, curr_node_widget->focus_back_name);
+					ituWidgetSetVisible(t_widget, false);
+					//显示当前的控件
+					t_widget = ituSceneFindWidget(&theScene, t_node_widget->focus_back_name);
+					ituWidgetSetVisible(t_widget, true);
+					curr_node_widget = t_node_widget;
+				}
 			}
 		}
+	
 	}
+	
+	
+	
+
 
 }
 
@@ -649,7 +680,7 @@ struct main_data g_main_data;
 
 
 //樱雪基础数据
-struct yingxue_base_tag yingxue_base;
+//struct yingxue_base_tag yingxue_base;
 
 //当前选中的控件
 struct node_widget *curr_node_widget;
@@ -1128,7 +1159,7 @@ char recv_uart_cmd()
 	return 0;
 }
 
-struct main_uart_chg g_main_uart_chg_data;
+
 
 
 
@@ -1735,6 +1766,7 @@ static void* UartFunc(void* arg)
 
 
 
+
 int SceneRun(void)
 {
 
@@ -1750,9 +1782,6 @@ int SceneRun(void)
 
 	//闪烁的时间
 	unsigned int shansuo_t = 0;
-
-	//初期关机
-	ScreenOff();
 	
 	//消息队列
 	struct mq_attr mq_uart_attr;
@@ -1803,51 +1832,11 @@ int SceneRun(void)
 		bool result = false;
 
 		//樱雪
+
 		//缓存时间
 		gettimeofday(&buf_tm, NULL);
-		//判断是否开关机机
-		pthread_mutex_lock(&msg_mutex);
-
-		//test
-		ITUWidget* txt = (ITUWidget*)ituSceneFindWidget(&theScene, "Text17");
-		if (txt){
-			txt->visible;
-			if (txt->visible == 0){
-				if (shansuo_t == 0){
-					ituWidgetSetVisible(txt, true);
-					shansuo_t = 10;
-				}
-			}
-			else{
-				if (shansuo_t == 0){
-					ituWidgetSetVisible(txt, false);
-					shansuo_t = 10;
-				}
-			}
-			shansuo_t--;
-			
-			
-		}
-
-
-		if (g_main_uart_chg_data.welcome_state == 3 ){
-
-			//延迟
-			if (g_main_uart_chg_data.welcome_t.tv_sec  < buf_tm.tv_sec){
-				ituLayerGoto(ituSceneFindWidget(&theScene, "MainLayer"), NULL);
-				g_main_uart_chg_data.welcome_state = 2;
-			}
-		}
-		else if (g_main_uart_chg_data.welcome_state == 1){
-			//延迟
-			if (g_main_uart_chg_data.welcome_t.tv_sec  < buf_tm.tv_sec){
-				ScreenOff();
-				g_main_uart_chg_data.welcome_state = 0;
-			}
-		}
-		pthread_mutex_unlock(&msg_mutex);
-
-		if (g_main_uart_chg_data.welcome_state == 3 || g_main_uart_chg_data.welcome_state == 1) continue;
+		
+		//主页面运行
 
 
 		if (CheckQuitValue())
@@ -1914,20 +1903,16 @@ int SceneRun(void)
 					
 				case SDLK_LEFT: //开机和关机
 					pthread_mutex_lock(&msg_mutex);
-					if (g_main_uart_chg_data.welcome_state == 0){
+					if (g_main_uart_chg_data.run_state == 0){
 						//开机
 						ScreenOn();
 						ituLayerGoto(ituSceneFindWidget(&theScene, "welcom"));
-						g_main_uart_chg_data.welcome_state = 3;
-						g_main_uart_chg_data.welcome_t = buf_tm;
-						g_main_uart_chg_data.welcome_t.tv_sec += 1;
+						g_main_uart_chg_data.run_state = 3;
 
 					}
-					else if (g_main_uart_chg_data.welcome_state == 2){
+					else if (g_main_uart_chg_data.run_state == 2){
 						ituLayerGoto(ituSceneFindWidget(&theScene, "welcom"));
-						g_main_uart_chg_data.welcome_state = 1;
-						g_main_uart_chg_data.welcome_t = buf_tm;
-						g_main_uart_chg_data.welcome_t.tv_sec += 1;
+						g_main_uart_chg_data.run_state = 1;
 					}
 					pthread_mutex_unlock(&msg_mutex);
 
