@@ -1748,6 +1748,9 @@ int SceneRun(void)
 	//缓存时间
 	struct timeval buf_tm;
 
+	//闪烁的时间
+	unsigned int shansuo_t = 0;
+
 	//初期关机
 	ScreenOff();
 	
@@ -1804,6 +1807,29 @@ int SceneRun(void)
 		gettimeofday(&buf_tm, NULL);
 		//判断是否开关机机
 		pthread_mutex_lock(&msg_mutex);
+
+		//test
+		ITUWidget* txt = (ITUWidget*)ituSceneFindWidget(&theScene, "Text17");
+		if (txt){
+			txt->visible;
+			if (txt->visible == 0){
+				if (shansuo_t == 0){
+					ituWidgetSetVisible(txt, true);
+					shansuo_t = 10;
+				}
+			}
+			else{
+				if (shansuo_t == 0){
+					ituWidgetSetVisible(txt, false);
+					shansuo_t = 10;
+				}
+			}
+			shansuo_t--;
+			
+			
+		}
+
+
 		if (g_main_uart_chg_data.welcome_state == 3 ){
 
 			//延迟
