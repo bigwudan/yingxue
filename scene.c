@@ -1550,6 +1550,52 @@ static void CheckMouse(void)
 #define TEST_DEVICE     itpDeviceUart3	
 #define TEST_BAUDRATE   "115200"
 
+//计算下一次预约的时间
+static void calcNextYure(int *beg, int *end)
+{
+	//计算时间
+	struct timeval curr_time;
+	struct tm *t_tm;
+	unsigned char cur_hour;
+	unsigned char num;
+	*beg = 0;
+	*end = 0;
+	gettimeofday(&curr_time, NULL);
+	t_tm = localtime(&curr_time);
+	cur_hour = t_tm->tm_hour;
+
+	//先向前。如何没有找到从新开始找
+	for (int i = 0; i < 2; i++){
+		if (i == 0){
+			num = cur_hour;
+		}
+		else{
+			num = 0;
+		}
+		for (int j = num; j < 24; j++)
+		{
+			//存在时间
+			if (*(yingxue_base.dingshi_list + j) == 1){
+				//开始计算
+				if (*beg == 0){
+					*beg = j + 1;
+				}
+				//结束连续时间一直计算
+				else if (*beg != 0){
+					*end = j;
+				}
+			}
+			else{
+				//如果有断层立即结束
+				if (*beg != 0) break;
+			}
+		}
+		if (*beg != 0) break;
+	}
+
+	return;
+}
+
 static int create_chain_list(struct chain_list_tag *p_chain_list)
 {
 	p_chain_list->rear = 0;
@@ -1722,8 +1768,12 @@ static void* UartFunc(void* arg)
 	uint8_t texBufArray[] = { 0xEB, 0x1B, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0xD8, 0x2A };
 	int len = 0;
 	int flag = 0;
-	struct   timespec tm;
-	tm.tv_nsec = 1;
+	int is_has = 0;
+	struct   timeval tm;
+	gettimeofday(&tm, NULL);
+	struct tm *tm_t;
+	
+	
 	while (1){
 		
 		memset(getstr1, 0, sizeof(getstr1));
@@ -1751,7 +1801,50 @@ static void* UartFunc(void* arg)
 
 				//延迟20ms 发送回复信息
 				usleep(10);
+				//首先判断是否需要预热
+				if (yingxue_base.yure_mode > 0){
+					//单巡航模式
+					if (yingxue_base.yure_mode == 1){
+						if (tm.tv_sec > yingxue_base.yure_endtime.tv_sec){
+							//结束指令
+							memcpy(texBufArray, 1, 1);
+							is_has = 1;
+							
+						}
+					}
+					//定时器
+					else if (yingxue_base.yure_mode == 3){
+						tm_t = localtime(&tm.tv_sec);
+						//这个时间是否需要启动
+						if (  *(yingxue_base.dingshi_list + tm_t->tm_hour - 1) ==1 ){
+							if (yingxue_base.yure_state == 0){
+								//开始
+								memcpy(texBufArray, 1, 1);
+								is_has = 1;
+								yingxue_base.yure_state == 1;
+							}
+						}
+						//这个时间 是否需要关闭
+						else{
+							if (yingxue_base.yure_state == 1){
+								//结束
+								memcpy(texBufArray, 1, 1);
+								is_has = 1;
+								yingxue_base.yure_state == 0;
+							}
+						}
+					}
+				}
+			
+				if (is_has == 0){
+					//读取消息队列的数据
+					//结束指令
+					memcpy(texBufArray, 1, 1);
+					is_has = 1;
+				}
+
 				write(TEST_PORT, texBufArray, sizeof(texBufArray));
+				
 
 			}
 		}
@@ -1760,51 +1853,7 @@ static void* UartFunc(void* arg)
 	}
 }
 
-//计算下一次预约的时间
-void calcNextYure(int *beg, int *end)
-{
-	//计算时间
-	struct timeval curr_time;
-	struct tm *t_tm;
-	unsigned char cur_hour;
-	unsigned char num;
-	*beg = 0;
-	*end = 0;
-	gettimeofday(&curr_time, NULL);
-	t_tm = localtime(&curr_time);
-	cur_hour = t_tm->tm_hour;
 
-	//先向前。如何没有找到从新开始找
-	for (int i = 0; i < 2; i++){
-		if (i == 0){
-			num = cur_hour;
-		}
-		else{
-			num = 0;
-		}
-		for (int j = num; j < 24; j++)
-		{
-			//存在时间
-			if (*(yingxue_base.dingshi_list + j) == 1){
-				//开始计算
-				if (*beg == 0){
-					*beg = j + 1;
-				}
-				//结束连续时间一直计算
-				else if (*beg != 0){
-					*end = j;
-				}
-			}
-			else{
-				//如果有断层立即结束
-				if (*beg != 0) break;
-			}
-		}
-		if (*beg != 0) break;
-	}
-
-	return;
-}
 
 
 
@@ -1813,16 +1862,6 @@ int SceneRun(void)
 {
 
 	//樱雪
-	//test
-	yingxue_base.dingshi_list[0] = 1;
-	/*yingxue_base.dingshi_list[20] = 1;
-	yingxue_base.dingshi_list[21] = 1;
-	yingxue_base.dingshi_list[22] = 1;*/
-	int t_beg;
-	int t_end;
-	calcNextYure(&t_beg, &t_end);
-	printf("beg=%d,end=%d\n", t_beg, t_end);
-	return;
 
 	//初始锁
 	if (pthread_mutex_init(&msg_mutex, NULL) != 0){

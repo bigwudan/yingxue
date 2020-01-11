@@ -291,6 +291,9 @@ extern "C" {
 		//定时时间数组,0未开启 1开启
 		unsigned char dingshi_list[24];
 
+		//是否已经预热
+		unsigned char yure_state; //0 未预热 1已经预热
+
 	};
 
 	//发送串口命令
