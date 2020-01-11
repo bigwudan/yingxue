@@ -755,9 +755,9 @@ bool WelcomeOnTimer(ITUWidget* widget, char* param)
 	//上电，等待2秒
 	if (g_main_uart_chg_data.run_state == 0){
 		sleep(0);
-		//
-		//ituLayerGoto(ituSceneFindWidget(&theScene, "MainLayer"));
-		ituLayerGoto(ituSceneFindWidget(&theScene, "yureshijianLayer"));
+		
+		ituLayerGoto(ituSceneFindWidget(&theScene, "MainLayer"));
+		
 		//发送开机
 		//改变状态开机
 		send_uart_cmd(&op_data);

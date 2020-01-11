@@ -357,19 +357,40 @@ static void yure_node_widget_confirm_cb(struct node_widget *widget, unsigned cha
 	//Background27
 	else if (strcmp(widget->name, "BackgroundButton14") == 0){
 		//单次巡航 从现在到2个小时结束
-		yingxue_base.yure_mode = 1;
-		gettimeofday(&yingxue_base.yure_begtime, NULL);
-		//2个小时 
-		yingxue_base.yure_endtime.tv_sec = yingxue_base.yure_begtime.tv_sec + 60 * 60 * 2;
+		//同一个，取消
+		if (yingxue_base.yure_mode == 1){
+			yingxue_base.yure_mode = 0;
+			memset(&yingxue_base.yure_endtime, 0, sizeof(struct timeval));
+			//发送取消
+			send_uart_cmd(NULL);
+		}
+		else{
+			//发送开始
+			send_uart_cmd(NULL);
+			yingxue_base.yure_mode = 1;
+			gettimeofday(&yingxue_base.yure_begtime, NULL);
+			//2个小时 
+			yingxue_base.yure_endtime.tv_sec = yingxue_base.yure_begtime.tv_sec + 60 * 60 * 2;
+		}
 		t_widget = ituSceneFindWidget(&theScene, "MainLayer");
 		ituLayerGoto((ITULayer *)t_widget);
 	}
 	else if (strcmp(widget->name, "BackgroundButton19") == 0){
 		//全天候模式：
 		//启动：从点击巡航模式，即刻开始，发送一次串口命令：预热中的数据2“循环预热”
-		yingxue_base.yure_mode = 2;
-		gettimeofday(&yingxue_base.yure_begtime, NULL);
-		yingxue_base.yure_endtime.tv_sec = 9999;
+		if (yingxue_base.yure_mode == 2){
+			yingxue_base.yure_mode = 0;
+			memset(&yingxue_base.yure_endtime, 0, sizeof(struct timeval));
+			//发送取消
+			send_uart_cmd(NULL);
+		}
+		else{
+			yingxue_base.yure_mode = 2;
+			gettimeofday(&yingxue_base.yure_begtime, NULL);
+			memset(&yingxue_base.yure_endtime, 0, sizeof(struct timeval));
+			//发送预热开始
+			send_uart_cmd(NULL);
+		}
 		t_widget = ituSceneFindWidget(&theScene, "MainLayer");
 		ituLayerGoto((ITULayer *)t_widget);
 	}
@@ -380,12 +401,15 @@ static void yure_node_widget_confirm_cb(struct node_widget *widget, unsigned cha
 		启动：定时时间到达，发送一次串口命令：预热中的数据2“循环预热”，
 		结束：自动延迟1个小时，发送一次串口命令，TFT在发送 预热命令  0- 预热关闭是吧
 		*/
-		yingxue_base.yure_mode = 3;
-		gettimeofday(&yingxue_base.yure_begtime, NULL);
-		struct tm *tm;
-		tm = localtime(&yingxue_base.yure_begtime.tv_sec);
-		//tm->tm_hour = yingxue_base.yure_set_count;
-		yingxue_base.yure_endtime.tv_sec = mktime(tm);
+		if (yingxue_base.yure_mode == 3){
+			yingxue_base.yure_mode = 0;
+			memset(&yingxue_base.yure_endtime, 0, sizeof(struct timeval));
+			//发送取消
+			send_uart_cmd(NULL);
+		}
+		else{
+			yingxue_base.yure_mode = 3;
+		}
 		t_widget = ituSceneFindWidget(&theScene, "MainLayer");
 		ituLayerGoto((ITULayer *)t_widget);
 	}
@@ -1736,14 +1760,70 @@ static void* UartFunc(void* arg)
 	}
 }
 
+//计算下一次预约的时间
+void calcNextYure(int *beg, int *end)
+{
+	//计算时间
+	struct timeval curr_time;
+	struct tm *t_tm;
+	unsigned char cur_hour;
+	unsigned char num;
+	*beg = 0;
+	*end = 0;
+	gettimeofday(&curr_time, NULL);
+	t_tm = localtime(&curr_time);
+	cur_hour = t_tm->tm_hour;
+
+	//先向前。如何没有找到从新开始找
+	for (int i = 0; i < 2; i++){
+		if (i == 0){
+			num = cur_hour;
+		}
+		else{
+			num = 0;
+		}
+		for (int j = num; j < 24; j++)
+		{
+			//存在时间
+			if (*(yingxue_base.dingshi_list + j) == 1){
+				//开始计算
+				if (*beg == 0){
+					*beg = j + 1;
+				}
+				//结束连续时间一直计算
+				else if (*beg != 0){
+					*end = j;
+				}
+			}
+			else{
+				//如果有断层立即结束
+				if (*beg != 0) break;
+			}
+		}
+		if (*beg != 0) break;
+	}
+
+	return;
+}
+
 
 
 
 int SceneRun(void)
 {
 
-
 	//樱雪
+	//test
+	yingxue_base.dingshi_list[0] = 1;
+	/*yingxue_base.dingshi_list[20] = 1;
+	yingxue_base.dingshi_list[21] = 1;
+	yingxue_base.dingshi_list[22] = 1;*/
+	int t_beg;
+	int t_end;
+	calcNextYure(&t_beg, &t_end);
+	printf("beg=%d,end=%d\n", t_beg, t_end);
+	return;
+
 	//初始锁
 	if (pthread_mutex_init(&msg_mutex, NULL) != 0){
 		printf("error mutex func=%s,line=%d\n", __func__, __LINE__);
