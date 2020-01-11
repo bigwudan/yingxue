@@ -569,6 +569,8 @@ static void MainLayer_init()
 	curr_node_widget = &mainlayer_1;
 	t_widget = ituSceneFindWidget(&theScene, curr_node_widget->focus_back_name);
 	ituWidgetSetVisible(t_widget, true);
+
+	yingxue_base.lock_state = 0;
 }
 
 
@@ -799,7 +801,7 @@ bool MainLayerOnTimer(ITUWidget* widget, char* param)
 		//闪烁5s结束
 		if (now_tm.tv_sec > yingxue_base.last_shezhi_tm.tv_sec + 7){
 			ituWidgetSetVisible(t_widget, true);
-			yingxue_base.lock_state = 2;
+			yingxue_base.lock_state = 0;
 		}
 		else{
 			if (t_widget){

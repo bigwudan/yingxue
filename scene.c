@@ -311,6 +311,7 @@ static void main_widget_confirm_cb(struct node_widget *widget, unsigned char sta
 {
 	if (yingxue_base.lock_state == 0){
 		yingxue_base.lock_state = 3;
+		return;
 	}
 
 	ITUWidget *t_widget = NULL;
@@ -1922,16 +1923,13 @@ int SceneRun(void)
 
 	for (;;)
 	{
-		
 		bool result = false;
-
 		//樱雪
 		//缓存时间
 		gettimeofday(&buf_tm, NULL);
 		
 		//如果超过3s没有动作自动回到主页面
 		if (buf_tm.tv_sec > last_tm.tv_sec + 5){
-			printf("over 5s\n");
 			memcpy(&last_tm, &buf_tm, sizeof(struct timeval));
 			//strcmp
 			if (strcmp(curr_node_widget->name, "BackgroundButton3") != 0 ){
