@@ -282,13 +282,10 @@ extern "C" {
 		struct moshi_data super_moshi; //超级模式
 		struct moshi_data eco_moshi; //节能模式
 		struct moshi_data fruit_moshi; //水果模式
-
 		//模式
-		unsigned char clock_state; //0上下调整温度 1进入功能界面
-		//是否闪烁
-		unsigned char is_shake;//0不闪烁 1闪烁
-		//上次点击的时间
-		struct timeval last_tm;
+		unsigned char lock_state; //0无操作 1开始调整温度 2 开始闪烁 3进入功能界面
+		//上次点击的时间,判断是否闪烁
+		struct timeval last_shezhi_tm;
 
 	};
 

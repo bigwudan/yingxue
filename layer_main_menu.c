@@ -762,14 +762,43 @@ bool MainLayerOnTimer(ITUWidget* widget, char* param)
 	//1秒运行一次
 	static struct timeval last_tm;
 	struct timeval now_tm;
+	char t_buf[20] = { 0 };
+	ITUWidget* t_widget;
 	gettimeofday(&now_tm, NULL);
 	if (now_tm.tv_sec < last_tm.tv_sec + 1){
 		return true;
 	}
+
+	//是否显示闪烁
+	if (yingxue_base.lock_state == 1){
+		//如果5s都没有动作，闪烁
+		if (now_tm.tv_sec > yingxue_base.last_shezhi_tm.tv_sec + 2){
+			yingxue_base.lock_state = 2;
+		}
+	}
+	//开始闪烁
+	else if (yingxue_base.lock_state == 2){
+		t_widget = (ITUWidget*)ituSceneFindWidget(&theScene, "Text17");
+		//闪烁5s结束
+		if (now_tm.tv_sec > yingxue_base.last_shezhi_tm.tv_sec + 7){
+			ituWidgetSetVisible(t_widget, true);
+			yingxue_base.lock_state = 2;
+		}
+		else{
+			if (t_widget){
+				if (t_widget->visible == 0){
+					ituWidgetSetVisible(t_widget, true);
+				}
+				else{
+					ituWidgetSetVisible(t_widget, false);
+				}
+			}
+		}
+	}
+
+
 	//加锁
 	pthread_mutex_lock(&msg_mutex);
-	char t_buf[20] = { 0 };
-	ITUWidget* t_widget = NULL;
 	/*g_main_uart_chg_data.water_show = 1;
 	g_main_uart_chg_data.fire_show = 1;
 	g_main_uart_chg_data.wind_show = 1;*/

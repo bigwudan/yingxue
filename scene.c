@@ -143,18 +143,22 @@ static void node_widget_up_down(struct node_widget *widget, unsigned char state)
 	char t_buf[20] = { 0 };
 	int t_num = 0;
 
+	//正在闪烁不让操作
+	if (yingxue_base.lock_state == 2){
+		return;
+	}
 	//主页面上下调整温度
-	if (yingxue_base.clock_state == 0){
-
+	else if (yingxue_base.lock_state == 0 || yingxue_base.lock_state == 1){
+		//时间
+		gettimeofday(&yingxue_base.last_shezhi_tm, NULL);
+		yingxue_base.lock_state = 1;
+		
 		if (state == 0){
 			g_main_uart_chg_data.shezhi_temp = g_main_uart_chg_data.shezhi_temp + 1;
 		}
 		else{
 			g_main_uart_chg_data.shezhi_temp = g_main_uart_chg_data.shezhi_temp - 1;
 		}
-
-		
-
 		t_widget = ituSceneFindWidget(&theScene, "Text17");
 		sprintf(t_buf, "%d", g_main_uart_chg_data.shezhi_temp);
 		ituTextSetString(t_widget, t_buf);
