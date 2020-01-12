@@ -37,6 +37,11 @@ extern void resetScene(void);
 //信息对象
 extern mqd_t uartQueue;
 
+//反馈数据 标识和 目标地址，优先级
+unsigned char frame_0 = 0xEB;
+unsigned char frame_1 = 0x1B;
+
+
 //樱雪线程锁
 pthread_mutex_t msg_mutex = 0;//PTHREAD_MUTEX_INITIALIZER;
 
@@ -163,7 +168,7 @@ static void node_widget_up_down(struct node_widget *widget, unsigned char state)
 		sprintf(t_buf, "%d", g_main_uart_chg_data.shezhi_temp);
 		ituTextSetString(t_widget, t_buf);
 
-		send_uart_cmd(NULL);
+		SEND_OPEN_CMD();
 	}else {
 		if (widget->state == 1){ //如果已经锁定
 			if (strcmp(widget->name, "Background2") == 0){
@@ -363,11 +368,12 @@ static void yure_node_widget_confirm_cb(struct node_widget *widget, unsigned cha
 			yingxue_base.yure_mode = 0;
 			memset(&yingxue_base.yure_endtime, 0, sizeof(struct timeval));
 			//发送取消
-			send_uart_cmd(NULL);
+			SEND_OPEN_CMD();
+			
 		}
 		else{
 			//发送开始
-			send_uart_cmd(NULL);
+			SEND_OPEN_CMD();
 			yingxue_base.yure_mode = 1;
 			gettimeofday(&yingxue_base.yure_begtime, NULL);
 			//2个小时 
@@ -383,14 +389,16 @@ static void yure_node_widget_confirm_cb(struct node_widget *widget, unsigned cha
 			yingxue_base.yure_mode = 0;
 			memset(&yingxue_base.yure_endtime, 0, sizeof(struct timeval));
 			//发送取消
-			send_uart_cmd(NULL);
+			SEND_OPEN_CMD();
+			
 		}
 		else{
 			yingxue_base.yure_mode = 2;
 			gettimeofday(&yingxue_base.yure_begtime, NULL);
 			memset(&yingxue_base.yure_endtime, 0, sizeof(struct timeval));
 			//发送预热开始
-			send_uart_cmd(NULL);
+			SEND_OPEN_CMD();
+			
 		}
 		t_widget = ituSceneFindWidget(&theScene, "MainLayer");
 		ituLayerGoto((ITULayer *)t_widget);
@@ -406,7 +414,7 @@ static void yure_node_widget_confirm_cb(struct node_widget *widget, unsigned cha
 			yingxue_base.yure_mode = 0;
 			memset(&yingxue_base.yure_endtime, 0, sizeof(struct timeval));
 			//发送取消
-			send_uart_cmd(NULL);
+			SEND_CLOSE_CMD();
 		}
 		else{
 			yingxue_base.yure_mode = 3;
@@ -484,7 +492,7 @@ static void yure_yureshezhiLayer_widget_confirm_cb(struct node_widget *widget, u
 				num = atoi(t_buf);
 				yingxue_base.huishui_temp = num;
 				//发送改变回水温度,也就是预热回温温度
-				send_uart_cmd(NULL);
+				SEND_CLOSE_CMD();
 			}
 			//北京时间小时
 			else if ((strcmp(widget->name, "Background3") == 0) || (strcmp(widget->name, "Background4") == 0)){
@@ -516,7 +524,7 @@ static void yure_yureshezhiLayer_widget_confirm_cb(struct node_widget *widget, u
 static void moshi_widget_confirm_cb(struct node_widget *widget, unsigned char state)
 {
 	//初始化一个控制板数据
-	struct operate_data oper_data;
+	//struct operate_data oper_data;
 
 	ITUWidget *t_widget = NULL;
 	if (strcmp(widget->name, "BackgroundButton68") == 0){
@@ -525,7 +533,7 @@ static void moshi_widget_confirm_cb(struct node_widget *widget, unsigned char st
 	}
 	else if (strcmp(widget->name, "moshi_BackgroundButton10") == 0){
 		//发送模式命令就发指令 4 ： 模式设置  ： 默认 0 ，设置温度 ： XX ， 定升设定  ： 默认值时发0 
-		memset(&oper_data, 0, sizeof(struct operate_data));
+		/*memset(&oper_data, 0, sizeof(struct operate_data));
 		oper_data.data_0 = 0xEB;
 		oper_data.data_1 = 0x03 << 5 | 0x07 << 2 | 0x01;
 		oper_data.data_2 = 0x04;
@@ -534,7 +542,7 @@ static void moshi_widget_confirm_cb(struct node_widget *widget, unsigned char st
 		struct timespec tm;
 		memset(&tm, 0, sizeof(struct timespec));
 		tm.tv_sec += 2;
-		mq_timedsend(uartQueue, &oper_data, sizeof(struct operate_data), 1, &tm);
+		mq_timedsend(uartQueue, &oper_data, sizeof(struct operate_data), 1, &tm);*/
 
 		yingxue_base.moshi_mode = 1;
 		t_widget = ituSceneFindWidget(&theScene, "MainLayer");
@@ -543,7 +551,7 @@ static void moshi_widget_confirm_cb(struct node_widget *widget, unsigned char st
 	else if (strcmp(widget->name, "moshi_BackgroundButton11") == 0){
 
 		//发送模式命令就发指令 4 ： 模式设置  ： 默认 0 ，设置温度 ： XX ， 定升设定  ： 默认值时发0 
-		memset(&oper_data, 0, sizeof(struct operate_data));
+		/*memset(&oper_data, 0, sizeof(struct operate_data));
 		oper_data.data_0 = 0xEB;
 		oper_data.data_1 = 0x03 << 5 | 0x07 << 2 | 0x01;
 		oper_data.data_2 = 0x04;
@@ -552,7 +560,7 @@ static void moshi_widget_confirm_cb(struct node_widget *widget, unsigned char st
 		struct timespec tm;
 		memset(&tm, 0, sizeof(struct timespec));
 		tm.tv_sec += 2;
-		mq_timedsend(uartQueue, &oper_data, sizeof(struct operate_data), 1, &tm);
+		mq_timedsend(uartQueue, &oper_data, sizeof(struct operate_data), 1, &tm);*/
 
 		yingxue_base.moshi_mode = 2;
 		t_widget = ituSceneFindWidget(&theScene, "MainLayer");
@@ -561,7 +569,7 @@ static void moshi_widget_confirm_cb(struct node_widget *widget, unsigned char st
 	else if (strcmp(widget->name, "moshi_BackgroundButton12") == 0){
 
 		//发送模式命令就发指令 4 ： 模式设置  ： 默认 0 ，设置温度 ： XX ， 定升设定  ： 默认值时发0 
-		memset(&oper_data, 0, sizeof(struct operate_data));
+		/*memset(&oper_data, 0, sizeof(struct operate_data));
 		oper_data.data_0 = 0xEB;
 		oper_data.data_1 = 0x03 << 5 | 0x07 << 2 | 0x01;
 		oper_data.data_2 = 0x04;
@@ -570,7 +578,7 @@ static void moshi_widget_confirm_cb(struct node_widget *widget, unsigned char st
 		struct timespec tm;
 		memset(&tm, 0, sizeof(struct timespec));
 		tm.tv_sec += 2;
-		mq_timedsend(uartQueue, &oper_data, sizeof(struct operate_data), 1, &tm);
+		mq_timedsend(uartQueue, &oper_data, sizeof(struct operate_data), 1, &tm);*/
 
 		yingxue_base.moshi_mode = 3;
 		t_widget = ituSceneFindWidget(&theScene, "MainLayer");
@@ -579,7 +587,7 @@ static void moshi_widget_confirm_cb(struct node_widget *widget, unsigned char st
 	else if (strcmp(widget->name, "moshi_BackgroundButton13") == 0){
 
 		//发送模式命令就发指令 4 ： 模式设置  ： 默认 0 ，设置温度 ： XX ， 定升设定  ： 默认值时发0 
-		memset(&oper_data, 0, sizeof(struct operate_data));
+		/*memset(&oper_data, 0, sizeof(struct operate_data));
 		oper_data.data_0 = 0xEB;
 		oper_data.data_1 = 0x03 << 5 | 0x07 << 2 | 0x01;
 		oper_data.data_2 = 0x04;
@@ -588,7 +596,7 @@ static void moshi_widget_confirm_cb(struct node_widget *widget, unsigned char st
 		struct timespec tm;
 		memset(&tm, 0, sizeof(struct timespec));
 		tm.tv_sec += 2;
-		mq_timedsend(uartQueue, &oper_data, sizeof(struct operate_data), 1, &tm);
+		mq_timedsend(uartQueue, &oper_data, sizeof(struct operate_data), 1, &tm);*/
 
 		yingxue_base.moshi_mode = 4;
 		t_widget = ituSceneFindWidget(&theScene, "MainLayer");
@@ -740,12 +748,7 @@ struct node_widget chushui_0;
 struct node_widget chushui_1;
 struct node_widget chushui_2;
 
-//发送串口命令
-void send_uart_cmd(struct operate_data *var_opt_data)
-{
-	printf("send to uart\n");
-	return;
-}
+
 
 //预热时间
 static void yure_settime_init()
@@ -1550,6 +1553,42 @@ static void CheckMouse(void)
 #define TEST_DEVICE     itpDeviceUart3	
 #define TEST_BAUDRATE   "115200"
 
+
+//发送命令到控制板
+void sendCmdToCtr(unsigned char cmd, unsigned char data_1, unsigned char data_2, unsigned char data_3, unsigned char data_4)
+{
+	struct main_pthread_mq_tag mq_data;
+	processCmdToCtrData(cmd, data_1, data_2, data_3, data_4, mq_data.s_data);
+	struct timespec tm;
+	memset(&tm, 0, sizeof(struct timespec));
+	tm.tv_sec = 1;
+	mq_timedsend(uartQueue, &mq_data, sizeof(struct main_pthread_mq_tag), 1, &tm);
+	return 0;
+}
+
+//组合数据
+void processCmdToCtrData(unsigned char cmd, unsigned char data_1, 
+					unsigned char data_2, unsigned char data_3, unsigned char data_4, unsigned char *dst)
+{
+	unsigned short crc = 0;
+	unsigned char *old = dst;
+	*dst++ = frame_0;
+	*dst++ = frame_1;
+	*dst++ = cmd;
+	*dst++ = data_1;
+	*dst++ = data_2;
+	*dst++ = data_3;
+	*dst++ = data_4;
+	*dst++ = 0x01;
+	*dst++ = 0x00;
+	//计算CRC
+	crc = crc16_ccitt(old + 1, 8);
+	*dst++ = (unsigned char)(crc >> 8);
+	*dst++ = (unsigned char)crc;
+	return;
+}
+
+
 //计算下一次预约的时间
 void calcNextYure(int *beg, int *end)
 {
@@ -1765,22 +1804,21 @@ static void* UartFunc(void* arg)
 	struct main_pthread_mq_tag main_pthread_mq;
 	uint8_t getstr1[10];
 	//默认应答
-	uint8_t texBufArray[] = { 0xEB, 0x1B, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0xD8, 0x2A };
+	uint8_t texBufArray[11] = {0};
+	uint8_t backBufArray[11] = { 0xEB, 0x1B, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0xD8, 0x2A };
+
 	int len = 0;
 	int flag = 0;
 	int is_has = 0;
 	struct   timeval tm;
 	gettimeofday(&tm, NULL);
 	struct tm *tm_t;
-	
-	
 	while (1){
-		
 		memset(getstr1, 0, sizeof(getstr1));
 		len = read(TEST_PORT, getstr1, sizeof(getstr1));
 		//如果串口有数据
 		if (len > 0){
-
+			printf("buf=%02X\n", getstr1[0]);
 			//写入环形缓存
 			for (int i = 0; i < len; i++){
 				flag = in_chain_list(&chain_list, getstr1[i]);
@@ -1788,19 +1826,13 @@ static void* UartFunc(void* arg)
 			process_data(&uart_data, &chain_list);
 			//已经完成
 			if (uart_data.state == 2){
-				for (int j = 0; j< uart_data.count; j++){
-					printf("0x%02X ", uart_data.buf_data[j]);
-
-				}
+				
 				printf("\nfinish \n");
+				is_has = 0;
 				uart_data.state = 0;
 				uart_data.count = 0;
-
 				//分析收到的数
 				process_frame(&g_main_uart_chg_data, uart_data.buf_data);
-
-				//延迟20ms 发送回复信息
-				usleep(10);
 				//首先判断是否需要预热
 				if (yingxue_base.yure_mode > 0){
 					//单巡航模式
@@ -1809,7 +1841,6 @@ static void* UartFunc(void* arg)
 							//结束指令
 							memcpy(texBufArray, 1, 1);
 							is_has = 1;
-							
 						}
 					}
 					//定时器
@@ -1838,14 +1869,20 @@ static void* UartFunc(void* arg)
 			
 				if (is_has == 0){
 					//读取消息队列的数据
-					//结束指令
-					memcpy(texBufArray, 1, 1);
-					is_has = 1;
+					//结束指令struct main_pthread_mq_tag
+					flag = mq_receive(uartQueue, &main_pthread_mq, sizeof(struct main_pthread_mq_tag), NULL);
+					//如果存在信息就发送消息
+					if (flag){
+						memcpy(texBufArray, main_pthread_mq.s_data, sizeof(texBufArray));
+						is_has = 1;
+					}
 				}
-
-				write(TEST_PORT, texBufArray, sizeof(texBufArray));
-				
-
+				if (is_has){
+					write(TEST_PORT, texBufArray, sizeof(texBufArray));
+				}
+				else{
+					write(TEST_PORT, backBufArray, sizeof(texBufArray));
+				}
 			}
 		}
 		
@@ -1862,6 +1899,9 @@ int SceneRun(void)
 {
 
 	//樱雪
+	//测试
+
+
 	//最后一次按键的时间
 	static struct timeval last_tm;
 	gettimeofday(&last_tm, NULL);
@@ -1884,7 +1924,7 @@ int SceneRun(void)
 	mq_uart_attr.mq_maxmsg = 10;
 	mq_uart_attr.mq_msgsize = sizeof(struct main_pthread_mq_tag);
 	uartQueue = mq_open("scene", O_CREAT | O_NONBLOCK, 0644, &mq_uart_attr);
-
+	
 
 	memset(&uart_data, 0, sizeof(struct uart_data_tag));
 
@@ -1917,8 +1957,6 @@ int SceneRun(void)
 
 	/* Watch keystrokes */
 	dblclk = frames = lasttick = lastx = lasty = mouseDownTick = 0;
-
-
 
 	for (;;)
 	{

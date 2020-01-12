@@ -118,6 +118,9 @@ extern "C" {
 	//控制键回调函数
 	typedef void(*node_widget_cb)(struct node_widget *widget, unsigned char state);
 
+#define SEND_OPEN_CMD() do{sendCmdToCtr(0x03, 0x01, 0x00, 0x00, 0x00);}while(0)
+#define SEND_CLOSE_CMD() do{sendCmdToCtr(0x03, 0x00, 0x00, 0x00, 0x00);}while(0)
+
 	//主页串口改变显示
 	struct main_uart_chg
 	{
@@ -141,33 +144,10 @@ extern "C" {
 
 	};
 
-	//控制板回复数据结构
-	struct operate_data
-	{
-		unsigned char data_0;
-
-		//固定信息
-		unsigned char data_1;
-		unsigned char data_2;
-
-		//回复数据
-		unsigned char data_3;
-		unsigned char data_4;
-		unsigned char data_5;
-
-		unsigned char data_6;
-		unsigned char data_7;
-		unsigned char data_8;
-		//crc
-		unsigned char data_9;
-		unsigned char data_10;
-
-
-	};
-
 	//主线程通过消息队列传送数据
 	struct main_pthread_mq_tag{
-		struct operate_data op_data; //控制板的回复数据结构
+		//struct operate_data op_data; //控制板的回复数据结构
+		unsigned char s_data[11];
 		unsigned char state;			// 0 控制板数据 1开机命令 2关机命令
 	};
 
@@ -299,8 +279,6 @@ extern "C" {
 
 	};
 
-	//发送串口命令
-	void send_uart_cmd(struct operate_data *var_opt_data);
 
 	//接受主板来的命令 0成功 1未完成 -1失败
 	char recv_uart_cmd();
@@ -329,6 +307,15 @@ extern "C" {
 
 	//计算下次预热的时间
 	void calcNextYure(int *beg, int *end);
+
+	//发送命令，直接发送
+	void sendCmdToCtr(unsigned char cmd, unsigned char data_1, unsigned char data_2, unsigned char data_3, unsigned char data_4);
+	//命令组合数据
+	void processCmdToCtrData(unsigned char cmd, unsigned char data_1, 
+		unsigned char data_2, unsigned char data_3, unsigned char data_4, unsigned char *dst);
+
+	//crc效验
+	unsigned short crc16_ccitt(const char *buf, int len);
 
 #ifdef __cplusplus
 }

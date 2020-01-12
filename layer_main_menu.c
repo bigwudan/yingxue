@@ -793,7 +793,7 @@ bool YX_MenuOnEnter(ITUWidget* widget, char* param)
 bool WelcomeOnTimer(ITUWidget* widget, char* param)
 {
 
-	struct operate_data op_data;
+	
 
 	//上电，等待2秒
 	if (yingxue_base.run_state == 0 || yingxue_base.run_state == 1){
@@ -801,14 +801,14 @@ bool WelcomeOnTimer(ITUWidget* widget, char* param)
 		ituLayerGoto(ituSceneFindWidget(&theScene, "MainLayer"));
 		//发送开机
 		//改变状态开机
-		send_uart_cmd(&op_data);
+		SEND_OPEN_CMD();
 		yingxue_base.run_state = 1;
 	}
 	//关机，等待2秒
 	else if (yingxue_base.run_state == 2){
 		//发送关机
 		//改变状态开机
-		send_uart_cmd(&op_data);
+		SEND_CLOSE_CMD();
 		sleep(1);
 		ScreenOff();
 		printf("off \n");
