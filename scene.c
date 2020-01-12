@@ -533,17 +533,7 @@ static void moshi_widget_confirm_cb(struct node_widget *widget, unsigned char st
 	}
 	else if (strcmp(widget->name, "moshi_BackgroundButton10") == 0){
 		//发送模式命令就发指令 4 ： 模式设置  ： 默认 0 ，设置温度 ： XX ， 定升设定  ： 默认值时发0 
-		/*memset(&oper_data, 0, sizeof(struct operate_data));
-		oper_data.data_0 = 0xEB;
-		oper_data.data_1 = 0x03 << 5 | 0x07 << 2 | 0x01;
-		oper_data.data_2 = 0x04;
-		oper_data.data_3 = 0x00;
-		oper_data.data_4 = yingxue_base.normal_moshi.temp;
-		struct timespec tm;
-		memset(&tm, 0, sizeof(struct timespec));
-		tm.tv_sec += 2;
-		mq_timedsend(uartQueue, &oper_data, sizeof(struct operate_data), 1, &tm);*/
-
+		sendCmdToCtr(0x04, 0x00, yingxue_base.normal_moshi.temp, 0x00, 0x00);
 		yingxue_base.moshi_mode = 1;
 		t_widget = ituSceneFindWidget(&theScene, "MainLayer");
 		ituLayerGoto((ITULayer *)t_widget);
@@ -551,16 +541,8 @@ static void moshi_widget_confirm_cb(struct node_widget *widget, unsigned char st
 	else if (strcmp(widget->name, "moshi_BackgroundButton11") == 0){
 
 		//发送模式命令就发指令 4 ： 模式设置  ： 默认 0 ，设置温度 ： XX ， 定升设定  ： 默认值时发0 
-		/*memset(&oper_data, 0, sizeof(struct operate_data));
-		oper_data.data_0 = 0xEB;
-		oper_data.data_1 = 0x03 << 5 | 0x07 << 2 | 0x01;
-		oper_data.data_2 = 0x04;
-		oper_data.data_3 = 0x00;
-		oper_data.data_4 = yingxue_base.super_moshi.temp;
-		struct timespec tm;
-		memset(&tm, 0, sizeof(struct timespec));
-		tm.tv_sec += 2;
-		mq_timedsend(uartQueue, &oper_data, sizeof(struct operate_data), 1, &tm);*/
+		sendCmdToCtr(0x04, 0x00, yingxue_base.super_moshi.temp, 0x00, 0x00);
+		yingxue_base.moshi_mode = 1;
 
 		yingxue_base.moshi_mode = 2;
 		t_widget = ituSceneFindWidget(&theScene, "MainLayer");
@@ -569,17 +551,7 @@ static void moshi_widget_confirm_cb(struct node_widget *widget, unsigned char st
 	else if (strcmp(widget->name, "moshi_BackgroundButton12") == 0){
 
 		//发送模式命令就发指令 4 ： 模式设置  ： 默认 0 ，设置温度 ： XX ， 定升设定  ： 默认值时发0 
-		/*memset(&oper_data, 0, sizeof(struct operate_data));
-		oper_data.data_0 = 0xEB;
-		oper_data.data_1 = 0x03 << 5 | 0x07 << 2 | 0x01;
-		oper_data.data_2 = 0x04;
-		oper_data.data_3 = 0x00;
-		oper_data.data_4 = yingxue_base.eco_moshi.temp;
-		struct timespec tm;
-		memset(&tm, 0, sizeof(struct timespec));
-		tm.tv_sec += 2;
-		mq_timedsend(uartQueue, &oper_data, sizeof(struct operate_data), 1, &tm);*/
-
+		sendCmdToCtr(0x04, 0x00, yingxue_base.eco_moshi.temp, 0x00, 0x00);
 		yingxue_base.moshi_mode = 3;
 		t_widget = ituSceneFindWidget(&theScene, "MainLayer");
 		ituLayerGoto((ITULayer *)t_widget);
@@ -587,17 +559,7 @@ static void moshi_widget_confirm_cb(struct node_widget *widget, unsigned char st
 	else if (strcmp(widget->name, "moshi_BackgroundButton13") == 0){
 
 		//发送模式命令就发指令 4 ： 模式设置  ： 默认 0 ，设置温度 ： XX ， 定升设定  ： 默认值时发0 
-		/*memset(&oper_data, 0, sizeof(struct operate_data));
-		oper_data.data_0 = 0xEB;
-		oper_data.data_1 = 0x03 << 5 | 0x07 << 2 | 0x01;
-		oper_data.data_2 = 0x04;
-		oper_data.data_3 = 0x00;
-		oper_data.data_4 = yingxue_base.fruit_moshi.temp;
-		struct timespec tm;
-		memset(&tm, 0, sizeof(struct timespec));
-		tm.tv_sec += 2;
-		mq_timedsend(uartQueue, &oper_data, sizeof(struct operate_data), 1, &tm);*/
-
+		sendCmdToCtr(0x04, 0x00, yingxue_base.fruit_moshi.temp, 0x00, 0x00);
 		yingxue_base.moshi_mode = 4;
 		t_widget = ituSceneFindWidget(&theScene, "MainLayer");
 		ituLayerGoto((ITULayer *)t_widget);
