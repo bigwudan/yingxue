@@ -537,6 +537,15 @@ static void MainLayer_init()
 		ituSpriteGoto(t_widget, 2);
 	}
 	else if (yingxue_base.yure_mode == 3){
+		int beg = 0;
+		int end = 0;
+		char t_buf[100] = { 0 };
+		//计算下次预热时间
+		calcNextYure(&beg, &end);
+		if (end == 0) end = beg;
+		sprintf(t_buf, "%d:00--%d:59", beg, end);
+		t_widget = ituSceneFindWidget(&theScene, "Text35");
+		ituTextSetString(t_widget, t_buf);
 		ituSpriteGoto(t_widget, 3);
 
 	}
@@ -579,6 +588,7 @@ bool YX_MenuOnEnter(ITUWidget* widget, char* param)
 {
 	static int test_flag = 0;
 	ITUWidget *t_widget = NULL;
+	char t_buf[10] = { 0 };
 
 	//welcome页面
 	if (strcmp(widget->name, "welcom") == 0){
@@ -611,6 +621,21 @@ bool YX_MenuOnEnter(ITUWidget* widget, char* param)
 		ituWidgetSetVisible(t_widget, true);
 		t_widget = ituSceneFindWidget(&theScene, curr_node_widget->name);
 		ituWidgetSetVisible(t_widget, false);
+
+
+		//预热时间
+		int beg = 0;
+		int end = 0;
+		char t_buf[100] = { 0 };
+		//计算下次预热时间
+		calcNextYure(&beg, &end);
+		if (end == 0) end = beg;
+		sprintf(t_buf, "%02d--%02d", beg, end);
+		t_widget = ituSceneFindWidget(&theScene, "Text99");
+		ituTextSetString(t_widget, t_buf);
+		printf("t_buf=%s\n", t_buf);
+
+
 	}
 	else if (strcmp(widget->name, "yureshijianLayer") == 0 ){
 		//初始化
@@ -662,6 +687,22 @@ bool YX_MenuOnEnter(ITUWidget* widget, char* param)
 		//选中背景
 		t_widget = ituSceneFindWidget(&theScene, "Background107");
 		ituWidgetSetVisible(t_widget, false);
+
+		//设置时间
+		struct timeval curr_time;
+		struct tm *t_tm;
+		gettimeofday(&curr_time, NULL);
+		t_tm = localtime(&curr_time);
+
+		//设置小时
+		t_widget = ituSceneFindWidget(&theScene, "Text42");
+		sprintf(t_buf, "%02d", t_tm->tm_hour);
+		ituTextSetString(t_widget, t_buf);
+
+		//设置min
+		t_widget = ituSceneFindWidget(&theScene, "Text43");
+		sprintf(t_buf, "%02d", t_tm->tm_min);
+		ituTextSetString(t_widget, t_buf);
 
 	}
 	else if (strcmp(widget->name, "moshiLayer") == 0){

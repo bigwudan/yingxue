@@ -327,6 +327,8 @@ extern "C" {
 	//分析得到的数组
 	void process_frame(struct main_uart_chg *dst, const unsigned char *src);
 
+	//计算下次预热的时间
+	void calcNextYure(int *beg, int *end);
 
 #ifdef __cplusplus
 }

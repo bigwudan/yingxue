@@ -483,6 +483,8 @@ static void yure_yureshezhiLayer_widget_confirm_cb(struct node_widget *widget, u
 				t_buf = ituTextGetString(t_widget);
 				num = atoi(t_buf);
 				yingxue_base.huishui_temp = num;
+				//发送改变回水温度,也就是预热回温温度
+				send_uart_cmd(NULL);
 			}
 			//北京时间小时
 			else if ((strcmp(widget->name, "Background3") == 0) || (strcmp(widget->name, "Background4") == 0)){
@@ -490,21 +492,18 @@ static void yure_yureshezhiLayer_widget_confirm_cb(struct node_widget *widget, u
 				struct tm *t_tm;
 				gettimeofday(&curr_time, NULL);
 				t_tm = localtime(&curr_time);
-				if (strcmp(widget->name, "Background3") == 0){
-					t_widget = ituSceneFindWidget(&theScene, "Text42");
-					t_buf = ituTextGetString(t_widget);
-					num = atoi(t_buf);
-					t_tm->tm_hour = num;
-				}
-				else{
-					t_widget = ituSceneFindWidget(&theScene, "Text43");
-					t_buf = ituTextGetString(t_widget);
-					num = atoi(t_buf);
-					t_tm->tm_min = num;
-				}
+				//hour
+				t_widget = ituSceneFindWidget(&theScene, "Text42");
+				t_buf = ituTextGetString(t_widget);
+				num = atoi(t_buf);
+				t_tm->tm_hour = num;
+				//min
+				t_widget = ituSceneFindWidget(&theScene, "Text43");
+				t_buf = ituTextGetString(t_widget);
+				num = atoi(t_buf);
+				t_tm->tm_min = num;
 				curr_time.tv_sec = mktime(t_tm);
 				settimeofday(&curr_time, NULL);
-
 			}
 			widget->state = 0;
 			t_widget = ituSceneFindWidget(&theScene, widget->checked_back_name);
@@ -1552,7 +1551,7 @@ static void CheckMouse(void)
 #define TEST_BAUDRATE   "115200"
 
 //计算下一次预约的时间
-static void calcNextYure(int *beg, int *end)
+void calcNextYure(int *beg, int *end)
 {
 	//计算时间
 	struct timeval curr_time;
