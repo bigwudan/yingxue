@@ -792,9 +792,6 @@ bool YX_MenuOnEnter(ITUWidget* widget, char* param)
 //欢迎页面，定时器
 bool WelcomeOnTimer(ITUWidget* widget, char* param)
 {
-
-	
-
 	//上电，等待2秒
 	if (yingxue_base.run_state == 0 || yingxue_base.run_state == 1){
 		sleep(1);
@@ -811,9 +808,7 @@ bool WelcomeOnTimer(ITUWidget* widget, char* param)
 		SEND_CLOSE_CMD();
 		sleep(1);
 		ScreenOff();
-		printf("off \n");
 	}
-
 }
 
 //主页定时器
@@ -910,11 +905,6 @@ bool MainLayerOnTimer(ITUWidget* widget, char* param)
 		t_widget = ituSceneFindWidget(&theScene, "Background36");
 		ituWidgetSetVisible(t_widget, false);
 	}
-
 	pthread_mutex_unlock(&msg_mutex);
-
 	gettimeofday(&last_tm, NULL);
-
-
-
 }

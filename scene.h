@@ -117,9 +117,15 @@ extern "C" {
 	//消息
 	//控制键回调函数
 	typedef void(*node_widget_cb)(struct node_widget *widget, unsigned char state);
-
+//开机
 #define SEND_OPEN_CMD() do{sendCmdToCtr(0x03, 0x01, 0x00, 0x00, 0x00);}while(0)
+//关机
 #define SEND_CLOSE_CMD() do{sendCmdToCtr(0x03, 0x00, 0x00, 0x00, 0x00);}while(0)
+
+//开始预热 预热	命令9	(0 - 预热关 2 - 循环预热)	 随机	预热回差设置	 随机
+#define SEND_OPEN_YURE_CMD() do{sendCmdToCtr(0x09, 0x02, 0x00, yingxue_base.huishui_temp, 0x00);}while(0)
+//结束预热
+#define SEND_CLOSE_YURE_CMD() do{sendCmdToCtr(0x09, 0x00, 0x00, yingxue_base.huishui_temp, 0x00);}while(0)
 
 	//主页串口改变显示
 	struct main_uart_chg
@@ -254,7 +260,7 @@ extern "C" {
 		struct timeval yure_begtime; //预热开始时间
 		struct timeval yure_endtime; //预热结束时间
 		//unsigned char yure_set_count; //预热设置开始时间
-		unsigned char huishui_temp; //回水温度
+		unsigned char huishui_temp; //回水温度 ,预热设置回差
 
 		//moshi
 		unsigned char moshi_mode; // 模式 0无模式 1 普通模式 2 超级模式 3 节能模式 4 水果模式

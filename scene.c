@@ -167,8 +167,8 @@ static void node_widget_up_down(struct node_widget *widget, unsigned char state)
 		t_widget = ituSceneFindWidget(&theScene, "Text17");
 		sprintf(t_buf, "%d", g_main_uart_chg_data.shezhi_temp);
 		ituTextSetString(t_widget, t_buf);
-
-		SEND_OPEN_CMD();
+		//设置温度 模式设置	4	模式设置	设置温度	定升设定
+		sendCmdToCtr(0x04, 0x00, g_main_uart_chg_data.shezhi_temp, 0x00, 0x00);
 	}else {
 		if (widget->state == 1){ //如果已经锁定
 			if (strcmp(widget->name, "Background2") == 0){
@@ -368,12 +368,12 @@ static void yure_node_widget_confirm_cb(struct node_widget *widget, unsigned cha
 			yingxue_base.yure_mode = 0;
 			memset(&yingxue_base.yure_endtime, 0, sizeof(struct timeval));
 			//发送取消
-			SEND_OPEN_CMD();
+			SEND_CLOSE_YURE_CMD();
 			
 		}
 		else{
 			//发送开始
-			SEND_OPEN_CMD();
+			SEND_OPEN_YURE_CMD();
 			yingxue_base.yure_mode = 1;
 			gettimeofday(&yingxue_base.yure_begtime, NULL);
 			//2个小时 
@@ -389,7 +389,7 @@ static void yure_node_widget_confirm_cb(struct node_widget *widget, unsigned cha
 			yingxue_base.yure_mode = 0;
 			memset(&yingxue_base.yure_endtime, 0, sizeof(struct timeval));
 			//发送取消
-			SEND_OPEN_CMD();
+			SEND_CLOSE_YURE_CMD();
 			
 		}
 		else{
@@ -397,7 +397,7 @@ static void yure_node_widget_confirm_cb(struct node_widget *widget, unsigned cha
 			gettimeofday(&yingxue_base.yure_begtime, NULL);
 			memset(&yingxue_base.yure_endtime, 0, sizeof(struct timeval));
 			//发送预热开始
-			SEND_OPEN_CMD();
+			SEND_OPEN_YURE_CMD();
 			
 		}
 		t_widget = ituSceneFindWidget(&theScene, "MainLayer");
@@ -414,7 +414,7 @@ static void yure_node_widget_confirm_cb(struct node_widget *widget, unsigned cha
 			yingxue_base.yure_mode = 0;
 			memset(&yingxue_base.yure_endtime, 0, sizeof(struct timeval));
 			//发送取消
-			SEND_CLOSE_CMD();
+			SEND_CLOSE_YURE_CMD();
 		}
 		else{
 			yingxue_base.yure_mode = 3;
@@ -1838,8 +1838,8 @@ static void* UartFunc(void* arg)
 					//单巡航模式
 					if (yingxue_base.yure_mode == 1){
 						if (tm.tv_sec > yingxue_base.yure_endtime.tv_sec){
-							//结束指令
-							memcpy(texBufArray, 1, 1);
+							//结束预热指令
+							processCmdToCtrData(0x09, 0x00, 0x00, yingxue_base.huishui_temp, 0x00, texBufArray);
 							is_has = 1;
 						}
 					}
@@ -1850,7 +1850,7 @@ static void* UartFunc(void* arg)
 						if (  *(yingxue_base.dingshi_list + tm_t->tm_hour - 1) ==1 ){
 							if (yingxue_base.yure_state == 0){
 								//开始
-								memcpy(texBufArray, 1, 1);
+								processCmdToCtrData(0x09, 0x02, 0x00, yingxue_base.huishui_temp, 0x00, texBufArray);
 								is_has = 1;
 								yingxue_base.yure_state == 1;
 							}
@@ -1859,34 +1859,34 @@ static void* UartFunc(void* arg)
 						else{
 							if (yingxue_base.yure_state == 1){
 								//结束
-								memcpy(texBufArray, 1, 1);
+								processCmdToCtrData(0x09, 0x00, 0x00, yingxue_base.huishui_temp, 0x00, texBufArray);
 								is_has = 1;
 								yingxue_base.yure_state == 0;
 							}
 						}
 					}
 				}
-			
+				//如果预热没有指令需要发出,就查看消息
 				if (is_has == 0){
 					//读取消息队列的数据
 					//结束指令struct main_pthread_mq_tag
 					flag = mq_receive(uartQueue, &main_pthread_mq, sizeof(struct main_pthread_mq_tag), NULL);
 					//如果存在信息就发送消息
-					if (flag){
+					if (flag > 0){
 						memcpy(texBufArray, main_pthread_mq.s_data, sizeof(texBufArray));
 						is_has = 1;
 					}
 				}
+				//如果有指令需要发出
 				if (is_has){
 					write(TEST_PORT, texBufArray, sizeof(texBufArray));
 				}
+				//没有指令就应答
 				else{
 					write(TEST_PORT, backBufArray, sizeof(texBufArray));
 				}
 			}
 		}
-		
-		usleep(1);
 	}
 }
 
@@ -1899,6 +1899,13 @@ int SceneRun(void)
 {
 
 	//樱雪
+
+	//串口
+#ifndef _WIN32
+	itpRegisterDevice(TEST_PORT, &TEST_DEVICE);
+	ioctl(TEST_PORT, ITP_IOCTL_INIT, NULL);
+	ioctl(TEST_PORT, ITP_IOCTL_RESET, (void *)CFG_UART3_BAUDRATE);
+#endif
 	//测试
 
 
