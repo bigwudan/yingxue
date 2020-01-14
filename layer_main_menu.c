@@ -763,10 +763,27 @@ bool YX_MenuOnEnter(ITUWidget* widget, char* param)
 		t_widget = ituSceneFindWidget(&theScene, "chushui_BackgroundButton73");
 		ituWidgetSetVisible(t_widget, false);
 
-		//2
-		//本体
-		//t_widget = ituSceneFindWidget(&theScene, "chushui_Background13");
-		//ituWidgetSetVisible(t_widget, false);
+
+		//根据设置温度显示Text38
+		t_widget = ituSceneFindWidget(&theScene, "Text38");
+		if (yingxue_base.select_set_moshi_mode > 0){
+			if (yingxue_base.select_set_moshi_mode == 1){
+				sprintf(t_buf, "%02d", yingxue_base.normal_moshi.temp);
+				ituTextSetString(t_widget, t_buf);
+			}
+			else if (yingxue_base.select_set_moshi_mode == 2){
+				sprintf(t_buf, "%02d", yingxue_base.super_moshi.temp);
+				ituTextSetString(t_widget, t_buf);
+			}
+			else if (yingxue_base.select_set_moshi_mode == 3){
+				sprintf(t_buf, "%02d", yingxue_base.eco_moshi.temp);
+				ituTextSetString(t_widget, t_buf);
+			}
+			else if (yingxue_base.select_set_moshi_mode == 4){
+				sprintf(t_buf, "%02d", yingxue_base.fruit_moshi.temp);
+				ituTextSetString(t_widget, t_buf);
+			}
+		}
 
 		//选中背景
 		t_widget = ituSceneFindWidget(&theScene, "chushui_Background45");
