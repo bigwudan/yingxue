@@ -324,7 +324,7 @@ extern "C" {
 	unsigned short crc16_ccitt(const char *buf, int len);
 
 	//得到当前时间戳
-	long get_rtc_time();
+	int get_rtc_time(struct  timeval *dst, unsigned char *zone);
 
 	//设置当前时间
 	void set_rtc_time(unsigned char hour, unsigned char min);

@@ -140,7 +140,7 @@ struct main_uart_chg g_main_uart_chg_data;
 
 
 //得到当前时间戳
-long get_rtc_time()
+int get_rtc_time(struct  timeval *dst, unsigned char *zone)
 {
 	struct timeval tv;
 	struct tm *tm;
@@ -148,7 +148,9 @@ long get_rtc_time()
 	gettimeofday(&tv, NULL);
 	tm = localtime(&tv.tv_sec);
 	memcpy(&mytime, tm, sizeof(struct tm));
-	return mktime((struct tm*)&mytime);
+	dst->tv_sec = mktime((struct tm*)&mytime);
+	dst->tv_usec = 0;
+	return 1;
 }
 
 //设置当前时间
@@ -189,7 +191,7 @@ static void node_widget_up_down(struct node_widget *widget, unsigned char state)
 	//主页面上下调整温度
 	else if (yingxue_base.lock_state == 0 || yingxue_base.lock_state == 1){
 		//时间
-		yingxue_base.last_shezhi_tm.tv_sec = get_rtc_time();
+		get_rtc_time(&yingxue_base.last_shezhi_tm, NULL);
 		yingxue_base.lock_state = 1;
 		if (state == 0){
 			g_main_uart_chg_data.shezhi_temp = g_main_uart_chg_data.shezhi_temp + 1;
@@ -402,15 +404,15 @@ static void yure_node_widget_confirm_cb(struct node_widget *widget, unsigned cha
 			memset(&yingxue_base.yure_endtime, 0, sizeof(struct timeval));
 			//发送取消
 			SEND_CLOSE_YURE_CMD();
-			
 		}
 		else{
 			//发送开始
 			SEND_OPEN_YURE_CMD();
 			yingxue_base.yure_mode = 1;
-			gettimeofday(&yingxue_base.yure_begtime, NULL);
+			get_rtc_time(&yingxue_base.yure_begtime, NULL);
 			//2个小时 
-			yingxue_base.yure_endtime.tv_sec = yingxue_base.yure_begtime.tv_sec + 60 * 60 * 2;
+			//yingxue_base.yure_endtime.tv_sec = yingxue_base.yure_begtime.tv_sec + 60 * 60 * 2;
+			yingxue_base.yure_endtime.tv_sec = yingxue_base.yure_begtime.tv_sec + 30;
 		}
 		t_widget = ituSceneFindWidget(&theScene, "MainLayer");
 		ituLayerGoto((ITULayer *)t_widget);
@@ -427,7 +429,7 @@ static void yure_node_widget_confirm_cb(struct node_widget *widget, unsigned cha
 		}
 		else{
 			yingxue_base.yure_mode = 2;
-			gettimeofday(&yingxue_base.yure_begtime, NULL);
+			get_rtc_time(&yingxue_base.yure_begtime, NULL);
 			memset(&yingxue_base.yure_endtime, 0, sizeof(struct timeval));
 			//发送预热开始
 			SEND_OPEN_YURE_CMD();
@@ -531,7 +533,7 @@ static void yure_yureshezhiLayer_widget_confirm_cb(struct node_widget *widget, u
 			else if ((strcmp(widget->name, "Background3") == 0) || (strcmp(widget->name, "Background4") == 0)){
 				struct timeval curr_time;
 				struct tm *t_tm;
-				gettimeofday(&curr_time, NULL);
+				get_rtc_time(&curr_time, NULL);
 				t_tm = localtime(&curr_time);
 				//hour
 				t_widget = ituSceneFindWidget(&theScene, "Text42");
@@ -1594,7 +1596,7 @@ void calcNextYure(int *beg, int *end)
 	unsigned char num;
 	*beg = 0;
 	*end = 0;
-	gettimeofday(&curr_time, NULL);
+	get_rtc_time(&curr_time, NULL);
 	t_tm = localtime(&curr_time);
 	cur_hour = t_tm->tm_hour;
 
@@ -1831,14 +1833,13 @@ static void* UartFunc(void* arg)
 	//默认应答
 	uint8_t texBufArray[11] = {0};
 	uint8_t backBufArray[11] = { 0xEB, 0x1B, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0xD8, 0x2A };
-
 	int len = 0;
 	int flag = 0;
 	int is_has = 0;
 	struct   timeval tm;
-	gettimeofday(&tm, NULL);
 	struct tm *tm_t;
 	while (1){
+		get_rtc_time(&tm, NULL);
 		memset(getstr1, 0, sizeof(getstr1));
 //如果是win虚拟测试
 #ifdef _WIN32
@@ -1850,7 +1851,6 @@ static void* UartFunc(void* arg)
 
 		//如果串口有数据
 		if (len > 0){
-			//printf("buf=%02X\n", getstr1[0]);
 			//写入环形缓存
 			for (int i = 0; i < len; i++){
 				flag = in_chain_list(&chain_list, getstr1[i]);
@@ -1870,6 +1870,9 @@ static void* UartFunc(void* arg)
 						if (tm.tv_sec > yingxue_base.yure_endtime.tv_sec){
 							//结束预热指令
 							processCmdToCtrData(0x09, 0x00, 0x00, yingxue_base.huishui_temp, 0x00, texBufArray);
+							memset(&yingxue_base.yure_begtime, 0, sizeof(struct timeval));
+							memset(&yingxue_base.yure_endtime, 0, sizeof(struct timeval));
+							yingxue_base.yure_mode = 0;
 							is_has = 1;
 						}
 					}
@@ -1942,7 +1945,7 @@ int SceneRun(void)
 
 	//最后一次按键的时间
 	static struct timeval last_tm;
-	gettimeofday(&last_tm, NULL);
+	get_rtc_time(&last_tm, NULL);
 
 
 	//初始锁
@@ -2041,7 +2044,7 @@ int SceneRun(void)
 
 
 		//缓存时间
-		gettimeofday(&buf_tm, NULL);
+		get_rtc_time(&buf_tm, NULL);
 		
 		//如果超过3s没有动作自动回到主页面
 		if (buf_tm.tv_sec > last_tm.tv_sec + 5){
@@ -2091,11 +2094,11 @@ int SceneRun(void)
 				{
 					//case SDLK_UP:
 				case 1073741884:
-					gettimeofday(&last_tm, NULL);
+					get_rtc_time(&last_tm, NULL);
 					curr_node_widget->updown_cb(curr_node_widget, 0);
 					break;
 				case SDLK_UP:
-					gettimeofday(&last_tm, NULL);
+					get_rtc_time(&last_tm, NULL);
 					curr_node_widget->updown_cb(curr_node_widget, 0);
 					break;
 				case SDL_SCANCODE_BACKSLASH:
@@ -2111,12 +2114,12 @@ int SceneRun(void)
 					break;
 				case 1073741889:
 					//case SDLK_DOWN:
-					gettimeofday(&last_tm, NULL);
+					get_rtc_time(&last_tm, NULL);
 					curr_node_widget->updown_cb(curr_node_widget, 1);
 					break;
 				case SDLK_DOWN:
 					//case SDLK_DOWN:
-					gettimeofday(&last_tm, NULL);
+					get_rtc_time(&last_tm, NULL);
 					curr_node_widget->updown_cb(curr_node_widget, 1);
 					break;
 
@@ -2124,13 +2127,13 @@ int SceneRun(void)
 					curtime = buf_tm;
 					break;
 				case 13://回车
-					gettimeofday(&last_tm, NULL);
+					get_rtc_time(&last_tm, NULL);
 					curtime = buf_tm;
 					curr_node_widget->confirm_cb(curr_node_widget, 2);
 					break;
 				case 1073741885:
 					printf("power on\off");
-					gettimeofday(&last_tm, NULL);
+					get_rtc_time(&last_tm, NULL);
 					if (yingxue_base.run_state == 1){
 						yingxue_base.run_state = 2;
 					}
@@ -2143,7 +2146,7 @@ int SceneRun(void)
 					break;
 					
 				case SDLK_LEFT: //开机和关机
-					gettimeofday(&last_tm, NULL);
+					get_rtc_time(&last_tm, NULL);
 					if (yingxue_base.run_state == 1){
 						yingxue_base.run_state = 2;
 					}
@@ -2203,7 +2206,7 @@ int SceneRun(void)
 					printf("sdlk_keyup longpress\n");
 					unsigned long t_curr = 0;
 					struct timeval t_time = { 0 };
-					gettimeofday(&t_time, NULL);
+					get_rtc_time(&t_time, NULL);
 					t_curr = t_time.tv_sec - curtime.tv_sec;
 					if (t_curr >= 2){
 						printf("long press\n");

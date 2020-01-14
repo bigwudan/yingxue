@@ -633,9 +633,6 @@ bool YX_MenuOnEnter(ITUWidget* widget, char* param)
 		sprintf(t_buf, "%02d--%02d", beg, end);
 		t_widget = ituSceneFindWidget(&theScene, "Text99");
 		ituTextSetString(t_widget, t_buf);
-		printf("t_buf=%s\n", t_buf);
-
-
 	}
 	else if (strcmp(widget->name, "yureshijianLayer") == 0 ){
 		//初始化
@@ -691,7 +688,7 @@ bool YX_MenuOnEnter(ITUWidget* widget, char* param)
 		//设置时间
 		struct timeval curr_time;
 		struct tm *t_tm;
-		gettimeofday(&curr_time, NULL);
+		get_rtc_time(&curr_time, NULL);
 		t_tm = localtime(&curr_time);
 
 		//设置小时
@@ -820,7 +817,10 @@ bool MainLayerOnTimer(ITUWidget* widget, char* param)
 	struct timeval now_tm;
 	char t_buf[20] = { 0 };
 	ITUWidget* t_widget;
-	gettimeofday(&now_tm, NULL);
+	get_rtc_time(&now_tm, NULL);
+	
+
+
 	if (now_tm.tv_sec < last_tm.tv_sec + 1){
 		return true;
 	}
@@ -902,7 +902,7 @@ bool MainLayerOnTimer(ITUWidget* widget, char* param)
 		ituWidgetSetVisible(t_widget, false);
 	}
 	pthread_mutex_unlock(&msg_mutex);
-	gettimeofday(&last_tm, NULL);
+	get_rtc_time(&last_tm, NULL);
 	return true;
 }
 
