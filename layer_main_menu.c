@@ -809,6 +809,7 @@ bool WelcomeOnTimer(ITUWidget* widget, char* param)
 		sleep(1);
 		ScreenOff();
 	}
+	return true;
 }
 
 //主页定时器
@@ -902,4 +903,15 @@ bool MainLayerOnTimer(ITUWidget* widget, char* param)
 	}
 	pthread_mutex_unlock(&msg_mutex);
 	gettimeofday(&last_tm, NULL);
+	return true;
+}
+
+//ERROnTimer
+bool ERROnTimer(ITUWidget* widget, char* param)
+{
+	sleep(2);
+	if (g_main_uart_chg_data.is_err == 0){
+		ituLayerGoto(ituSceneFindWidget(&theScene, "MainLayer"));
+	}
+	return true;
 }

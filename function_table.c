@@ -195,10 +195,11 @@ extern bool WelcomeOnTimer(ITUWidget* widget, char* param);
 
 //主页，定时器
 extern bool MainLayerOnTimer(ITUWidget* widget, char* param);
-
-
+//错误页面，定时器
+extern bool ERROnTimer(ITUWidget* widget, char* param);
 ITUActionFunction actionFunctions[] =
 {
+	"ERROnTimer", ERROnTimer,
 	"MainLayerOnTimer", MainLayerOnTimer,
 	"WelcomeOnTimer", WelcomeOnTimer,
 	"YX_MenuOnEnter", YX_MenuOnEnter,

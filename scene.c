@@ -138,6 +138,40 @@ extern void ScreenSetDoubleClick(void);
 //樱雪
 struct main_uart_chg g_main_uart_chg_data;
 
+
+//得到当前时间戳
+long get_rtc_time()
+{
+	struct timeval tv;
+	struct tm *tm;
+	struct tm mytime;
+	gettimeofday(&tv, NULL);
+	tm = localtime(&tv.tv_sec);
+	memcpy(&mytime, tm, sizeof(struct tm));
+	return mktime((struct tm*)&mytime);
+}
+
+//设置当前时间
+void set_rtc_time(unsigned char hour, unsigned char min)
+{
+	struct timeval tv;
+	struct tm *tm, mytime;
+	//设置时间
+	gettimeofday(&tv, NULL);
+	tm = localtime(&tv.tv_sec);
+	memcpy(&mytime, tm, sizeof(struct tm));
+	if (hour != -1){
+		mytime.tm_hour = hour; //小时
+	}
+	if (min != -1){
+		mytime.tm_min = min; //分
+	}
+	tv.tv_sec = mktime(&mytime);
+	tv.tv_usec = 0;
+	settimeofday(&tv, NULL);
+	return;
+}
+
 //点击上下键，回调函数
 //@param widget 点击空间
 //@param state 0向上 1向下
@@ -155,9 +189,8 @@ static void node_widget_up_down(struct node_widget *widget, unsigned char state)
 	//主页面上下调整温度
 	else if (yingxue_base.lock_state == 0 || yingxue_base.lock_state == 1){
 		//时间
-		gettimeofday(&yingxue_base.last_shezhi_tm, NULL);
+		yingxue_base.last_shezhi_tm.tv_sec = get_rtc_time();
 		yingxue_base.lock_state = 1;
-		
 		if (state == 0){
 			g_main_uart_chg_data.shezhi_temp = g_main_uart_chg_data.shezhi_temp + 1;
 		}
@@ -1761,6 +1794,14 @@ void process_frame(struct main_uart_chg *dst, const unsigned char *src)
 	}
 }
 
+unsigned char test_buf[68] = {
+	//[0][0] //[0][1]                                                 //erno
+	0xEA, 0x1B, 0x10, 0x4D, 0x00, 0x00, 0x00, 0x2D, 0x10, 0x00, 0x00, 0x00, 0x41, 0x00, 0x00, 0x79, 0x53,
+	0xEA, 0x1B, 0x11, 0x01, 0x00, 0x00, 0x00, 0x1E, 0x0A, 0x2A, 0x28, 0x26, 0x2A, 0x00, 0x00, 0x48, 0x35,
+	0xEA, 0x1B, 0x12, 0x00, 0xCD, 0x80, 0x9E, 0x1E, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x03, 0x05, 0x4B,
+	0xEA, 0x1B, 0x13, 0x00, 0x00, 0x05, 0x40, 0x50, 0x00, 0xF0, 0x00, 0x00, 0x00, 0x00, 0x00, 0xBE, 0x5F,
+};
+
 #ifdef _WIN32
 //win虚拟机测试
 static unsigned char win_test()
@@ -1772,13 +1813,7 @@ static unsigned char win_test()
 
 	static int idx;
 	unsigned char res;
-	unsigned char test_buf[68] = {
-		                  //[0][0] //[0][1]                                       //erno
-		0xEA, 0x1B, 0x10, 0x4D,    0x04,      0x00, 0x00, 0x2D, 0x10, 0x00, 0x00, 0xe1, 0x41, 0x00, 0x00, 0x79, 0x53,
-		0xEA, 0x1B, 0x11, 0x01, 0x00, 0x00, 0x00, 0x1E, 0x0A, 0x2A, 0x28, 0x26, 0x2A, 0x00, 0x00, 0x48, 0x35,
-		0xEA, 0x1B, 0x12, 0x00, 0xCD, 0x80, 0x9E, 0x1E, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x03, 0x05, 0x4B,
-		0xEA, 0x1B, 0x13, 0x00, 0x00, 0x05, 0x40, 0x50, 0x00, 0xF0, 0x00, 0x00, 0x00, 0x00, 0x00, 0xBE, 0x5F,
-	};
+
 	res = test_buf[idx++];
 	if (idx == 68){
 		idx = 0;
@@ -1998,7 +2033,7 @@ int SceneRun(void)
 			else if (g_main_uart_chg_data.err_no == 0xfd){
 				ituLayerGoto(ituSceneFindWidget(&theScene, "H1Layer"));
 			}
-			else if (g_main_uart_chg_data.err_no == 0xec){
+			else{
 				ituLayerGoto(ituSceneFindWidget(&theScene, "ECLayer"));
 			}
 			
@@ -2062,6 +2097,17 @@ int SceneRun(void)
 				case SDLK_UP:
 					gettimeofday(&last_tm, NULL);
 					curr_node_widget->updown_cb(curr_node_widget, 0);
+					break;
+				case SDL_SCANCODE_BACKSLASH:
+					test_buf[11] = 0xe1;
+					test_buf[4] = 0x04;
+					printf("win1 send data\n");
+					break;
+
+				case SDL_SCANCODE_NONUSHASH:
+					test_buf[11] = 0x00;
+					test_buf[4] = 0x00;
+					printf("win2 send data\n");
 					break;
 				case 1073741889:
 					//case SDLK_DOWN:

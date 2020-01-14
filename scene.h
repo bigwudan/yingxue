@@ -323,6 +323,13 @@ extern "C" {
 	//crc效验
 	unsigned short crc16_ccitt(const char *buf, int len);
 
+	//得到当前时间戳
+	long get_rtc_time();
+
+	//设置当前时间
+	void set_rtc_time(unsigned char hour, unsigned char min);
+
+
 #define LOG_WRITE_UART(arr) do{\
 								for(int i=0; i<11;i++) \
 									printf("%02X ", arr[i]);\
