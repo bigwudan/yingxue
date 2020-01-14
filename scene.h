@@ -323,6 +323,11 @@ extern "C" {
 	//crc效验
 	unsigned short crc16_ccitt(const char *buf, int len);
 
+#define LOG_WRITE_UART(arr) do{\
+								for(int i=0; i<11;i++) \
+									printf("%02X ", arr[i]);\
+							}while(0)
+
 #ifdef __cplusplus
 }
 #endif

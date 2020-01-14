@@ -794,7 +794,7 @@ bool WelcomeOnTimer(ITUWidget* widget, char* param)
 {
 	//上电，等待2秒
 	if (yingxue_base.run_state == 0 || yingxue_base.run_state == 1){
-		sleep(1);
+		sleep(2);
 		ituLayerGoto(ituSceneFindWidget(&theScene, "MainLayer"));
 		//发送开机
 		//改变状态开机
@@ -854,17 +854,12 @@ bool MainLayerOnTimer(ITUWidget* widget, char* param)
 
 	//加锁
 	pthread_mutex_lock(&msg_mutex);
-	/*g_main_uart_chg_data.water_show = 1;
-	g_main_uart_chg_data.fire_show = 1;
-	g_main_uart_chg_data.wind_show = 1;*/
-	g_main_uart_chg_data.state_show = 0xff;
 	//显示出水温度
-	if (g_main_uart_chg_data.chushui_temp){
-		sprintf(t_buf, "%d", g_main_uart_chg_data.chushui_temp);
-		t_widget = ituSceneFindWidget(&theScene, "Text17");
-		ituTextSetString(t_widget, t_buf);
+	sprintf(t_buf, "%d", g_main_uart_chg_data.chushui_temp);
+	t_widget = ituSceneFindWidget(&theScene, "Text17");
+	ituTextSetString(t_widget, t_buf);
 
-	}
+	
 
 
 	//Background34

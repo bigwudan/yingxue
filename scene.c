@@ -1670,6 +1670,8 @@ process_data(struct uart_data_tag *dst, struct chain_list_tag *p_chain_list)
 				else{
 					flag = 1;
 				}
+				//测试方便去掉crc
+				flag = 0;
 				//如果出错
 				if (flag == 1){
 					dst->state = 1;
@@ -1705,24 +1707,27 @@ void process_frame(struct main_uart_chg *dst, const unsigned char *src)
 		//[0][1]
 		//得到主机状态
 		dst->machine_state = *src & 0x03;
-
 		//判断是否故障
-		dst->is_err = *src & 0x04;
-
+		if ((*src & 0x04) == 0){
+			dst->is_err = 0;
+		}
+		else{
+			dst->is_err = 1;
+		}
 		//判断状态 流水
 		if (*src & 0x10){
 			dst->state_show = 0x01;
 			//风机
 		}
-		else if (*src & 0x20){
+		if (*src & 0x20){
 			dst->state_show = dst->state_show | 0x2;
 			//火焰
 		}
-		else if (*src & 0x40){
+		if (*src & 0x40){
 			dst->state_show = dst->state_show | 0x4;
 			//风压
 		}
-		else if (*src & 80){
+		if (*src & 0x80){
 			dst->state_show = dst->state_show | 0x8;
 		}
 
@@ -1739,25 +1744,48 @@ void process_frame(struct main_uart_chg *dst, const unsigned char *src)
 		//错误代码或者比例阀电流
 		src++;
 		dst->err_no = *src++;
-
-		printf("frame 00\n");
 		//第1帧
 	}
 	else if ((*src & 0x0f) == 0x01){
-		printf("frame 01\n");
+		
 
 		//第2帧
 	}
 	else if ((*src & 0x0f) == 0x02){
-		printf("frame 02\n");
+		
 
 	}
 	else if ((*src & 0x0f) == 0x03){
-		printf("frame 03\n");
+		
 
 	}
 }
 
+#ifdef _WIN32
+//win虚拟机测试
+static unsigned char win_test()
+{
+	/*  0xEA, 0x1B, 0x10, 0x4D, 0x00, 0x00, 0x00, 0x2D, 0x00, 0x00, 0x00, 0x00, 0x41, 0x00, 0x00, 0x79, 0x53,
+		0xEA, 0x1B, 0x11, 0x01, 0x00, 0x00, 0x00, 0x1E, 0x0A, 0x2A, 0x28, 0x26, 0x2A, 0x00, 0x00, 0x48, 0x35,
+		0xEA, 0x1B, 0x12, 0x00, 0xCD, 0x80, 0x9E, 0x1E, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x03, 0x05, 0x4B,
+		0xEA, 0x1B, 0x13, 0x00, 0x00, 0x05, 0x40, 0x50, 0x00, 0xF0, 0x00, 0x00, 0x00, 0x00, 0x00, 0xBE, 0x5F,*/
+
+	static int idx;
+	unsigned char res;
+	unsigned char test_buf[68] = {
+		                  //[0][0] //[0][1]                                       //erno
+		0xEA, 0x1B, 0x10, 0x4D,    0x04,      0x00, 0x00, 0x2D, 0x10, 0x00, 0x00, 0xe1, 0x41, 0x00, 0x00, 0x79, 0x53,
+		0xEA, 0x1B, 0x11, 0x01, 0x00, 0x00, 0x00, 0x1E, 0x0A, 0x2A, 0x28, 0x26, 0x2A, 0x00, 0x00, 0x48, 0x35,
+		0xEA, 0x1B, 0x12, 0x00, 0xCD, 0x80, 0x9E, 0x1E, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x03, 0x05, 0x4B,
+		0xEA, 0x1B, 0x13, 0x00, 0x00, 0x05, 0x40, 0x50, 0x00, 0xF0, 0x00, 0x00, 0x00, 0x00, 0x00, 0xBE, 0x5F,
+	};
+	res = test_buf[idx++];
+	if (idx == 68){
+		idx = 0;
+	}
+	return res;
+}
+#endif
 
 //线程串口回调函数
 static void* UartFunc(void* arg)
@@ -1777,10 +1805,17 @@ static void* UartFunc(void* arg)
 	struct tm *tm_t;
 	while (1){
 		memset(getstr1, 0, sizeof(getstr1));
+//如果是win虚拟测试
+#ifdef _WIN32
+		len = 1;
+		getstr1[0] = win_test();
+#else
 		len = read(TEST_PORT, getstr1, sizeof(getstr1));
+#endif
+
 		//如果串口有数据
 		if (len > 0){
-			printf("buf=%02X\n", getstr1[0]);
+			//printf("buf=%02X\n", getstr1[0]);
 			//写入环形缓存
 			for (int i = 0; i < len; i++){
 				flag = in_chain_list(&chain_list, getstr1[i]);
@@ -1788,8 +1823,6 @@ static void* UartFunc(void* arg)
 			process_data(&uart_data, &chain_list);
 			//已经完成
 			if (uart_data.state == 2){
-				
-				printf("\nfinish \n");
 				is_has = 0;
 				uart_data.state = 0;
 				uart_data.count = 0;
@@ -1841,10 +1874,13 @@ static void* UartFunc(void* arg)
 				}
 				//如果有指令需要发出
 				if (is_has){
+					LOG_WRITE_UART(texBufArray);
+					printf("\n");
 					write(TEST_PORT, texBufArray, sizeof(texBufArray));
 				}
 				//没有指令就应答
 				else{
+					//LOG_WRITE_UART(backBufArray);
 					write(TEST_PORT, backBufArray, sizeof(texBufArray));
 				}
 			}
@@ -1929,9 +1965,9 @@ int SceneRun(void)
 	{
 		bool result = false;
 		//樱雪
+
 		//判断是否有错误代码
 		if (g_main_uart_chg_data.is_err){
-			printf("误差");
 			if (g_main_uart_chg_data.err_no == 0xe0){
 				ituLayerGoto(ituSceneFindWidget(&theScene, "E0Layer"));
 			}
@@ -1965,8 +2001,7 @@ int SceneRun(void)
 			else if (g_main_uart_chg_data.err_no == 0xec){
 				ituLayerGoto(ituSceneFindWidget(&theScene, "ECLayer"));
 			}
-
-			continue;
+			
 		}
 
 
@@ -1977,7 +2012,7 @@ int SceneRun(void)
 		if (buf_tm.tv_sec > last_tm.tv_sec + 5){
 			memcpy(&last_tm, &buf_tm, sizeof(struct timeval));
 			//strcmp
-			if (strcmp(curr_node_widget->name, "BackgroundButton3") != 0 ){
+			if (g_main_uart_chg_data.is_err == 1 || strcmp(curr_node_widget->name, "BackgroundButton3") != 0 ){
 				ituLayerGoto(ituSceneFindWidget(&theScene, "MainLayer"));
 				continue;
 			}
