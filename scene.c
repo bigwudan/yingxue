@@ -1868,8 +1868,6 @@ int SceneRun(void)
 	ioctl(TEST_PORT, ITP_IOCTL_INIT, NULL);
 	ioctl(TEST_PORT, ITP_IOCTL_RESET, (void *)CFG_UART3_BAUDRATE);
 #endif
-	//测试
-
 
 	//最后一次按键的时间
 	static struct timeval last_tm;
@@ -1931,6 +1929,47 @@ int SceneRun(void)
 	{
 		bool result = false;
 		//樱雪
+		//判断是否有错误代码
+		if (g_main_uart_chg_data.is_err){
+			printf("误差");
+			if (g_main_uart_chg_data.err_no == 0xe0){
+				ituLayerGoto(ituSceneFindWidget(&theScene, "E0Layer"));
+			}
+			else if (g_main_uart_chg_data.err_no == 0xe1){
+				ituLayerGoto(ituSceneFindWidget(&theScene, "E1Layer"));
+			}
+			else if (g_main_uart_chg_data.err_no == 0xe2){
+				ituLayerGoto(ituSceneFindWidget(&theScene, "E2Layer"));
+			}
+			else if (g_main_uart_chg_data.err_no == 0xe3){
+				ituLayerGoto(ituSceneFindWidget(&theScene, "E3Layer"));
+			}
+			else if (g_main_uart_chg_data.err_no == 0xe4){
+				ituLayerGoto(ituSceneFindWidget(&theScene, "E4Layer"));
+			}
+			else if (g_main_uart_chg_data.err_no == 0xe5){
+				ituLayerGoto(ituSceneFindWidget(&theScene, "E5Layer"));
+			}
+			else if (g_main_uart_chg_data.err_no == 0xe6){
+				ituLayerGoto(ituSceneFindWidget(&theScene, "E6Layer"));
+			}
+			else if (g_main_uart_chg_data.err_no == 0xe7){
+				ituLayerGoto(ituSceneFindWidget(&theScene, "E7Layer"));
+			}
+			else if (g_main_uart_chg_data.err_no == 0xe8){
+				ituLayerGoto(ituSceneFindWidget(&theScene, "E8Layer"));
+			}
+			else if (g_main_uart_chg_data.err_no == 0xfd){
+				ituLayerGoto(ituSceneFindWidget(&theScene, "H1Layer"));
+			}
+			else if (g_main_uart_chg_data.err_no == 0xec){
+				ituLayerGoto(ituSceneFindWidget(&theScene, "ECLayer"));
+			}
+
+			continue;
+		}
+
+
 		//缓存时间
 		gettimeofday(&buf_tm, NULL);
 		
